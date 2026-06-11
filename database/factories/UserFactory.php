@@ -30,6 +30,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'role' => 'student',
         ];
     }
 
@@ -44,7 +45,37 @@ class UserFactory extends Factory
     }
 
     /**
+     * Indicate that the model is an administrator.
+     */
+    public function administrator(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'administrator',
+        ]);
+    }
+
+    /**
+     * Indicate that the model is an educator.
+     */
+    public function educator(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'educator',
+        ]);
+    }
+
+    /**
+     * Indicate that the model is a student.
+     */
+    public function student(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'student',
+        ]);
+    }
+
+    /**
      * Indicate that the model has two-factor authentication configured.
      */
-    public function withTwoFactor(): static {}
+    // public function withTwoFactor(): static {}
 }

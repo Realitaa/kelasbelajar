@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import {
     SidebarGroup,
     SidebarGroupLabel,
@@ -14,21 +14,24 @@ defineProps<{
     items: NavItem[];
 }>();
 
+const userRole = usePage().props.auth.user.role;
+
 const { isCurrentUrl } = useCurrentUrl();
 </script>
 
 <template>
     <SidebarGroup class="px-2 py-0">
-        <SidebarGroupLabel>Platform</SidebarGroupLabel>
+        <SidebarGroupLabel v-if="userRole === 'admin'">Akses Administrator</SidebarGroupLabel>
         <SidebarMenu>
             <SidebarMenuItem v-for="item in items" :key="item.title">
                 <SidebarMenuButton
                     as-child
+                    size="lg"
                     :is-active="isCurrentUrl(item.href)"
                     :tooltip="item.title"
                 >
                     <Link :href="item.href">
-                        <component :is="item.icon" />
+                        <component :is="item.icon" class="ml-1 size-5!" />
                         <span>{{ item.title }}</span>
                     </Link>
                 </SidebarMenuButton>

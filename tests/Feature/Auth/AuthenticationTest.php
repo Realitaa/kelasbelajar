@@ -10,16 +10,42 @@ test('login screen can be rendered', function () {
     $response->assertOk();
 });
 
-test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create();
+describe('authenticated users', function () {
+    it('redirects administrators to dashboard page', function () {
+        $user = User::factory()->administrator()->create();
 
-    $response = $this->post(route('login.store'), [
-        'email' => $user->email,
-        'password' => 'password',
-    ]);
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
 
-    $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('dashboard'));
+    });
+
+    it('redirects educators to classroom management page', function () {
+        $user = User::factory()->educator()->create();
+
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('classrooms.index'));
+    });
+
+    it('redirects students to classroom page', function () {
+        $user = User::factory()->student()->create();
+
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('classrooms.index'));
+    });
 });
 
 test('users with two factor enabled are redirected to two factor challenge', function () {
