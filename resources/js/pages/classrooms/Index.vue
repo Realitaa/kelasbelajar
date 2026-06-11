@@ -78,12 +78,15 @@ const confirmDelete = (id: number) => {
 
 const executeDelete = () => {
     if (classroomToDelete.value) {
-        router.delete(ClassroomController.destroy.url(classroomToDelete.value), {
-            onSuccess: () => {
-                isDeleteDialogOpen.value = false;
-                classroomToDelete.value = null;
+        router.delete(
+            ClassroomController.destroy.url(classroomToDelete.value),
+            {
+                onSuccess: () => {
+                    isDeleteDialogOpen.value = false;
+                    classroomToDelete.value = null;
+                },
             },
-        });
+        );
     }
 };
 
@@ -119,18 +122,24 @@ defineOptions({
                 :links="{
                     title: 'Buat Kelas Baru',
                     onClick: openCreateDialog,
-                    icon: Plus
+                    icon: Plus,
                 }"
             />
 
             <!-- Main Content Grid / Empty State -->
-            <div v-if="classrooms.length === 0" class="flex flex-col items-center justify-center rounded-xl border border-dashed p-16 text-center shadow-xs bg-card/50 backdrop-blur-xs animate-in fade-in duration-500">
+            <div
+                v-if="classrooms.length === 0"
+                class="flex animate-in flex-col items-center justify-center rounded-xl border border-dashed bg-card/50 p-16 text-center shadow-xs backdrop-blur-xs duration-500 fade-in"
+            >
                 <div class="rounded-full bg-primary/15 p-5 text-primary">
                     <BookOpen class="h-12 w-12" />
                 </div>
-                <h3 class="mt-6 text-xl font-bold tracking-tight">Belum Ada Kelas</h3>
-                <p class="mt-2 text-sm text-muted-foreground max-w-sm">
-                    Anda belum membuat kelas apapun. Mulai buat kelas pertama Anda dan bagikan kodenya kepada murid.
+                <h3 class="mt-6 text-xl font-bold tracking-tight">
+                    Belum Ada Kelas
+                </h3>
+                <p class="mt-2 max-w-sm text-sm text-muted-foreground">
+                    Anda belum membuat kelas apapun. Mulai buat kelas pertama
+                    Anda dan bagikan kodenya kepada murid.
                 </p>
                 <Button @click="openCreateDialog" class="mt-6 gap-2">
                     <Plus class="h-4 w-4" />
@@ -138,7 +147,10 @@ defineOptions({
                 </Button>
             </div>
 
-            <div v-else class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div
+                v-else
+                class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            >
                 <ClassroomCard
                     v-for="classroom in classrooms"
                     :key="classroom.id"
@@ -155,9 +167,15 @@ defineOptions({
         <Dialog v-model:open="isDialogOpen">
             <DialogContent class="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>{{ isEditing ? 'Edit Kelas' : 'Buat Kelas Baru' }}</DialogTitle>
+                    <DialogTitle>{{
+                        isEditing ? 'Edit Kelas' : 'Buat Kelas Baru'
+                    }}</DialogTitle>
                     <DialogDescription>
-                        {{ isEditing ? 'Perbarui informasi kelas Anda di bawah ini.' : 'Isi formulir berikut untuk membuat kelas baru.' }}
+                        {{
+                            isEditing
+                                ? 'Perbarui informasi kelas Anda di bawah ini.'
+                                : 'Isi formulir berikut untuk membuat kelas baru.'
+                        }}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -181,7 +199,7 @@ defineOptions({
                             v-model="form.description"
                             rows="4"
                             placeholder="Deskripsi singkat mengenai kelas ini..."
-                            class="placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive"
+                            class="w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:aria-invalid:ring-destructive/40"
                         ></textarea>
                         <InputError :message="form.errors.description" />
                     </div>
@@ -204,21 +222,27 @@ defineOptions({
         <Dialog v-model:open="isDeleteDialogOpen">
             <DialogContent class="sm:max-w-[400px]">
                 <DialogHeader>
-                    <DialogTitle class="text-destructive flex items-center gap-2">
+                    <DialogTitle
+                        class="flex items-center gap-2 text-destructive"
+                    >
                         <AlertTriangle class="h-5 w-5" />
                         Hapus Kelas
                     </DialogTitle>
                     <DialogDescription>
-                        Apakah Anda yakin ingin menghapus kelas ini? Tindakan ini tidak dapat dibatalkan dan semua data terkait akan dihapus.
+                        Apakah Anda yakin ingin menghapus kelas ini? Tindakan
+                        ini tidak dapat dibatalkan dan semua data terkait akan
+                        dihapus.
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter class="mt-4 gap-2 sm:justify-end">
                     <DialogClose as-child>
-                        <Button type="button" variant="outline">
-                            Batal
-                        </Button>
+                        <Button type="button" variant="outline"> Batal </Button>
                     </DialogClose>
-                    <Button type="button" variant="destructive" @click="executeDelete">
+                    <Button
+                        type="button"
+                        variant="destructive"
+                        @click="executeDelete"
+                    >
                         Ya, Hapus
                     </Button>
                 </DialogFooter>

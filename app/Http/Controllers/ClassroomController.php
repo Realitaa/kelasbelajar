@@ -117,4 +117,18 @@ class ClassroomController extends Controller
 
         return redirect()->back();
     }
+
+    /**
+     * Display the classroom manage page with loaded modules.
+     */
+    public function manage(Classroom $classroom): Response
+    {
+        Gate::authorize('update', $classroom);
+
+        $classroom->load(['modules.objects.object']);
+
+        return Inertia::render('classrooms/Manage', [
+            'classroom' => $classroom,
+        ]);
+    }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ClassroomController;
+use App\Http\Controllers\ClassroomModuleController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -10,4 +11,11 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('classrooms/{classroom}', [ClassroomController::class, 'destroy'])->name('classrooms.destroy');
     Route::post('classrooms/{classroom}/publish', [ClassroomController::class, 'publish'])->name('classrooms.publish');
     Route::post('classrooms/{classroom}/unpublish', [ClassroomController::class, 'unpublish'])->name('classrooms.unpublish');
+    Route::get('classrooms/{classroom:slug}/manage', [ClassroomController::class, 'manage'])->name('classrooms.manage');
+
+    Route::post('classrooms/{classroom:slug}/modules', [ClassroomModuleController::class, 'store'])->name('classrooms.modules.store');
+    Route::put('classrooms/{classroom:slug}/modules/{module}', [ClassroomModuleController::class, 'update'])->name('classrooms.modules.update');
+    Route::delete('classrooms/{classroom:slug}/modules/{module}', [ClassroomModuleController::class, 'destroy'])->name('classrooms.modules.destroy');
+    Route::post('classrooms/{classroom:slug}/modules/reorder', [ClassroomModuleController::class, 'reorder'])->name('classrooms.modules.reorder');
+    Route::post('classrooms/{classroom:slug}/objects/reorder', [ClassroomModuleController::class, 'reorderObjects'])->name('classrooms.objects.reorder');
 });

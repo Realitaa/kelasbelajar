@@ -42,6 +42,16 @@ class Classroom extends Model
     }
 
     /**
+     * Get the modules for the classroom.
+     *
+     * @return HasMany<ClassroomModule, $this>
+     */
+    public function modules(): HasMany
+    {
+        return $this->hasMany(ClassroomModule::class)->orderBy('position');
+    }
+
+    /**
      * Get the educator that owns the classroom.
      *
      * @return BelongsTo<User, $this>

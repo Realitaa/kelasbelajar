@@ -24,29 +24,38 @@ const normalizedLinks = computed(() => {
     if (!props.links) {
         return [];
     }
-    
+
     return Array.isArray(props.links) ? props.links : [props.links];
 });
 </script>
 
 <template>
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div
+        class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+    >
         <div class="flex flex-col gap-1">
             <h1 class="text-3xl font-extrabold tracking-tight">{{ title }}</h1>
             <p v-if="description" class="text-sm text-muted-foreground">
                 {{ description }}
             </p>
         </div>
-        <div v-if="normalizedLinks.length" class="flex flex-wrap gap-2 items-center">
+        <div
+            v-if="normalizedLinks.length"
+            class="flex flex-wrap items-center gap-2"
+        >
             <template v-for="(link, index) in normalizedLinks" :key="index">
                 <!-- If it has an onClick, render as a button executing that click -->
                 <Button
                     v-if="link.onClick"
                     v-bind="link"
                     @click="link.onClick"
-                    class="w-full sm:w-auto gap-2"
+                    class="w-full gap-2 sm:w-auto"
                 >
-                    <component v-if="link.icon" :is="link.icon" class="h-4 w-4" />
+                    <component
+                        v-if="link.icon"
+                        :is="link.icon"
+                        class="h-4 w-4"
+                    />
                     {{ link.title || link.label }}
                 </Button>
                 <!-- If it has a 'to' prop, render as an Inertia link inside Button -->
@@ -54,10 +63,14 @@ const normalizedLinks = computed(() => {
                     v-else-if="link.to"
                     as-child
                     v-bind="link"
-                    class="w-full sm:w-auto gap-2"
+                    class="w-full gap-2 sm:w-auto"
                 >
                     <Link :href="link.to">
-                        <component v-if="link.icon" :is="link.icon" class="h-4 w-4" />
+                        <component
+                            v-if="link.icon"
+                            :is="link.icon"
+                            class="h-4 w-4"
+                        />
                         {{ link.title || link.label }}
                     </Link>
                 </Button>

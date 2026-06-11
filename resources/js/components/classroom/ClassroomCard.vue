@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAppearance } from '@/composables/useAppearance';
+import { manage } from '@/routes/classrooms';
 import type { Classroom } from '@/types';
 
 defineProps<{
@@ -48,7 +49,9 @@ function copyClassroomCode(code: string) {
             ></div>
             <!-- Status Badge -->
             <div class="absolute top-3 left-3 z-10">
-                <Badge :variant="classroom.is_published ? 'default' : 'secondary'">
+                <Badge
+                    :variant="classroom.is_published ? 'default' : 'secondary'"
+                >
                     {{ classroom.is_published ? 'Terpublikasi' : 'Draf' }}
                 </Badge>
             </div>
@@ -70,7 +73,7 @@ function copyClassroomCode(code: string) {
         <!-- Content Area -->
         <div class="flex flex-1 flex-col p-6 pt-2">
             <div class="mb-4">
-                <Link href="#">
+                <Link :href="manage(classroom.slug)">
                     <h3
                         class="line-clamp-1 text-xl font-bold tracking-tight transition-colors group-hover:text-primary hover:underline"
                     >
@@ -82,9 +85,7 @@ function copyClassroomCode(code: string) {
                     title="Salin kode kelas"
                     class="line-clamp-1 flex cursor-pointer items-center gap-2 font-mono text-xs font-medium tracking-wider text-muted-foreground"
                 >
-                    <span>
-                        Kode: {{ classroom.unique_code }}
-                    </span>
+                    <span> Kode: {{ classroom.unique_code }} </span>
                     <Button
                         variant="ghost"
                         size="icon"
@@ -96,7 +97,10 @@ function copyClassroomCode(code: string) {
             </div>
 
             <p class="line-clamp-2 min-h-10 text-sm text-muted-foreground">
-                {{ classroom.description || 'Tidak ada deskripsi untuk kelas ini.' }}
+                {{
+                    classroom.description ||
+                    'Tidak ada deskripsi untuk kelas ini.'
+                }}
             </p>
 
             <!-- Actions Area (Footer) -->
