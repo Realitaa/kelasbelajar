@@ -81,6 +81,7 @@ function handleReturnManage() {
                         ref="contentEditorRef"
                         :learning-content="activeContent?.object"
                         :classroom-slug="classroom.slug"
+                        :is-educator="true"
                     />
                 </div>
 

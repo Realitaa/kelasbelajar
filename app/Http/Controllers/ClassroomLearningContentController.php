@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateLearningContentRequest;
 use App\Models\Classroom;
 use App\Models\LearningContent;
+use App\Services\LearningContentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,17 +26,17 @@ class ClassroomLearningContentController extends Controller
         ]);
     }
 
-    public function updateContent(Request $request, Classroom $classroom, LearningContent $learningContent): RedirectResponse
+    public function updateContent(UpdateLearningContentRequest $request, Classroom $classroom, LearningContent $learningContent, LearningContentService $learningContentService): RedirectResponse
     {
         Gate::authorize('update', $classroom);
 
-        $validated = $request->validate([
-            'content' => 'present',
-        ]);
+        $validated = $request->validated();
 
         $learningContent->update([
             'content' => $validated['content'],
         ]);
+
+        $learningContentService->promoteMediaFromContent($learningContent, $validated['content']);
 
         Inertia::flash('toast', [
             'type' => 'success',

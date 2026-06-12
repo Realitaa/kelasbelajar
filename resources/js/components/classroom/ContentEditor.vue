@@ -10,6 +10,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 const props = defineProps<{
     learningContent: any;
     classroomSlug: string;
+    isEducator?: boolean;
 }>();
 
 const isLoading = ref(false);
@@ -137,7 +138,7 @@ onBeforeUnmount(() => {
             
             <div class="flex-1 min-h-0 overflow-hidden relative p-4">
                 <div v-show="activeTab === 'editor'" class="h-full">
-                    <RichEditor v-model="content" class="h-full" />
+                    <RichEditor v-model="content" :is-educator="isEducator" class="h-full" />
                 </div>
                 
                 <div v-show="activeTab === 'preview'" class="h-full overflow-y-auto bg-background border rounded-md p-6">

@@ -3,6 +3,7 @@
 use App\Models\Classroom;
 use App\Models\ClassroomModule;
 use App\Models\LearningContent;
+use App\Models\Media;
 use App\Models\ModuleObject;
 use App\Models\User;
 
@@ -130,5 +131,62 @@ test('teacher can update learning content json', function () {
     $this->assertDatabaseHas('learning_contents', [
         'id' => $content->id,
         'content' => json_encode($newContent),
+    ]);
+});
+
+test('teacher can update learning content and promote media', function () {
+    $teacher = User::factory()->create(['role' => 'educator']);
+    $classroom = Classroom::factory()->create(['educator_id' => $teacher->id]);
+    $content = LearningContent::factory()->create([
+        'title' => 'Some Content',
+        'created_by' => $teacher->id,
+        'content' => [],
+    ]);
+
+    // Create temporary media
+    $media = Media::factory()->create([
+        'status' => 'temporary',
+        'uploaded_by' => $teacher->id,
+    ]);
+
+    $newContent = [
+        'type' => 'doc',
+        'content' => [
+            [
+                'type' => 'image',
+                'attrs' => [
+                    'src' => '/files/'.$media->id,
+                ],
+            ],
+            [
+                'type' => 'slideshow',
+                'attrs' => [
+                    'images' => [
+                        ['id' => $media->id, 'url' => '/files/'.$media->id],
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+    $response = $this->actingAs($teacher)->put(route('classrooms.learning-contents.update-content', [
+        'classroom' => $classroom->slug,
+        'learningContent' => $content->id,
+    ]), [
+        'content' => $newContent,
+    ]);
+
+    $response->assertRedirect();
+
+    $this->assertDatabaseHas('learning_contents', [
+        'id' => $content->id,
+        'content' => json_encode($newContent),
+    ]);
+
+    $this->assertDatabaseHas('media', [
+        'id' => $media->id,
+        'status' => 'attached',
+        'fileable_type' => LearningContent::class,
+        'fileable_id' => $content->id,
     ]);
 });

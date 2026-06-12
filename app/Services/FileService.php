@@ -45,9 +45,16 @@ class FileService
     /**
      * Promote a temporary file to an attached file and link it to a parent model.
      */
-    public function promote(Media $media, Model $model): Media
+    public function promote(Media $media, Model $model, string $folder = 'images'): Media
     {
+        $newPath = $folder.'/'.$media->filename;
+
+        if (Storage::disk($media->disk)->exists($media->path)) {
+            Storage::disk($media->disk)->move($media->path, $newPath);
+        }
+
         $media->status = 'attached';
+        $media->path = $newPath;
         $media->fileable_type = get_class($model);
         $media->fileable_id = $model->getKey();
         $media->save();

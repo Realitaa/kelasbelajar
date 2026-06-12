@@ -1,36 +1,102 @@
 <script setup lang="ts">
+import Image from '@tiptap/extension-image';
+import { Mathematics } from '@tiptap/extension-mathematics';
+import Youtube from '@tiptap/extension-youtube';
 import { generateHTML } from '@tiptap/html';
 import StarterKit from '@tiptap/starter-kit';
-import { computed } from 'vue';
+import katex from 'katex';
+import { computed, ref, nextTick, watch, onMounted } from 'vue';
+import SlideshowPreview from './SlideshowPreview.vue';
 
 const props = defineProps<{
     content: any;
 }>();
 
-const htmlContent = computed(() => {
+const extensions = [
+    StarterKit,
+    Image.configure({ inline: true }),
+    Youtube.configure({ inline: false, width: 640, height: 480 }),
+    Mathematics.configure({ katexOptions: { throwOnError: false } })
+];
+
+const containerRef = ref<HTMLElement | null>(null);
+
+const blocks = computed(() => {
     if (!props.content) {
-        return '';
+        return [];
     }
 
     try {
         const json = typeof props.content === 'string' ? JSON.parse(props.content) : props.content;
         
-        // Return empty string if the json structure is empty/blank
         if (!json || (Object.keys(json).length === 0 && json.constructor === Object)) {
-            return '';
+            return [];
         }
-        
-        return generateHTML(json, [StarterKit]);
+
+        if (json.type === 'doc' && Array.isArray(json.content)) {
+            return json.content;
+        }
+
+        return [];
     } catch (error) {
-        console.error('Failed to generate HTML from Tiptap JSON', error);
+        console.error('Failed to parse Tiptap JSON', error);
+
+        return [];
+    }
+});
+
+function renderHtmlNode(node: any) {
+    try {
+        return generateHTML({ type: 'doc', content: [node] }, extensions);
+    } catch (error) {
+        console.error('Failed to generate HTML for node', error);
 
         return '';
     }
+}
+
+function renderMath() {
+    nextTick(() => {
+        if (!containerRef.value) {
+            return;
+        }
+        
+        const mathElements = containerRef.value.querySelectorAll('[data-latex]');
+        mathElements.forEach((el) => {
+            const latex = el.getAttribute('data-latex') || '';
+            const isBlock = el.getAttribute('data-type') === 'block-math';
+
+            try {
+                katex.render(latex, el as HTMLElement, {
+                    displayMode: isBlock,
+                    throwOnError: false,
+                });
+            } catch (error) {
+                console.error('KaTeX rendering error in preview', error);
+            }
+        });
+    });
+}
+
+watch(() => props.content, () => {
+    renderMath();
+}, { immediate: true, deep: true });
+
+onMounted(() => {
+    renderMath();
 });
 </script>
 
 <template>
-    <div class="tiptap-preview px-4 py-2" v-html="htmlContent"></div>
+    <div ref="containerRef" class="tiptap-preview px-4 py-2">
+        <template v-for="(node, index) in blocks" :key="index">
+            <SlideshowPreview v-if="node.type === 'slideshow'" :images="node.attrs?.images || []" />
+            <div v-else v-html="renderHtmlNode(node)"></div>
+        </template>
+        <div v-if="blocks.length === 0" class="text-muted-foreground italic text-sm text-center py-8">
+            Belum ada konten.
+        </div>
+    </div>
 </template>
 
 <style>
