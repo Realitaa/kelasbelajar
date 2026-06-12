@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\FileService;
 use Database\Factories\LearningContentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,6 +19,16 @@ class LearningContent extends Model
 {
     /** @use HasFactory<LearningContentFactory> */
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        static::deleting(function (LearningContent $learningContent) {
+            $fileService = app(FileService::class);
+            foreach ($learningContent->media as $media) {
+                $fileService->remove($media);
+            }
+        });
+    }
 
     protected function casts(): array
     {
@@ -40,5 +51,13 @@ class LearningContent extends Model
     public function moduleObjects(): MorphMany
     {
         return $this->morphMany(ModuleObject::class, 'object');
+    }
+
+    /**
+     * @return MorphMany<Media, $this>
+     */
+    public function media(): MorphMany
+    {
+        return $this->morphMany(Media::class, 'fileable');
     }
 }

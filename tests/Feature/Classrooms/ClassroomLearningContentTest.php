@@ -6,6 +6,7 @@ use App\Models\LearningContent;
 use App\Models\Media;
 use App\Models\ModuleObject;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 
 test('teacher can create learning content object in module', function () {
     $teacher = User::factory()->create(['role' => 'educator']);
@@ -189,4 +190,63 @@ test('teacher can update learning content and promote media', function () {
         'fileable_type' => LearningContent::class,
         'fileable_id' => $content->id,
     ]);
+});
+
+test('deleting a module object deletes its learning content and cleans up attached media files', function () {
+    Storage::fake('public');
+
+    $teacher = User::factory()->create(['role' => 'educator']);
+    $classroom = Classroom::factory()->create(['educator_id' => $teacher->id]);
+    $module = ClassroomModule::factory()->create(['classroom_id' => $classroom->id]);
+
+    $content = LearningContent::factory()->create([
+        'title' => 'Content with Media',
+        'created_by' => $teacher->id,
+        'content' => [],
+    ]);
+
+    $moduleObject = ModuleObject::factory()->create([
+        'module_id' => $module->id,
+        'object_id' => $content->id,
+        'object_type' => LearningContent::class,
+    ]);
+
+    // Create a physical file in fake storage
+    $filename = 'test-image.jpg';
+    $path = 'images/'.$filename;
+    Storage::disk('public')->put($path, 'dummy content');
+
+    // Create a media record associated with the learning content
+    $media = Media::factory()->create([
+        'disk' => 'public',
+        'path' => $path,
+        'filename' => $filename,
+        'status' => 'attached',
+        'fileable_type' => LearningContent::class,
+        'fileable_id' => $content->id,
+        'uploaded_by' => $teacher->id,
+    ]);
+
+    // Assert files exist before delete
+    Storage::disk('public')->assertExists($path);
+    $this->assertDatabaseHas('learning_contents', ['id' => $content->id]);
+    $this->assertDatabaseHas('media', ['id' => $media->id]);
+
+    // Delete the module object
+    $response = $this->actingAs($teacher)->delete(route('classrooms.objects.destroy', [
+        'classroom' => $classroom->slug,
+        'object' => $moduleObject->id,
+    ]));
+
+    $response->assertRedirect();
+
+    // Assert learning content and module object are deleted
+    $this->assertDatabaseMissing('learning_contents', ['id' => $content->id]);
+    $this->assertDatabaseMissing('module_objects', ['id' => $moduleObject->id]);
+
+    // Assert media record is deleted from DB
+    $this->assertDatabaseMissing('media', ['id' => $media->id]);
+
+    // Assert physical file is deleted from fake disk
+    Storage::disk('public')->assertMissing($path);
 });
