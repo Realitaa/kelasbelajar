@@ -2,8 +2,9 @@
 import { router, useHttp } from '@inertiajs/vue3';
 import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue';
 import { show, updateContent } from '@/actions/App/Http/Controllers/ClassroomLearningContentController';
+import PreviewRenderer from '@/components/PreviewRenderer.vue';
+import RichEditor from '@/components/RichEditor.vue';
 import { Button } from '@/components/ui/button';
-import Editor from '@/components/ui/editor/Editor.vue';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const props = defineProps<{
@@ -24,7 +25,7 @@ const isDirty = computed(() => {
 
 defineExpose({ isDirty });
 
-const activeTab = ref('editor');
+const activeTab = ref('preview');
 
 async function fetchContent() {
     if (!props.learningContent?.id) {
@@ -112,15 +113,15 @@ onBeforeUnmount(() => {
         </div>
         <div v-else class="flex flex-col h-full">
             <div class="flex items-center justify-between border-b border-border px-4 py-2 bg-muted/20">
-                <Tabs v-model="activeTab" class="w-[300px]">
+                <Tabs v-model="activeTab" class="w-50">
                     <TabsList class="grid w-full grid-cols-2">
-                        <TabsTrigger value="editor">
-                            <UIcon name="i-lucide-edit-3" class="size-4" />
-                            <span>Editor</span>
-                        </TabsTrigger>
                         <TabsTrigger value="preview">
                             <UIcon name="i-lucide-eye" class="size-4" />
                             <span>Pratinjau</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="editor">
+                            <UIcon name="i-lucide-edit-3" class="size-4" />
+                            <span>Editor</span>
                         </TabsTrigger>
                     </TabsList>
                 </Tabs>
@@ -136,12 +137,11 @@ onBeforeUnmount(() => {
             
             <div class="flex-1 min-h-0 overflow-hidden relative p-4">
                 <div v-show="activeTab === 'editor'" class="h-full">
-                    <Editor v-model="content" class="h-full border rounded-md" />
+                    <RichEditor v-model="content" class="h-full" />
                 </div>
                 
-                <div v-show="activeTab === 'preview'" class="h-full overflow-y-auto">
-                    <!-- Readonly mode for preview -->
-                    <Editor v-model="content" disabled class="h-full border rounded-md" />
+                <div v-show="activeTab === 'preview'" class="h-full overflow-y-auto bg-background border rounded-md p-6">
+                    <PreviewRenderer :content="content" />
                 </div>
             </div>
         </div>
