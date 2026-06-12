@@ -181,7 +181,7 @@ defineOptions({
 
                 <form @submit.prevent="submitForm" class="space-y-4 py-4">
                     <div class="grid gap-2">
-                        <Label for="title" important>Nama Kelas</Label>
+                        <Label for="title" required>Nama Kelas</Label>
                         <Input
                             id="title"
                             v-model="form.title"

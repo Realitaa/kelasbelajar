@@ -84,7 +84,7 @@ function closeModal() {
 
             <div class="grid gap-4 py-4">
                 <div class="grid gap-2">
-                    <Label htmlFor="image-file">File Gambar</Label>
+                    <Label htmlFor="image-file" required>File Gambar</Label>
                     <Input id="image-file" type="file" accept="image/*" @change="handleFileChange" />
                 </div>
                 <div v-if="http.processing" class="text-sm text-muted-foreground">

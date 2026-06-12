@@ -106,7 +106,7 @@ function closeModal() {
 
             <div class="grid gap-4 py-4">
                 <div class="grid gap-2">
-                    <Label for="latex-code">Formula LaTeX</Label>
+                    <Label for="latex-code" required>Formula LaTeX</Label>
                     <Textarea
                         id="latex-code"
                         placeholder="Contoh: \int_{a}^{b} x^2 \, dx = \frac{b^3 - a^3}{3}"
@@ -117,7 +117,7 @@ function closeModal() {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label>Gaya Tampilan</Label>
+                    <Label required>Gaya Tampilan</Label>
                     <RadioGroup v-model="isBlock" class="flex gap-4">
                         <div class="flex items-center space-x-2">
                             <RadioGroupItem value="true" id="math-block" />

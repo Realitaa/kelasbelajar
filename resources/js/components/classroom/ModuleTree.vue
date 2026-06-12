@@ -27,9 +27,10 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import type { Classroom } from '@/types';
 
 const props = defineProps<{
-    classroom: any;
+    classroom: Classroom;
     isManage?: boolean;
 }>();
 
@@ -626,7 +627,7 @@ function getContextMenuItems(item: any) {
 
                 <form @submit.prevent="submitModule" class="space-y-4">
                     <div class="grid gap-2">
-                        <Label>Judul Modul</Label>
+                        <Label required>Judul Modul</Label>
                         <Input
                             v-model="moduleForm.title"
                             placeholder="Contoh: Pengenalan Dasar"
@@ -670,7 +671,7 @@ function getContextMenuItems(item: any) {
 
                 <form @submit.prevent="submitObject" class="space-y-4">
                     <div class="grid gap-2">
-                        <Label>Judul</Label>
+                        <Label required>Judul</Label>
                         <Input
                             v-model="objectForm.title"
                             placeholder="Masukkan judul"
@@ -691,7 +692,7 @@ function getContextMenuItems(item: any) {
                         </div>
 
                         <div class="grid gap-2">
-                            <Label>Nilai Kelulusan (Minimum)</Label>
+                            <Label required>Nilai Kelulusan (Minimum)</Label>
                             <Input
                                 v-model="objectForm.passing_grade"
                                 type="number"

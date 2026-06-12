@@ -70,7 +70,7 @@ function closeModal() {
 
             <div class="grid gap-4 py-4">
                 <div class="grid gap-2">
-                    <Label for="youtube-url">Tautan YouTube</Label>
+                    <Label for="youtube-url" required>Tautan YouTube</Label>
                     <Input
                         id="youtube-url"
                         placeholder="Contoh: https://www.youtube.com/watch?v=dQw4w9WgXcQ"
