@@ -19,6 +19,13 @@ class LearningContent extends Model
     /** @use HasFactory<LearningContentFactory> */
     use HasFactory;
 
+    protected function casts(): array
+    {
+        return [
+            'content' => 'array',
+        ];
+    }
+
     /**
      * @return BelongsTo<User, $this>
      */

@@ -255,4 +255,20 @@ describe('Reordering Modules and Objects', function () {
             ->post(route('classrooms.objects.reorder', $classroom->slug), ['objects' => []])
             ->assertForbidden();
     });
+
+    it('validates module object reordering payload structure', function () {
+        $educator = User::factory()->create(['role' => 'educator']);
+        $classroom = Classroom::factory()->create(['educator_id' => $educator->id]);
+        $module = ClassroomModule::factory()->create(['classroom_id' => $classroom->id]);
+        $content = LearningContent::factory()->create();
+        $obj = $module->objects()->create(['object_id' => $content->id, 'object_type' => LearningContent::class, 'position' => 1]);
+
+        $this->actingAs($educator)
+            ->post(route('classrooms.objects.reorder', $classroom->slug), [
+                'objects' => [
+                    ['id' => $obj->id, 'classroom_module_id' => $module->id, 'position' => 1],
+                ],
+            ])
+            ->assertSessionHasErrors('objects.0.module_id');
+    });
 });

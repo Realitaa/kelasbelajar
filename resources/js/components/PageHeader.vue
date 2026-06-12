@@ -35,9 +35,11 @@ const normalizedLinks = computed(() => {
     >
         <div class="flex flex-col gap-1">
             <h1 class="text-3xl font-extrabold tracking-tight">{{ title }}</h1>
-            <p v-if="description" class="text-sm text-muted-foreground">
-                {{ description }}
-            </p>
+            <slot name="description">
+                <p v-if="description" class="text-md text-muted-foreground">
+                    {{ description }}
+                </p>
+            </slot>
         </div>
         <div
             v-if="normalizedLinks.length"

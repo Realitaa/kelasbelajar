@@ -5,12 +5,17 @@ import type { TreeItem } from '@nuxt/ui';
 import { ref, watch, computed } from 'vue';
 import { VueDraggable } from 'vue-draggable-plus';
 import {
-    store,
-    update,
-    destroy,
-    reorder,
-    reorderObjects,
+    store as storeModule,
+    update as updateModule,
+    destroy as destroyModule,
+    reorder as reorderModule,
+    reorderObjects as reorderObjects,
 } from '@/actions/App/Http/Controllers/ClassroomModuleController';
+import {
+    store as storeObject,
+    update as updateObject,
+    destroy as destroyObject,
+} from '@/actions/App/Http/Controllers/ModuleObjectController';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -25,9 +30,10 @@ import { Label } from '@/components/ui/label';
 
 const props = defineProps<{
     classroom: any;
+    isManage?: boolean;
 }>();
 
-const isManage = ref(true);
+const emit = defineEmits(['edit-content', 'return-manage']);
 const orderingMode = ref(false);
 
 // Local state for dragging
@@ -45,6 +51,37 @@ watch(
     },
     { immediate: true, deep: true },
 );
+
+const hasOrderingChanges = computed(() => {
+    if (!props.classroom?.modules) {
+        return false;
+    }
+
+    if (localModules.value.length !== props.classroom.modules.length) {
+        return true;
+    }
+
+    for (let i = 0; i < localModules.value.length; i++) {
+        if (localModules.value[i].id !== props.classroom.modules[i].id) {
+            return true;
+        }
+
+        const localObjects = localModules.value[i].objects || [];
+        const originalObjects = props.classroom.modules[i].objects || [];
+
+        if (localObjects.length !== originalObjects.length) {
+            return true;
+        }
+
+        for (let j = 0; j < localObjects.length; j++) {
+            if (localObjects[j].id !== originalObjects[j].id) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+});
 
 // Modal States
 const isModuleModalOpen = ref(false);
@@ -75,7 +112,7 @@ const reorderForm = useForm({
 
 const deleteForm = useForm({});
 
-// Modal Actions
+// Modal Actions for Module
 function openCreateModule() {
     moduleForm.reset();
     moduleForm.id = null;
@@ -91,14 +128,14 @@ function openEditModule(module: any) {
 
 function submitModule() {
     if (moduleForm.id) {
-        moduleForm.put(update([props.classroom.slug, moduleForm.id]).url, {
+        moduleForm.put(updateModule([props.classroom.slug, moduleForm.id]).url, {
             onSuccess: () => {
                 isModuleModalOpen.value = false;
                 moduleForm.reset();
             },
         });
     } else {
-        moduleForm.post(store(props.classroom.slug).url, {
+        moduleForm.post(storeModule(props.classroom.slug).url, {
             onSuccess: () => {
                 isModuleModalOpen.value = false;
                 moduleForm.reset();
@@ -107,6 +144,7 @@ function submitModule() {
     }
 }
 
+// Modal Actions for Object
 function openCreateObject(moduleId: number, type: 'learning_content' | 'quiz') {
     objectForm.reset();
     objectForm.id = null;
@@ -134,7 +172,7 @@ function openEditObject(objectItem: any) {
 function submitObject() {
     if (objectForm.id) {
         objectForm.put(
-            `/classrooms/${props.classroom.slug}/manage/objects/${objectForm.id}`,
+            updateObject([props.classroom.slug, objectForm.id]).url,
             {
                 onSuccess: () => {
                     isObjectModalOpen.value = false;
@@ -143,7 +181,7 @@ function submitObject() {
         );
     } else {
         objectForm.post(
-            `/classrooms/${props.classroom.slug}/manage/modules/${objectForm.module_id}/objects`,
+            storeObject([props.classroom.slug, objectForm.module_id!]).url,
             {
                 onSuccess: () => {
                     isObjectModalOpen.value = false;
@@ -153,6 +191,7 @@ function submitObject() {
     }
 }
 
+// Modal Action for deleting module and object
 function confirmDeleteModule(module: any) {
     itemToDelete.value = module;
     deleteTargetType.value = 'module';
@@ -174,7 +213,7 @@ function submitDelete() {
 
     if (deleteTargetType.value === 'module') {
         deleteForm.delete(
-            destroy([props.classroom.slug, itemToDelete.value.id]).url,
+            destroyModule([props.classroom.slug, itemToDelete.value.id]).url,
             {
                 onSuccess: () => {
                     isDeleteModalOpen.value = false;
@@ -185,7 +224,7 @@ function submitDelete() {
         );
     } else if (deleteTargetType.value === 'object') {
         deleteForm.delete(
-            `/classrooms/${props.classroom.slug}/manage/objects/${itemToDelete.value.id}`,
+            destroyObject([props.classroom.slug, itemToDelete.value.id]).url,
             {
                 onSuccess: () => {
                     isDeleteModalOpen.value = false;
@@ -197,6 +236,7 @@ function submitDelete() {
     }
 }
 
+// Function for saving order of module and object
 function saveOrder() {
     const mappedModules = localModules.value.map((m, index) => ({
         id: m.id,
@@ -209,7 +249,7 @@ function saveOrder() {
             m.objects.forEach((o: any, oIdx: number) => {
                 mappedObjects.push({
                     id: o.id,
-                    classroom_module_id: m.id,
+                    module_id: m.id,
                     position: oIdx + 1,
                 });
             });
@@ -218,7 +258,7 @@ function saveOrder() {
 
     // We have two endpoints in backend, let's call them sequentially using router.post
     router.post(
-        reorder(props.classroom.slug).url,
+        reorderModule(props.classroom.slug).url,
         { modules: mappedModules },
         {
             preserveScroll: true,
@@ -252,11 +292,11 @@ function cancelOrder() {
     }
 }
 
-// UTree formatting
+// UTree formatting 
 const treeItems = computed<TreeItem[]>(() => {
     if (!props.classroom?.modules) {
-return [];
-}
+        return [];
+    }
 
     return props.classroom.modules.map((m: any) => ({
         label: m.title,
@@ -275,19 +315,19 @@ return [];
 
 function getIcon(iconName?: string) {
     if (!iconName) {
-return 'i-lucide-file-text';
-}
+        return 'i-lucide-file-text';
+    }
 
     if (iconName.startsWith('heroicons:')) {
         const name = iconName.replace('heroicons:', '');
 
         if (name === 'light-bulb') {
-return 'i-lucide-lightbulb';
-}
+            return 'i-lucide-lightbulb';
+        }
 
         if (name === 'question-mark-circle') {
-return 'i-lucide-help-circle';
-}
+            return 'i-lucide-help-circle';
+        }
 
         return `i-lucide-${name}`;
     }
@@ -333,10 +373,15 @@ function getContextMenuItems(item: any) {
         return [
             [
                 {
-                    label: isQuiz ? 'Edit Kuis' : 'Edit Materi Pembelajaran',
+                    label: isQuiz ? 'Edit Pengaturan Kuis' : 'Ubah Nama Materi',
                     icon: isQuiz ? 'i-lucide-settings' : 'i-lucide-file-text',
                     onSelect: () => openEditObject(item.original),
                 },
+                ...(!isQuiz ? [{
+                    label: 'Edit Isi Materi',
+                    icon: 'i-lucide-edit',
+                    onSelect: () => emit('edit-content', item.original),
+                }] : []),
             ],
             [
                 {
@@ -352,7 +397,7 @@ function getContextMenuItems(item: any) {
 </script>
 
 <template>
-    <Card class="flex h-full w-full flex-col px-4 gap-0">
+    <Card class="flex h-full flex-col px-4 gap-0" :class="isManage ? 'w-full' : 'w-1/3'">
         <!-- Header -->
         <div
             class="mb-4 flex shrink-0 items-center justify-between border-b border-border pb-3"
@@ -398,6 +443,7 @@ function getContextMenuItems(item: any) {
                     <Button
                         @click="saveOrder"
                         :loading="reorderForm.processing"
+                        :disabled="!hasOrderingChanges"
                     >
                         <Check class="size-4" />
                         Simpan
@@ -409,8 +455,9 @@ function getContextMenuItems(item: any) {
                     <Button
                         variant="ghost"
                         size="icon"
+                        @click="emit('return-manage')"
                     >
-                        <X class="size-4" />
+                        <UIcon name="i-lucide-x" class="size-4" />
                     </Button>
                 </UTooltip>
             </template>

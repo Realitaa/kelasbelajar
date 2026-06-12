@@ -3,6 +3,8 @@
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\ClassroomModuleController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ModuleObjectController;
+use App\Http\Controllers\ClassroomLearningContentController;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('classrooms', [ClassroomController::class, 'index'])->name('classrooms.index');
@@ -18,4 +20,11 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('classrooms/{classroom:slug}/modules/{module}', [ClassroomModuleController::class, 'destroy'])->name('classrooms.modules.destroy');
     Route::post('classrooms/{classroom:slug}/modules/reorder', [ClassroomModuleController::class, 'reorder'])->name('classrooms.modules.reorder');
     Route::post('classrooms/{classroom:slug}/objects/reorder', [ClassroomModuleController::class, 'reorderObjects'])->name('classrooms.objects.reorder');
+
+    Route::post('classrooms/{classroom:slug}/manage/modules/{module}/objects', [ModuleObjectController::class, 'store'])->name('classrooms.objects.store');
+    Route::put('classrooms/{classroom:slug}/manage/objects/{object}', [ModuleObjectController::class, 'update'])->name('classrooms.objects.update');
+    Route::delete('classrooms/{classroom:slug}/manage/objects/{object}', [ModuleObjectController::class, 'destroy'])->name('classrooms.objects.destroy');
+
+    Route::get('classrooms/{classroom:slug}/learning-contents/{learningContent}', [ClassroomLearningContentController::class, 'show'])->name('classrooms.learning-contents.show');
+    Route::put('classrooms/{classroom:slug}/learning-contents/{learningContent}/content', [ClassroomLearningContentController::class, 'updateContent'])->name('classrooms.learning-contents.update-content');
 });
