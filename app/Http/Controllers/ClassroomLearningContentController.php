@@ -20,7 +20,7 @@ class ClassroomLearningContentController extends Controller
             'data' => [
                 'id' => $learningContent->id,
                 'content' => $learningContent->content,
-            ]
+            ],
         ]);
     }
 

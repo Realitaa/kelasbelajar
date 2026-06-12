@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Controllers\ClassroomController;
-use App\Http\Controllers\ClassroomModuleController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ModuleObjectController;
 use App\Http\Controllers\ClassroomLearningContentController;
+use App\Http\Controllers\ClassroomModuleController;
+use App\Http\Controllers\ModuleObjectController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('classrooms', [ClassroomController::class, 'index'])->name('classrooms.index');

@@ -20,7 +20,7 @@ test('teacher can create learning content object in module', function () {
     ]);
 
     $response->assertRedirect();
-    
+
     $this->assertDatabaseHas('learning_contents', [
         'title' => 'My New Content',
         'created_by' => $teacher->id,
@@ -39,13 +39,13 @@ test('teacher can update learning content title', function () {
     $teacher = User::factory()->create(['role' => 'educator']);
     $classroom = Classroom::factory()->create(['educator_id' => $teacher->id]);
     $module = ClassroomModule::factory()->create(['classroom_id' => $classroom->id]);
-    
+
     $content = LearningContent::factory()->create([
         'title' => 'Old Title',
         'created_by' => $teacher->id,
         'content' => [],
     ]);
-    
+
     $moduleObject = ModuleObject::factory()->create([
         'module_id' => $module->id,
         'object_id' => $content->id,
@@ -61,7 +61,7 @@ test('teacher can update learning content title', function () {
     ]);
 
     $response->assertRedirect();
-    
+
     $this->assertDatabaseHas('learning_contents', [
         'id' => $content->id,
         'title' => 'New Title',
@@ -72,13 +72,13 @@ test('teacher can get learning content data', function () {
     $teacher = User::factory()->create(['role' => 'educator']);
     $classroom = Classroom::factory()->create(['educator_id' => $teacher->id]);
     $module = ClassroomModule::factory()->create(['classroom_id' => $classroom->id]);
-    
+
     $content = LearningContent::factory()->create([
         'title' => 'Some Content',
         'created_by' => $teacher->id,
         'content' => ['ops' => [['insert' => 'Hello']]],
     ]);
-    
+
     $moduleObject = ModuleObject::factory()->create([
         'module_id' => $module->id,
         'object_id' => $content->id,
@@ -95,7 +95,7 @@ test('teacher can get learning content data', function () {
         'data' => [
             'id' => $content->id,
             'content' => ['ops' => [['insert' => 'Hello']]],
-        ]
+        ],
     ]);
 });
 
@@ -103,13 +103,13 @@ test('teacher can update learning content json', function () {
     $teacher = User::factory()->create(['role' => 'educator']);
     $classroom = Classroom::factory()->create(['educator_id' => $teacher->id]);
     $module = ClassroomModule::factory()->create(['classroom_id' => $classroom->id]);
-    
+
     $content = LearningContent::factory()->create([
         'title' => 'Some Content',
         'created_by' => $teacher->id,
         'content' => [],
     ]);
-    
+
     $moduleObject = ModuleObject::factory()->create([
         'module_id' => $module->id,
         'object_id' => $content->id,
@@ -126,7 +126,7 @@ test('teacher can update learning content json', function () {
     ]);
 
     $response->assertRedirect();
-    
+
     $this->assertDatabaseHas('learning_contents', [
         'id' => $content->id,
         'content' => json_encode($newContent),
