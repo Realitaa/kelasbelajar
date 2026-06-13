@@ -92,7 +92,7 @@ const selectedFile = ref<string>('Welcome.vue');
 
 const handleSelect = (event: any, item: TreeItem) => {
     if (!item.children) {
-        selectedFile.value = item.label;
+        selectedFile.value = item.label ?? '';
     }
 };
 

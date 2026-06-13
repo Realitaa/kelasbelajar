@@ -12,6 +12,12 @@ interface Classroom {
         name: string;
         email: string;
     };
+    enrollments?: {
+        id: number;
+        classroom_id: number;
+        student_id: number;
+        enrolled_at: string;
+    }[];
 }
 
 interface LearningContent {

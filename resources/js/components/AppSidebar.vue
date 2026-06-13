@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { House } from '@lucide/vue';
+import { Link, usePage } from '@inertiajs/vue3';
+import { House, Compass } from '@lucide/vue';
+import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -16,13 +17,28 @@ import {
 import { index } from '@/routes/classrooms';
 import type { NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Daftar Kelas',
-        href: index(),
-        icon: House,
-    },
-];
+const page = usePage();
+const userRole = computed(() => page.props.auth.user.role);
+
+const mainNavItems = computed<NavItem[]>(() => {
+    const items: NavItem[] = [
+        {
+            title: userRole.value === 'educator' ? 'Manajemen Kelas' : 'Kelas Saya',
+            href: index(),
+            icon: House,
+        },
+    ];
+
+    if (userRole.value === 'student') {
+        items.push({
+            title: 'Cari Kelas',
+            href: '/discovery',
+            icon: Compass,
+        });
+    }
+
+    return items;
+});
 </script>
 
 <template>

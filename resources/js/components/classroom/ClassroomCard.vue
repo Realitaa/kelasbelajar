@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Link, usePage, useHttp } from '@inertiajs/vue3';
-import { Edit, Trash2, Copy, Globe, EyeOff, Users } from '@lucide/vue';
+import { Edit, Trash2, Copy, Globe, EyeOff, Users, Check, UserPlus } from '@lucide/vue';
 import { useClipboard } from '@vueuse/core';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { toast } from 'vue-sonner';
 import ClassroomController from '@/actions/App/Http/Controllers/ClassroomController';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -19,16 +19,27 @@ import { useAppearance } from '@/composables/useAppearance';
 import { manage } from '@/routes/classrooms';
 import type { Classroom } from '@/types';
 
-const props = defineProps<{
-    classroom: Classroom;
-}>();
+const props = withDefaults(
+    defineProps<{
+        classroom: Classroom;
+        showEnrollAction?: boolean;
+    }>(),
+    {
+        showEnrollAction: false,
+    }
+);
 
 defineEmits<{
     (e: 'edit', classroom: Classroom): void;
     (e: 'delete', id: number): void;
     (e: 'publish', classroom: Classroom): void;
     (e: 'unpublish', classroom: Classroom): void;
+    (e: 'enroll', classroom: Classroom): void;
 }>();
+
+const isEnrolled = computed(() => {
+    return !!(props.classroom.enrollments && props.classroom.enrollments.length > 0);
+});
 
 const page = usePage();
 const userRole = page.props.auth.user.role;
@@ -122,7 +133,7 @@ return '';
                 </Link>
                 <Link v-else :href="`/classrooms/${classroom.slug}`">
                     <h3
-                        class="line-clamp-1 text-xl font-bold tracking-tight transition-colors group-hover:text-primary hover:underline"
+                        class="line-clamp-1 text-xl font-bold tracking-tight transition-colors group-hover:text-primary hover:underline max-w-[85%]"
                     >
                         {{ classroom.title }}
                     </h3>
@@ -210,6 +221,28 @@ return '';
                     title="Hapus Kelas"
                 >
                     <Trash2 class="h-5 w-5" />
+                </Button>
+            </div>
+
+            <!-- Student Discovery Enroll Footer -->
+            <div
+                v-if="userRole === 'student' && showEnrollAction"
+                class="mt-6 border-t pt-4"
+            >
+                <div
+                    v-if="isEnrolled"
+                    class="flex w-full items-center justify-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 py-2.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 select-none animate-in fade-in zoom-in duration-300"
+                >
+                    <Check class="h-4 w-4" />
+                    <span>Sudah Bergabung</span>
+                </div>
+                <Button
+                    v-else
+                    @click="$emit('enroll', classroom)"
+                    class="w-full gap-1.5 py-2.5 font-bold transition-all hover:scale-[1.01] hover:shadow-xs active:scale-[0.99] cursor-pointer"
+                >
+                    <UserPlus class="h-4 w-4" />
+                    <span>Gabung Kelas</span>
                 </Button>
             </div>
         </div>
