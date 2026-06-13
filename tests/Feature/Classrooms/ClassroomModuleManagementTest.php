@@ -215,7 +215,6 @@ describe('Reordering Modules and Objects', function () {
                 ],
             ]);
 
-        $response->dump();
         $response->assertRedirect();
         $this->assertDatabaseHas('module_objects', ['id' => $obj1->id, 'position' => 2]);
         $this->assertDatabaseHas('module_objects', ['id' => $obj2->id, 'position' => 1]);
@@ -237,7 +236,6 @@ describe('Reordering Modules and Objects', function () {
                 ],
             ]);
 
-        $response->dump();
         $response->assertRedirect();
         $this->assertDatabaseHas('module_objects', ['id' => $obj->id, 'module_id' => $moduleB->id, 'position' => 1]);
     });

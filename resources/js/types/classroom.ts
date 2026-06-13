@@ -7,6 +7,11 @@ interface Classroom {
     description: string | null;
     is_published: boolean;
     modules?: ClassroomModule[];
+    educator?: {
+        id: number;
+        name: string;
+        email: string;
+    };
 }
 
 interface LearningContent {

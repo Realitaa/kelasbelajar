@@ -24,7 +24,19 @@ class ClassroomPolicy
             return $classroom->educator_id === $user->id;
         }
 
+        if ($user->role === 'student') {
+            return $classroom->is_published && $classroom->enrollments()->where('student_id', $user->id)->exists();
+        }
+
         return false;
+    }
+
+    /**
+     * Determine whether the user can view the classroom students.
+     */
+    public function viewStudents(User $user, Classroom $classroom): bool
+    {
+        return $user->role === 'educator' && $classroom->educator_id === $user->id;
     }
 
     /**

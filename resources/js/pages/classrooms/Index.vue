@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Head, useForm, router } from '@inertiajs/vue3';
+import { Head, useForm, router, usePage } from '@inertiajs/vue3';
 import { Plus, BookOpen, AlertTriangle } from '@lucide/vue';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import ClassroomController from '@/actions/App/Http/Controllers/ClassroomController';
 import ClassroomCard from '@/components/classroom/ClassroomCard.vue';
 import InputError from '@/components/InputError.vue';
@@ -23,6 +23,9 @@ import type { Classroom } from '@/types';
 defineProps<{
     classrooms: Classroom[];
 }>();
+
+const page = usePage();
+const userRole = computed(() => page.props.auth.user.role);
 
 const isDialogOpen = ref(false);
 const isEditing = ref(false);
@@ -112,18 +115,18 @@ defineOptions({
 
 <template>
     <div>
-        <Head title="Manajemen Kelas" />
+        <Head :title="userRole === 'educator' ? 'Manajemen Kelas' : 'Kelas Saya'" />
 
         <div class="flex h-full flex-1 flex-col gap-6 p-6">
             <!-- Dashboard Greeting Header -->
             <PageHeader
-                title="Manajemen Kelas"
-                description="Kelola kelas-kelas Anda, publikasikan materi, dan pantau siswa."
-                :links="{
+                :title="userRole === 'educator' ? 'Manajemen Kelas' : 'Kelas Saya'"
+                :description="userRole === 'educator' ? 'Kelola kelas-kelas Anda, publikasikan materi, dan pantau siswa.' : 'Lihat kelas yang Anda ikuti dan mulai belajar.'"
+                :links="userRole === 'educator' ? {
                     title: 'Buat Kelas Baru',
                     onClick: openCreateDialog,
                     icon: Plus,
-                }"
+                } : undefined"
             />
 
             <!-- Main Content Grid / Empty State -->
@@ -135,13 +138,16 @@ defineOptions({
                     <BookOpen class="h-12 w-12" />
                 </div>
                 <h3 class="mt-6 text-xl font-bold tracking-tight">
-                    Belum Ada Kelas
+                    {{ userRole === 'educator' ? 'Belum Ada Kelas' : 'Belum Bergabung dengan Kelas' }}
                 </h3>
                 <p class="mt-2 max-w-sm text-sm text-muted-foreground">
-                    Anda belum membuat kelas apapun. Mulai buat kelas pertama
-                    Anda dan bagikan kodenya kepada murid.
+                    {{
+                        userRole === 'educator'
+                            ? 'Anda belum membuat kelas apapun. Mulai buat kelas pertama Anda dan bagikan kodenya kepada murid.'
+                            : 'Anda belum bergabung ke kelas manapun. Silakan pergi ke halaman discovery untuk mendaftar ke kelas.'
+                    }}
                 </p>
-                <Button @click="openCreateDialog" class="mt-6 gap-2">
+                <Button v-if="userRole === 'educator'" @click="openCreateDialog" class="mt-6 gap-2">
                     <Plus class="h-4 w-4" />
                     Buat Kelas Pertama
                 </Button>

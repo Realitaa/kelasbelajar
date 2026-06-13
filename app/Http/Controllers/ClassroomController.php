@@ -138,7 +138,7 @@ class ClassroomController extends Controller
      */
     public function students(Classroom $classroom): JsonResponse
     {
-        Gate::authorize('view', $classroom);
+        Gate::authorize('viewStudents', $classroom);
 
         $students = $classroom->enrollments()
             ->with('student')

@@ -22,6 +22,16 @@ class ClassroomService
                 ->get();
         }
 
+        if ($user->role === 'student') {
+            return Classroom::whereHas('enrollments', function ($query) use ($user) {
+                $query->where('student_id', $user->id);
+            })
+                ->where('is_published', true)
+                ->with('educator')
+                ->latest()
+                ->get();
+        }
+
         return collect();
     }
 

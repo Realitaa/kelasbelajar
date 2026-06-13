@@ -113,7 +113,14 @@ return '';
         <!-- Content Area -->
         <div class="flex flex-1 flex-col p-6 pt-2">
             <div class="mb-4">
-                <Link :href="manage(classroom.slug)">
+                <Link v-if="userRole === 'educator'" :href="manage(classroom.slug)">
+                    <h3
+                        class="line-clamp-1 text-xl font-bold tracking-tight transition-colors group-hover:text-primary hover:underline"
+                    >
+                        {{ classroom.title }}
+                    </h3>
+                </Link>
+                <Link v-else :href="`/classrooms/${classroom.slug}`">
                     <h3
                         class="line-clamp-1 text-xl font-bold tracking-tight transition-colors group-hover:text-primary hover:underline"
                     >
@@ -133,6 +140,12 @@ return '';
                     >
                         <Copy class="h-4 w-4" />
                     </Button>
+                </p>
+                <p
+                    v-if="userRole === 'student' && classroom.educator"
+                    class="mt-1 text-xs text-muted-foreground"
+                >
+                    Pengajar: <span class="font-medium text-foreground">{{ classroom.educator.name }}</span>
                 </p>
             </div>
 

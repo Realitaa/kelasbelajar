@@ -3,10 +3,10 @@ import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import ContentEditor from '@/components/classroom/ContentEditor.vue';
 import ModuleTree from '@/components/classroom/ModuleTree.vue';
+import QuizEditor from '@/components/classroom/QuizEditor.vue';
 import PageHeader from '@/components/PageHeader.vue';
 import { index } from '@/routes/classrooms';
 import type { Classroom } from '@/types/classroom';
-import QuizEditor from '@/components/classroom/QuizEditor.vue';
 
 defineProps<{
     classroom: Classroom;
