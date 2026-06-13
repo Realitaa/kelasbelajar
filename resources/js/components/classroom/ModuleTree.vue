@@ -34,7 +34,7 @@ const props = defineProps<{
     isManage?: boolean;
 }>();
 
-const emit = defineEmits(['edit-content', 'return-manage']);
+const emit = defineEmits(['edit-content', 'edit-quiz', 'return-manage']);
 const orderingMode = ref(false);
 
 // Local state for dragging
@@ -378,11 +378,15 @@ function getContextMenuItems(item: any) {
                     icon: isQuiz ? 'i-lucide-settings' : 'i-lucide-file-text',
                     onSelect: () => openEditObject(item.original),
                 },
-                ...(!isQuiz ? [{
+                ...(isQuiz ? [{
+                    label: 'Edit Soal Kuis',
+                    icon: 'i-lucide-edit',
+                    onSelect: () => emit('edit-quiz', item.original),
+                }] : [{
                     label: 'Edit Isi Materi',
                     icon: 'i-lucide-edit',
                     onSelect: () => emit('edit-content', item.original),
-                }] : []),
+                }]),
             ],
             [
                 {

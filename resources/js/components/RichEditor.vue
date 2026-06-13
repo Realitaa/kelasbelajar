@@ -7,12 +7,14 @@ import { Mathematics } from '@tiptap/extension-mathematics';
 import Youtube from '@tiptap/extension-youtube';
 import { computed, ref, provide, watch } from 'vue';
 import 'katex/dist/katex.min.css';
+import { cn } from '@/lib/utils';
 import { SlideshowExtension } from './editor/extensions/SlideshowExtension';
 import ImageUploadModal from './editor/ImageUploadModal.vue';
 import MathInsertModal from './editor/MathInsertModal.vue';
 import YoutubeInsertModal from './editor/YoutubeInsertModal.vue';
 
 const props = defineProps<{
+    class?: string;
     modelValue: any;
     placeholder?: string;
     isEducator?: boolean;
@@ -264,7 +266,7 @@ function handleYoutubeInsert(url: string) {
             v-model="value"
             :placeholder="placeholder || 'Mulai menulis...'"
             :extensions="extensions"
-            class="flex flex-col h-full border border-border rounded-lg overflow-hidden bg-background focus-within:border-primary/50 transition-colors"
+            :class="cn('flex flex-col h-full border border-border rounded-lg overflow-hidden bg-background focus-within:border-primary/50 transition-colors', props.class)"
         >
             <UEditorToolbar
                 :editor="editor"

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\ClassroomLearningContentController;
 use App\Http\Controllers\ClassroomModuleController;
+use App\Http\Controllers\ClassroomQuizController;
 use App\Http\Controllers\ModuleObjectController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,4 +28,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('classrooms/{classroom:slug}/learning-contents/{learningContent}', [ClassroomLearningContentController::class, 'show'])->name('classrooms.learning-contents.show');
     Route::put('classrooms/{classroom:slug}/learning-contents/{learningContent}/content', [ClassroomLearningContentController::class, 'updateContent'])->name('classrooms.learning-contents.update-content');
+
+    Route::get('classrooms/{classroom:slug}/quizzes/{quiz}', [ClassroomQuizController::class, 'show'])->name('classrooms.quizzes.show');
+    Route::put('classrooms/{classroom:slug}/quizzes/{quiz}/questions', [ClassroomQuizController::class, 'updateQuestions'])->name('classrooms.quizzes.update-questions');
 });

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 #[Fillable([
@@ -33,5 +34,13 @@ class Quiz extends Model
     public function moduleObjects(): MorphMany
     {
         return $this->morphMany(ModuleObject::class, 'object');
+    }
+
+    /**
+     * @return HasMany<QuizQuestion, $this>
+     */
+    public function questions(): HasMany
+    {
+        return $this->hasMany(QuizQuestion::class)->orderBy('position');
     }
 }

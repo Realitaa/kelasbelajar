@@ -35,16 +35,18 @@ async function fetchContent() {
     
     isLoading.value = true;
 
-    try {
-        const response = await http.get(show([props.classroomSlug, props.learningContent.id]).url) as any;
-        const data = response.data;
-        originalContent.value = data.content || {};
-        content.value = JSON.parse(JSON.stringify(originalContent.value));
-    } catch (error) {
-        console.error('Failed to fetch learning content', error);
-    } finally {
-        isLoading.value = false;
-    }
+    http.get(show([props.classroomSlug, props.learningContent.id]).url, {
+        onSuccess: (response: any) => {
+            const data = response?.data;
+            originalContent.value = data?.content || {};
+            content.value = JSON.parse(JSON.stringify(originalContent.value));
+            isLoading.value = false;
+        },
+        onError: (error: any) => {
+            console.error('Failed to fetch learning content', error);
+            isLoading.value = false;
+        }
+    });
 }
 
 watch(() => props.learningContent?.id, () => {
@@ -58,6 +60,7 @@ function handleSave() {
         content: content.value
     }, {
         preserveScroll: true,
+        preserveState: true,
         onSuccess: () => {
             originalContent.value = JSON.parse(JSON.stringify(content.value));
             isSaving.value = false;
