@@ -6,6 +6,7 @@ use App\Http\Requests\ClassroomStoreRequest;
 use App\Http\Requests\ClassroomUpdateRequest;
 use App\Models\Classroom;
 use App\Services\ClassroomService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -129,6 +130,28 @@ class ClassroomController extends Controller
 
         return Inertia::render('classrooms/Manage', [
             'classroom' => $classroom,
+        ]);
+    }
+
+    /**
+     * Get the enrolled students of the classroom.
+     */
+    public function students(Classroom $classroom): JsonResponse
+    {
+        Gate::authorize('view', $classroom);
+
+        $students = $classroom->enrollments()
+            ->with('student')
+            ->get()
+            ->map(fn ($enrollment) => [
+                'id' => $enrollment->student->id,
+                'name' => $enrollment->student->name,
+                'email' => $enrollment->student->email,
+                'enrolled_at' => $enrollment->enrolled_at->toIso8601String(),
+            ]);
+
+        return response()->json([
+            'data' => $students,
         ]);
     }
 }

@@ -1,16 +1,25 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3';
-import { Edit, Eye, Trash2, Copy, Globe, EyeOff } from '@lucide/vue';
+import { Link, usePage, useHttp } from '@inertiajs/vue3';
+import { Edit, Trash2, Copy, Globe, EyeOff, Users } from '@lucide/vue';
 import { useClipboard } from '@vueuse/core';
+import { ref } from 'vue';
 import { toast } from 'vue-sonner';
+import ClassroomController from '@/actions/App/Http/Controllers/ClassroomController';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '@/components/ui/dialog';
 import { useAppearance } from '@/composables/useAppearance';
 import { manage } from '@/routes/classrooms';
 import type { Classroom } from '@/types';
 
-defineProps<{
+const props = defineProps<{
     classroom: Classroom;
 }>();
 
@@ -29,6 +38,37 @@ const { resolvedAppearance } = useAppearance();
 function copyClassroomCode(code: string) {
     copy(code);
     toast.success(`Kode kelas ${code} berhasil disalin`);
+}
+
+const isStudentsModalOpen = ref(false);
+const students = ref<any[]>([]);
+const http = useHttp();
+
+function showStudents() {
+    isStudentsModalOpen.value = true;
+    http.get(ClassroomController.students.url(props.classroom.slug), {
+        onSuccess: (response: any) => {
+            students.value = response.data || [];
+        },
+        onError: (err: any) => {
+            toast.error('Gagal mengambil daftar siswa');
+            console.error(err);
+        }
+    });
+}
+
+function formatDate(dateString: string) {
+    if (!dateString) {
+return '';
+}
+
+    const date = new Date(dateString);
+
+    return new Intl.DateTimeFormat('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    }).format(date);
 }
 </script>
 
@@ -112,12 +152,11 @@ function copyClassroomCode(code: string) {
                     <Button
                         variant="ghost"
                         size="icon"
-                        as-child
+                        @click="showStudents"
                         class="h-10 w-10 rounded-full transition-colors hover:bg-primary/10 hover:text-primary"
+                        title="Lihat Siswa Terdaftar"
                     >
-                        <Link href="#">
-                            <Eye class="h-5 w-5" />
-                        </Link>
+                        <Users class="h-5 w-5" />
                     </Button>
                     <Button
                         variant="ghost"
@@ -161,5 +200,75 @@ function copyClassroomCode(code: string) {
                 </Button>
             </div>
         </div>
+
+        <Dialog v-model:open="isStudentsModalOpen">
+            <DialogContent class="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle class="flex items-center gap-2 text-xl font-bold tracking-tight">
+                        <Users class="h-5 w-5 text-primary" />
+                        <span>Siswa Terdaftar</span>
+                    </DialogTitle>
+                    <DialogDescription class="text-sm text-muted-foreground mt-1">
+                        Daftar siswa yang telah bergabung ke kelas
+                        <span class="font-semibold text-foreground bg-primary/10 px-1.5 py-0.5 rounded-sm">{{ classroom.title }}</span>.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <!-- Skeleton Loader -->
+                <div v-if="http.processing" class="space-y-4 py-4">
+                    <div v-for="i in 3" :key="i" class="flex items-center space-x-4 animate-pulse">
+                        <div class="h-10 w-10 rounded-full bg-muted"></div>
+                        <div class="space-y-2 flex-1">
+                            <div class="h-4 bg-muted rounded w-1/3"></div>
+                            <div class="h-3 bg-muted rounded w-1/2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student List / Empty State -->
+                <div v-else class="py-4">
+                    <div v-if="students.length === 0" class="flex flex-col items-center justify-center py-8 text-center animate-in fade-in duration-300">
+                        <div class="rounded-full bg-primary/10 p-4 text-primary mb-3 ring-8 ring-primary/5">
+                            <Users class="h-8 w-8" />
+                        </div>
+                        <p class="text-sm font-semibold text-foreground">Belum Ada Siswa</p>
+                        <p class="text-xs text-muted-foreground mt-1.5 max-w-[280px]">
+                            Bagikan kode kelas
+                            <span
+                                @click="copyClassroomCode(classroom.unique_code)"
+                                title="Klik untuk menyalin kode"
+                                class="font-mono bg-muted hover:bg-muted/80 cursor-pointer px-1.5 py-0.5 rounded font-semibold text-foreground border border-border/60 transition-colors"
+                            >
+                                {{ classroom.unique_code }}
+                            </span>
+                            kepada siswa untuk mulai belajar bersama.
+                        </p>
+                    </div>
+
+                    <div v-else class="max-h-[300px] overflow-y-auto space-y-3 pr-1 animate-in fade-in duration-300">
+                        <div
+                            v-for="student in students"
+                            :key="student.id"
+                            class="flex items-center justify-between p-2.5 rounded-xl hover:bg-muted/60 border border-transparent hover:border-border/40 transition-all duration-200"
+                        >
+                            <div class="flex items-center gap-3">
+                                <Avatar class="h-10 w-10 shadow-xs ring-1 ring-border/30">
+                                    <AvatarFallback class="bg-primary/10 text-primary font-bold text-sm">
+                                        {{ student.name.charAt(0).toUpperCase() }}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <p class="text-sm font-semibold leading-none text-foreground">{{ student.name }}</p>
+                                    <p class="text-xs text-muted-foreground mt-1.5 select-all">{{ student.email }}</p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] text-muted-foreground bg-muted/80 border px-2.5 py-1 rounded-full font-medium">
+                                {{ formatDate(student.enrolled_at) }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
     </div>
 </template>

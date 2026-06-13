@@ -290,3 +290,55 @@ describe('classroom unique code generation', function () {
         expect($classroom->unique_code)->not->toBeEmpty();
     });
 });
+
+describe('classroom students list', function () {
+    it('allows educators to view enrolled students of their own classrooms', function () {
+        $educator = User::factory()->educator()->create();
+        $student = User::factory()->student()->create();
+        $classroom = Classroom::factory()->create(['educator_id' => $educator->id]);
+
+        ClassroomEnrollment::factory()->create([
+            'classroom_id' => $classroom->id,
+            'student_id' => $student->id,
+        ]);
+
+        actingAs($educator)
+            ->get(route('classrooms.students', $classroom->slug))
+            ->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'name', 'email', 'enrolled_at'],
+                ],
+            ])
+            ->assertJsonFragment([
+                'id' => $student->id,
+                'name' => $student->name,
+                'email' => $student->email,
+            ]);
+    });
+
+    it('prevents educators from viewing enrolled students of classrooms owned by another educator', function () {
+        $educatorA = User::factory()->educator()->create();
+        $educatorB = User::factory()->educator()->create();
+        $classroom = Classroom::factory()->create(['educator_id' => $educatorB->id]);
+
+        actingAs($educatorA)
+            ->get(route('classrooms.students', $classroom->slug))
+            ->assertForbidden();
+    });
+
+    it('prevents students from viewing classroom students', function () {
+        $studentA = User::factory()->student()->create();
+        $studentB = User::factory()->student()->create();
+        $classroom = Classroom::factory()->create();
+
+        ClassroomEnrollment::factory()->create([
+            'classroom_id' => $classroom->id,
+            'student_id' => $studentB->id,
+        ]);
+
+        actingAs($studentA)
+            ->get(route('classrooms.students', $classroom->slug))
+            ->assertForbidden();
+    });
+});
