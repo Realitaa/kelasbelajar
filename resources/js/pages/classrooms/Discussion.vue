@@ -10,6 +10,7 @@ import {
     Clock,
     Reply,
     Send,
+    MoreHorizontal,
 } from '@lucide/vue';
 import { ref, computed } from 'vue';
 import PreviewRenderer from '@/components/PreviewRenderer.vue';
@@ -17,7 +18,12 @@ import RichEditor from '@/components/RichEditor.vue';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { show } from '@/routes/classrooms';
 import {
     store as storeComment,
@@ -213,62 +219,58 @@ function canEdit(comment: ClassroomComment) {
             </div>
 
             <!-- New Comment Thread Input -->
-            <Card
-                class="border border-border/80 bg-card/60 shadow-sm backdrop-blur-xs"
+            <div
+                class="rounded-xl border border-border/80 bg-card/50 p-5 shadow-xs backdrop-blur-xs"
             >
-                <CardContent class="p-5">
-                    <form @submit.prevent="submitNewComment" class="space-y-4">
-                        <div class="flex items-start gap-3">
-                            <Avatar class="mt-1 h-9 w-9 ring-1 ring-border">
-                                <AvatarFallback
-                                    class="bg-primary/10 font-bold text-primary"
-                                >
-                                    {{
-                                        currentUser.name.charAt(0).toUpperCase()
-                                    }}
-                                </AvatarFallback>
-                            </Avatar>
-                            <div class="flex-1">
-                                <h3
-                                    class="text-sm font-semibold text-foreground"
-                                >
-                                    Mulai diskusi baru
-                                </h3>
-                                <p class="text-xs text-muted-foreground">
-                                    Tulis topik baru untuk didiskusikan dengan
-                                    teman sekelas
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="min-h-40 rounded-lg border border-border">
-                            <RichEditor
-                                v-model="newCommentForm.content"
-                                :is-educator="false"
-                                placeholder="Bagikan pemikiran, pertanyaan, atau materi di sini..."
-                                class="min-h-36"
-                            />
-                        </div>
-                        <div
-                            v-if="newCommentForm.errors.content"
-                            class="text-xs text-destructive"
-                        >
-                            {{ newCommentForm.errors.content }}
-                        </div>
-
-                        <div class="flex justify-end">
-                            <Button
-                                type="submit"
-                                :disabled="newCommentForm.processing"
-                                class="cursor-pointer gap-2 font-semibold shadow-xs"
+                <form @submit.prevent="submitNewComment" class="space-y-4">
+                    <div class="flex items-start gap-3">
+                        <Avatar class="mt-1 h-9 w-9 ring-1 ring-border">
+                            <AvatarFallback
+                                class="bg-primary/10 font-bold text-primary"
                             >
-                                <Send class="size-4" />
-                                <span>Kirim Diskusi</span>
-                            </Button>
+                                {{ currentUser.name.charAt(0).toUpperCase() }}
+                            </AvatarFallback>
+                        </Avatar>
+                        <div class="flex-1">
+                            <h3 class="text-sm font-semibold text-foreground">
+                                Mulai diskusi baru
+                            </h3>
+                            <p class="text-xs text-muted-foreground">
+                                Tulis topik baru untuk didiskusikan dengan teman
+                                sekelas
+                            </p>
                         </div>
-                    </form>
-                </CardContent>
-            </Card>
+                    </div>
+
+                    <div
+                        class="min-h-40 rounded-lg border border-border bg-background"
+                    >
+                        <RichEditor
+                            v-model="newCommentForm.content"
+                            :is-educator="false"
+                            placeholder="Bagikan pemikiran, pertanyaan, atau materi di sini..."
+                            class="min-h-36"
+                        />
+                    </div>
+                    <div
+                        v-if="newCommentForm.errors.content"
+                        class="text-xs text-destructive"
+                    >
+                        {{ newCommentForm.errors.content }}
+                    </div>
+
+                    <div class="flex justify-end">
+                        <Button
+                            type="submit"
+                            :disabled="newCommentForm.processing"
+                            class="cursor-pointer gap-2 font-semibold shadow-xs"
+                        >
+                            <Send class="size-4" />
+                            <span>Kirim Diskusi</span>
+                        </Button>
+                    </div>
+                </form>
+            </div>
 
             <!-- Comments List -->
             <div class="space-y-6">
@@ -298,524 +300,468 @@ function canEdit(comment: ClassroomComment) {
                     </p>
                 </div>
 
-                <div v-else class="space-y-6">
+                <div v-else class="space-y-2 divide-y divide-border/60">
                     <!-- Loop Level 1 Comments -->
                     <div
                         v-for="comment in comments"
                         :key="comment.id"
-                        class="space-y-4 border-b border-border/40 pb-6 last:border-0"
+                        class="space-y-4 py-6"
                     >
-                        <!-- Main Comment Card -->
-                        <Card
-                            class="border bg-card shadow-xs transition-shadow duration-200 hover:shadow-sm"
-                            :class="[
-                                comment.deleted_at
-                                    ? 'border-dashed border-border bg-slate-50/50 opacity-80 dark:bg-slate-900/10'
-                                    : '',
-                            ]"
-                        >
-                            <CardContent class="p-5">
-                                <div class="flex items-start gap-3">
-                                    <Avatar
-                                        class="h-10 w-10 ring-1 ring-border/50"
+                        <!-- Main Comment Thread -->
+                        <div class="flex items-start gap-3">
+                            <Avatar
+                                class="h-10 w-10 shrink-0 ring-1 ring-border/50"
+                            >
+                                <AvatarFallback
+                                    class="bg-primary/10 font-bold text-primary"
+                                >
+                                    {{
+                                        comment.deleted_at
+                                            ? '?'
+                                            : comment.user.name
+                                                  .charAt(0)
+                                                  .toUpperCase()
+                                    }}
+                                </AvatarFallback>
+                            </Avatar>
+                            <div class="min-w-0 flex-1 space-y-1">
+                                <!-- Header: User info -->
+                                <div class="flex items-center justify-between">
+                                    <div
+                                        class="flex flex-wrap items-center gap-x-2 gap-y-1"
                                     >
-                                        <AvatarFallback
-                                            class="bg-primary/10 font-bold text-primary"
+                                        <span
+                                            class="text-sm font-bold text-foreground"
                                         >
                                             {{
                                                 comment.deleted_at
-                                                    ? '?'
+                                                    ? 'Komentar Dihapus'
                                                     : comment.user.name
-                                                          .charAt(0)
-                                                          .toUpperCase()
                                             }}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div class="min-w-0 flex-1 space-y-1">
-                                        <!-- Header: User info -->
-                                        <div
-                                            class="flex flex-wrap items-center gap-x-2 gap-y-1"
-                                        >
-                                            <span
-                                                class="text-sm font-bold text-foreground"
-                                            >
-                                                {{
-                                                    comment.deleted_at
-                                                        ? 'Komentar Dihapus'
-                                                        : comment.user.name
-                                                }}
-                                            </span>
-                                            <!-- Educator / Classroom Owner Badge -->
-                                            <Badge
-                                                v-if="
-                                                    !comment.deleted_at &&
-                                                    comment.user_id ===
-                                                        classroom.educator_id
-                                                "
-                                                variant="default"
-                                                class="bg-blue-600 px-2 py-0 text-[10px] font-bold text-white hover:bg-blue-600"
-                                            >
-                                                Pemilik Kelas
-                                            </Badge>
-                                            <span
-                                                class="flex items-center gap-1 text-xs text-muted-foreground"
-                                            >
-                                                <Clock class="size-3.5" />
-                                                {{
-                                                    formatDate(
-                                                        comment.created_at,
-                                                    )
-                                                }}
-                                            </span>
-                                            <!-- Edited Badge -->
-                                            <Badge
-                                                v-if="isEdited(comment)"
-                                                variant="secondary"
-                                                class="px-1.5 py-0 text-[10px] font-medium"
-                                            >
-                                                Diubah
-                                            </Badge>
-                                        </div>
-
-                                        <!-- Render content or Deleted placeholder -->
-                                        <div
-                                            class="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-300"
-                                        >
-                                            <div
-                                                v-if="comment.deleted_at"
-                                                class="flex flex-col gap-2 rounded-lg border border-border/40 bg-muted/40 p-2.5 text-muted-foreground italic"
-                                            >
-                                                <div
-                                                    class="flex items-center gap-2"
-                                                >
-                                                    <X
-                                                        class="size-4 text-muted-foreground/80"
-                                                    />
-                                                    <span>{{
-                                                        currentUser.role ==
-                                                            'educator' ||
-                                                        currentUser.role ==
-                                                            'administrator'
-                                                            ? 'Komentar terhapus (hanya Anda dan Administrator yang dapat melihat):'
-                                                            : 'Komentar ini dihapus.'
-                                                    }}</span>
-                                                </div>
-                                                <PreviewRenderer
-                                                    v-if="
-                                                        currentUser.role ==
-                                                            'educator' ||
-                                                        currentUser.role ==
-                                                            'administrator'
-                                                    "
-                                                    :content="comment.content"
-                                                />
-                                            </div>
-                                            <div
-                                                v-else-if="
-                                                    activeEditId === comment.id
-                                                "
-                                                class="mt-2 space-y-3"
-                                            >
-                                                <div
-                                                    class="min-h-32 rounded-lg border border-border bg-background"
-                                                >
-                                                    <RichEditor
-                                                        v-model="
-                                                            editForm.content
-                                                        "
-                                                        :is-educator="false"
-                                                        placeholder="Ubah komentar Anda..."
-                                                        class="min-h-28"
-                                                    />
-                                                </div>
-                                                <div
-                                                    class="flex justify-end gap-2"
-                                                >
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        @click="
-                                                            activeEditId = null
-                                                        "
-                                                        class="cursor-pointer"
-                                                    >
-                                                        Batal
-                                                    </Button>
-                                                    <Button
-                                                        size="sm"
-                                                        @click="
-                                                            submitEdit(
-                                                                comment.id,
-                                                            )
-                                                        "
-                                                        :disabled="
-                                                            editForm.processing
-                                                        "
-                                                        class="cursor-pointer font-semibold"
-                                                    >
-                                                        Simpan
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                            <PreviewRenderer
-                                                v-else
-                                                :content="comment.content"
-                                            />
-                                        </div>
-
-                                        <!-- Actions (Reply, Edit, Delete) -->
-                                        <div
+                                        </span>
+                                        <!-- Educator / Classroom Owner Badge -->
+                                        <Badge
                                             v-if="
                                                 !comment.deleted_at &&
-                                                activeEditId !== comment.id
+                                                comment.user_id ===
+                                                    classroom.educator_id
                                             "
-                                            class="mt-3 flex items-center gap-3 border-t pt-3"
+                                            variant="default"
+                                            class="bg-blue-600 px-2 py-0 text-[10px] font-bold text-white hover:bg-blue-600"
                                         >
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                @click="
-                                                    handleReplyToggle(comment)
-                                                "
-                                                class="h-8 cursor-pointer gap-1 text-xs font-semibold text-muted-foreground hover:text-primary"
-                                            >
-                                                <Reply class="size-3.5" />
-                                                <span>Balas</span>
-                                            </Button>
+                                            Pemilik Kelas
+                                        </Badge>
+                                        <Badge
+                                            v-if="isEdited(comment)"
+                                            variant="secondary"
+                                            class="px-1.5 py-0 text-[10px] font-medium"
+                                        >
+                                            Diubah
+                                        </Badge>
+                                        <span
+                                            class="ml-1 flex items-center gap-1 text-xs text-muted-foreground"
+                                        >
+                                            <Clock class="size-3.5" />
+                                            {{ formatDate(comment.created_at) }}
+                                        </span>
+                                    </div>
 
+                                    <!-- Actions Dropdown -->
+                                    <DropdownMenu
+                                        v-if="
+                                            !comment.deleted_at &&
+                                            (canEdit(comment) ||
+                                                canDelete(comment))
+                                        "
+                                    >
+                                        <DropdownMenuTrigger as-child>
                                             <Button
-                                                v-if="canEdit(comment)"
                                                 variant="ghost"
-                                                size="sm"
+                                                size="icon"
+                                                class="h-8 w-8 cursor-pointer rounded-full hover:bg-muted"
+                                            >
+                                                <MoreHorizontal
+                                                    class="size-4 text-muted-foreground"
+                                                />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent
+                                            align="end"
+                                            class="w-32"
+                                        >
+                                            <DropdownMenuItem
+                                                v-if="canEdit(comment)"
                                                 @click="
                                                     handleEditToggle(comment)
                                                 "
-                                                class="h-8 cursor-pointer gap-1 text-xs font-semibold text-muted-foreground hover:text-amber-600"
+                                                class="cursor-pointer gap-2"
                                             >
                                                 <Edit2 class="size-3.5" />
                                                 <span>Edit</span>
-                                            </Button>
-
-                                            <Button
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
                                                 v-if="canDelete(comment)"
-                                                variant="ghost"
-                                                size="sm"
                                                 @click="
                                                     deleteComment(comment.id)
                                                 "
-                                                class="ml-auto h-8 cursor-pointer gap-1 text-xs font-semibold text-destructive hover:bg-destructive/10"
+                                                class="cursor-pointer gap-2 text-destructive focus:bg-destructive/10 focus:text-destructive"
                                             >
                                                 <Trash2 class="size-3.5" />
                                                 <span>Hapus</span>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+
+                                <!-- Render content or Deleted placeholder -->
+                                <div
+                                    class="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-300"
+                                >
+                                    <div
+                                        v-if="comment.deleted_at"
+                                        class="flex flex-col gap-2 rounded-lg border border-border/40 bg-muted/40 p-2.5 text-muted-foreground italic"
+                                    >
+                                        <div class="flex items-center gap-2">
+                                            <X
+                                                class="size-4 text-muted-foreground/80"
+                                            />
+                                            <span>{{
+                                                currentUser.role ==
+                                                    'educator' ||
+                                                currentUser.role ==
+                                                    'administrator'
+                                                    ? 'Komentar terhapus (hanya Anda dan Administrator yang dapat melihat):'
+                                                    : 'Komentar ini dihapus.'
+                                            }}</span>
+                                        </div>
+                                        <PreviewRenderer
+                                            v-if="
+                                                currentUser.role ==
+                                                    'educator' ||
+                                                currentUser.role ==
+                                                    'administrator'
+                                            "
+                                            :content="comment.content"
+                                        />
+                                    </div>
+                                    <div
+                                        v-else-if="activeEditId === comment.id"
+                                        class="mt-2 space-y-3"
+                                    >
+                                        <div
+                                            class="min-h-32 rounded-lg border border-border bg-background"
+                                        >
+                                            <RichEditor
+                                                v-model="editForm.content"
+                                                :is-educator="false"
+                                                placeholder="Ubah komentar Anda..."
+                                                class="min-h-28"
+                                            />
+                                        </div>
+                                        <div class="flex justify-end gap-2">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                @click="activeEditId = null"
+                                                class="cursor-pointer"
+                                            >
+                                                Batal
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                @click="submitEdit(comment.id)"
+                                                :disabled="editForm.processing"
+                                                class="cursor-pointer font-semibold"
+                                            >
+                                                Simpan
                                             </Button>
                                         </div>
                                     </div>
+                                    <PreviewRenderer
+                                        v-else
+                                        :content="comment.content"
+                                    />
                                 </div>
-                            </CardContent>
-                        </Card>
+
+                                <!-- Reply Action Button -->
+                                <div
+                                    v-if="
+                                        !comment.deleted_at &&
+                                        activeEditId !== comment.id
+                                    "
+                                    class="mt-2 flex items-center gap-3"
+                                >
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        @click="handleReplyToggle(comment)"
+                                        class="h-8 cursor-pointer gap-1.5 px-0 text-xs font-semibold text-muted-foreground hover:bg-transparent hover:text-primary"
+                                    >
+                                        <Reply class="size-3.5" />
+                                        <span>Balas</span>
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Replies Area (Level 2) -->
-                        <div class="space-y-4 pl-6 md:pl-10">
+                        <div class="space-y-4 pl-10 md:pl-12">
                             <!-- Input Box for Reply (Active for current Level 1 comment) -->
                             <div
                                 v-if="activeReplyId === comment.id"
                                 class="relative pl-2"
                             >
                                 <div
-                                    class="absolute top-6 -left-6 text-muted-foreground/35 select-none"
+                                    class="rounded-xl border border-border bg-card/40 p-4 shadow-sm"
                                 >
-                                    <CornerDownRight class="size-4.5" />
-                                </div>
-
-                                <Card
-                                    class="border border-border bg-card/40 shadow-2xs"
-                                >
-                                    <CardContent class="p-4">
-                                        <form
-                                            @submit.prevent="
-                                                submitReply(comment.id)
-                                            "
-                                            class="space-y-3"
+                                    <form
+                                        @submit.prevent="
+                                            submitReply(comment.id)
+                                        "
+                                        class="space-y-3"
+                                    >
+                                        <div
+                                            class="text-xs font-semibold text-muted-foreground"
                                         >
-                                            <div
-                                                class="text-xs font-semibold text-muted-foreground"
-                                            >
-                                                Membalas komentar
-                                                {{ comment.user.name }}
-                                            </div>
+                                            Membalas komentar
+                                            {{ comment.user.name }}
+                                        </div>
 
-                                            <div
-                                                class="min-h-32 rounded-lg border border-border bg-background"
-                                            >
-                                                <RichEditor
-                                                    v-model="replyForm.content"
-                                                    :is-educator="false"
-                                                    :placeholder="`Tulis balasan untuk komentar ${comment.user.name}...`"
-                                                    class="min-h-28"
-                                                />
-                                            </div>
-                                            <div
-                                                v-if="replyForm.errors.content"
-                                                class="text-xs text-destructive"
-                                            >
-                                                {{ replyForm.errors.content }}
-                                            </div>
+                                        <div
+                                            class="min-h-32 rounded-lg border border-border bg-background"
+                                        >
+                                            <RichEditor
+                                                v-model="replyForm.content"
+                                                :is-educator="false"
+                                                :placeholder="`Tulis balasan untuk komentar ${comment.user.name}...`"
+                                                class="min-h-28"
+                                            />
+                                        </div>
+                                        <div
+                                            v-if="replyForm.errors.content"
+                                            class="text-xs text-destructive"
+                                        >
+                                            {{ replyForm.errors.content }}
+                                        </div>
 
-                                            <div class="flex justify-end gap-2">
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="sm"
-                                                    @click="
-                                                        handleReplyToggle(
-                                                            comment,
-                                                        )
-                                                    "
-                                                    class="cursor-pointer"
-                                                >
-                                                    Batal
-                                                </Button>
-                                                <Button
-                                                    type="submit"
-                                                    size="sm"
-                                                    :disabled="
-                                                        replyForm.processing
-                                                    "
-                                                    class="cursor-pointer gap-1.5 font-semibold shadow-xs"
-                                                >
-                                                    <Send class="size-3.5" />
-                                                    <span>Kirim Balasan</span>
-                                                </Button>
-                                            </div>
-                                        </form>
-                                    </CardContent>
-                                </Card>
+                                        <div class="flex justify-end gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                @click="
+                                                    handleReplyToggle(comment)
+                                                "
+                                                class="cursor-pointer"
+                                            >
+                                                Batal
+                                            </Button>
+                                            <Button
+                                                type="submit"
+                                                size="sm"
+                                                :disabled="replyForm.processing"
+                                                class="cursor-pointer gap-1.5 font-semibold shadow-xs"
+                                            >
+                                                <Send class="size-3.5" />
+                                                <span>Kirim Balasan</span>
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
 
                             <!-- Show Replies -->
                             <div
                                 v-for="reply in comment.replies"
                                 :key="reply.id"
-                                class="relative flex gap-3"
+                                class="flex items-start gap-3 border-t border-border/20 py-3 last:border-b-0"
                             >
-                                <!-- Indentation icon/connector -->
-                                <div
-                                    class="absolute top-4 -left-4 text-muted-foreground/35 select-none"
+                                <Avatar
+                                    class="h-8 w-8 shrink-0 ring-1 ring-border/40"
                                 >
-                                    <CornerDownRight class="size-4.5" />
-                                </div>
-
-                                <Card
-                                    class="w-full border bg-card/80 shadow-2xs transition-shadow duration-200 hover:shadow-xs"
-                                    :class="[
-                                        reply.deleted_at
-                                            ? 'border-dashed border-border bg-slate-50/50 opacity-80 dark:bg-slate-900/10'
-                                            : '',
-                                    ]"
-                                >
-                                    <CardContent class="p-4">
-                                        <div class="flex items-start gap-2.5">
-                                            <Avatar
-                                                class="h-8 w-8 ring-1 ring-border/40"
+                                    <AvatarFallback
+                                        class="bg-primary/5 text-xs font-semibold text-primary"
+                                    >
+                                        {{
+                                            reply.deleted_at
+                                                ? '?'
+                                                : reply.user.name
+                                                      .charAt(0)
+                                                      .toUpperCase()
+                                        }}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div class="min-w-0 flex-1 space-y-1">
+                                    <!-- Header -->
+                                    <div
+                                        class="flex items-center justify-between"
+                                    >
+                                        <div
+                                            class="flex flex-wrap items-center gap-x-2 gap-y-1"
+                                        >
+                                            <span
+                                                class="text-xs font-bold text-foreground"
                                             >
-                                                <AvatarFallback
-                                                    class="bg-primary/5 text-xs font-semibold text-primary"
-                                                >
-                                                    {{
-                                                        reply.deleted_at
-                                                            ? '?'
-                                                            : reply.user.name
-                                                                  .charAt(0)
-                                                                  .toUpperCase()
-                                                    }}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div
-                                                class="min-w-0 flex-1 space-y-1"
+                                                {{
+                                                    reply.deleted_at
+                                                        ? 'Komentar Dihapus'
+                                                        : reply.user.name
+                                                }}
+                                            </span>
+                                            <!-- Owner Badge -->
+                                            <Badge
+                                                v-if="
+                                                    !reply.deleted_at &&
+                                                    reply.user_id ===
+                                                        classroom.educator_id
+                                                "
+                                                variant="default"
+                                                class="bg-blue-600 px-1.5 py-0 text-[9px] font-bold text-white hover:bg-blue-600"
                                             >
-                                                <!-- Header -->
-                                                <div
-                                                    class="flex flex-wrap items-center gap-x-2 gap-y-1"
-                                                >
-                                                    <span
-                                                        class="text-xs font-bold text-foreground"
-                                                    >
-                                                        {{
-                                                            reply.deleted_at
-                                                                ? 'Komentar Dihapus'
-                                                                : reply.user
-                                                                      .name
-                                                        }}
-                                                    </span>
-                                                    <!-- Owner Badge -->
-                                                    <Badge
-                                                        v-if="
-                                                            !reply.deleted_at &&
-                                                            reply.user_id ===
-                                                                classroom.educator_id
-                                                        "
-                                                        variant="default"
-                                                        class="bg-blue-600 px-1.5 py-0 text-[9px] font-bold text-white hover:bg-blue-600"
-                                                    >
-                                                        Pemilik Kelas
-                                                    </Badge>
-                                                    <span
-                                                        class="flex items-center gap-1 text-[10px] text-muted-foreground"
-                                                    >
-                                                        <Clock class="size-3" />
-                                                        {{
-                                                            formatDate(
-                                                                reply.created_at,
-                                                            )
-                                                        }}
-                                                    </span>
-                                                    <!-- Edited Badge -->
-                                                    <Badge
-                                                        v-if="isEdited(reply)"
-                                                        variant="secondary"
-                                                        class="px-1 py-0 text-[9px] font-medium"
-                                                    >
-                                                        Diubah
-                                                    </Badge>
-                                                </div>
+                                                Pemilik Kelas
+                                            </Badge>
+                                            <Badge
+                                                v-if="isEdited(reply)"
+                                                variant="secondary"
+                                                class="px-1 py-0 text-[9px] font-medium"
+                                            >
+                                                Diubah
+                                            </Badge>
+                                            <span
+                                                class="ml-1 flex items-center gap-1 text-[10px] text-muted-foreground"
+                                            >
+                                                <Clock class="size-3" />
+                                                {{
+                                                    formatDate(reply.created_at)
+                                                }}
+                                            </span>
+                                        </div>
 
-                                                <!-- Content -->
-                                                <div
-                                                    class="mt-1.5 text-sm leading-relaxed text-slate-700 dark:text-slate-300"
+                                        <!-- Actions Dropdown for Reply -->
+                                        <DropdownMenu
+                                            v-if="
+                                                !reply.deleted_at &&
+                                                (canEdit(reply) ||
+                                                    canDelete(reply))
+                                            "
+                                        >
+                                            <DropdownMenuTrigger as-child>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    class="h-7 w-7 cursor-pointer rounded-full hover:bg-muted"
                                                 >
-                                                    <div
-                                                        v-if="reply.deleted_at"
-                                                        class="flex flex-col gap-2 rounded-lg border border-border/40 bg-muted/40 p-2 text-xs text-muted-foreground italic"
-                                                    >
-                                                        <div
-                                                            class="flex items-center gap-2"
-                                                        >
-                                                            <X
-                                                                class="size-3.5 text-muted-foreground/80"
-                                                            />
-                                                            <span>{{
-                                                                currentUser.role ==
-                                                                    'educator' ||
-                                                                currentUser.role ==
-                                                                    'administrator'
-                                                                    ? 'Komentar terhapus (hanya Anda dan Administrator yang dapat melihat):'
-                                                                    : 'Komentar ini dihapus.'
-                                                            }}</span>
-                                                        </div>
-                                                        <PreviewRenderer
-                                                            v-if="
-                                                                currentUser.role ==
-                                                                    'educator' ||
-                                                                currentUser.role ==
-                                                                    'administrator'
-                                                            "
-                                                            :content="
-                                                                reply.content
-                                                            "
-                                                        />
-                                                    </div>
-                                                    <div
-                                                        v-else-if="
-                                                            activeEditId ===
-                                                            reply.id
-                                                        "
-                                                        class="mt-2 space-y-3"
-                                                    >
-                                                        <div
-                                                            class="min-h-32 rounded-lg border border-border bg-background"
-                                                        >
-                                                            <RichEditor
-                                                                v-model="
-                                                                    editForm.content
-                                                                "
-                                                                :is-educator="
-                                                                    false
-                                                                "
-                                                                placeholder="Ubah komentar Anda..."
-                                                                class="min-h-28"
-                                                            />
-                                                        </div>
-                                                        <div
-                                                            class="flex justify-end gap-2"
-                                                        >
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                @click="
-                                                                    activeEditId =
-                                                                        null
-                                                                "
-                                                                class="cursor-pointer"
-                                                            >
-                                                                Batal
-                                                            </Button>
-                                                            <Button
-                                                                size="sm"
-                                                                @click="
-                                                                    submitEdit(
-                                                                        reply.id,
-                                                                    )
-                                                                "
-                                                                :disabled="
-                                                                    editForm.processing
-                                                                "
-                                                                class="cursor-pointer font-semibold"
-                                                            >
-                                                                Simpan
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                    <PreviewRenderer
-                                                        v-else
-                                                        :content="reply.content"
+                                                    <MoreHorizontal
+                                                        class="size-3.5 text-muted-foreground"
                                                     />
-                                                </div>
-
-                                                <!-- Actions -->
-                                                <div
-                                                    v-if="
-                                                        !reply.deleted_at &&
-                                                        activeEditId !==
-                                                            reply.id
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent
+                                                align="end"
+                                                class="w-32"
+                                            >
+                                                <DropdownMenuItem
+                                                    v-if="canEdit(reply)"
+                                                    @click="
+                                                        handleEditToggle(reply)
                                                     "
-                                                    class="mt-2 flex items-center gap-3 border-t pt-2"
+                                                    class="cursor-pointer gap-2"
                                                 >
-                                                    <Button
-                                                        v-if="canEdit(reply)"
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        @click="
-                                                            handleEditToggle(
-                                                                reply,
-                                                            )
-                                                        "
-                                                        class="h-7 cursor-pointer gap-1 px-2 text-[11px] font-semibold text-muted-foreground hover:text-amber-600"
-                                                    >
-                                                        <Edit2 class="size-3" />
-                                                        <span>Edit</span>
-                                                    </Button>
+                                                    <Edit2 class="size-3.5" />
+                                                    <span>Edit</span>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    v-if="canDelete(reply)"
+                                                    @click="
+                                                        deleteComment(reply.id)
+                                                    "
+                                                    class="cursor-pointer gap-2 text-destructive focus:bg-destructive/10 focus:text-destructive"
+                                                >
+                                                    <Trash2 class="size-3.5" />
+                                                    <span>Hapus</span>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
 
-                                                    <Button
-                                                        v-if="canDelete(reply)"
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        @click="
-                                                            deleteComment(
-                                                                reply.id,
-                                                            )
-                                                        "
-                                                        class="ml-auto h-7 cursor-pointer gap-1 px-2 text-[11px] font-semibold text-destructive hover:bg-destructive/10"
-                                                    >
-                                                        <Trash2
-                                                            class="size-3"
-                                                        />
-                                                        <span>Hapus</span>
-                                                    </Button>
-                                                </div>
+                                    <!-- Content -->
+                                    <div
+                                        class="mt-1.5 text-sm leading-relaxed text-slate-700 dark:text-slate-300"
+                                    >
+                                        <div
+                                            v-if="reply.deleted_at"
+                                            class="flex flex-col gap-2 rounded-lg border border-border/40 bg-muted/40 p-2 text-xs text-muted-foreground italic"
+                                        >
+                                            <div
+                                                class="flex items-center gap-2"
+                                            >
+                                                <X
+                                                    class="size-3.5 text-muted-foreground/80"
+                                                />
+                                                <span>{{
+                                                    currentUser.role ==
+                                                        'educator' ||
+                                                    currentUser.role ==
+                                                        'administrator'
+                                                        ? 'Komentar terhapus (hanya Anda dan Administrator yang dapat melihat):'
+                                                        : 'Komentar ini dihapus.'
+                                                }}</span>
+                                            </div>
+                                            <PreviewRenderer
+                                                v-if="
+                                                    currentUser.role ==
+                                                        'educator' ||
+                                                    currentUser.role ==
+                                                        'administrator'
+                                                "
+                                                :content="reply.content"
+                                            />
+                                        </div>
+                                        <div
+                                            v-else-if="
+                                                activeEditId === reply.id
+                                            "
+                                            class="mt-2 space-y-3"
+                                        >
+                                            <div
+                                                class="min-h-32 rounded-lg border border-border bg-background"
+                                            >
+                                                <RichEditor
+                                                    v-model="editForm.content"
+                                                    :is-educator="false"
+                                                    placeholder="Ubah komentar Anda..."
+                                                    class="min-h-28"
+                                                />
+                                            </div>
+                                            <div class="flex justify-end gap-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    @click="activeEditId = null"
+                                                    class="cursor-pointer"
+                                                >
+                                                    Batal
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    @click="
+                                                        submitEdit(reply.id)
+                                                    "
+                                                    :disabled="
+                                                        editForm.processing
+                                                    "
+                                                    class="cursor-pointer font-semibold"
+                                                >
+                                                    Simpan
+                                                </Button>
                                             </div>
                                         </div>
-                                    </CardContent>
-                                </Card>
+                                        <PreviewRenderer
+                                            v-else
+                                            :content="reply.content"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
