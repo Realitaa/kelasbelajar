@@ -25,6 +25,12 @@ import {
     DialogTitle,
     DialogDescription,
 } from '@/components/ui/dialog';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useAppearance } from '@/composables/useAppearance';
 import { manage, show } from '@/routes/classrooms';
 import { index as discussionIndex } from '@/routes/classrooms/discussion';
@@ -153,20 +159,29 @@ function formatDate(dateString: string) {
                         {{ classroom.title }}
                     </h3>
                 </Link>
-                <p
-                    @click="copyClassroomCode(classroom.unique_code)"
-                    title="Salin kode kelas"
-                    class="line-clamp-1 flex cursor-pointer items-center gap-2 font-mono text-xs font-medium tracking-wider text-muted-foreground"
+                <TooltipProvider
+                    :delay-duration="250"
+                    :content="{side: 'right'}"
                 >
-                    <span> Kode: {{ classroom.unique_code }} </span>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        class="h-6 w-6 cursor-pointer"
-                    >
-                        <Copy class="h-4 w-4" />
-                    </Button>
-                </p>
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <p
+                                @click="copyClassroomCode(classroom.unique_code)"
+                                class="line-clamp-1 flex cursor-pointer items-center gap-2 font-mono text-xs font-medium tracking-wider text-muted-foreground"
+                            >
+                                <span> Kode: {{ classroom.unique_code }} </span>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    class="h-6 w-6 cursor-pointer"
+                                >
+                                    <Copy class="h-4 w-4" />
+                                </Button>
+                            </p>
+                        </TooltipTrigger>
+                        <TooltipContent>Salin kode kelas</TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
                 <p
                     v-if="userRole === 'student' && classroom.educator"
                     class="mt-1 text-xs text-muted-foreground"
@@ -191,68 +206,104 @@ function formatDate(dateString: string) {
                 class="mt-6 flex items-center justify-between border-t pt-4"
             >
                 <div class="flex gap-1">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        @click="showStudents"
-                        class="h-10 w-10 rounded-full transition-colors hover:bg-primary/10 hover:text-primary"
-                        title="Lihat Siswa Terdaftar"
+                    <TooltipProvider
+                        :delay-duration="250"
+                        :content="{side: 'bottom'}"
                     >
-                        <Users class="h-5 w-5" />
-                    </Button>
-                    <Link
-                        :href="discussionIndex(classroom.slug).url"
-                        class="inline-flex"
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    @click="showStudents"
+                                    class="h-10 w-10 rounded-full transition-colors hover:bg-primary/10 hover:text-primary"
+                                >
+                                    <Users class="h-5 w-5" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Lihat Siswa Terdaftar</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider
+                        :delay-duration="250"
+                        :content="{side: 'bottom'}"
                     >
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            class="h-10 w-10 rounded-full transition-colors hover:bg-primary/10 hover:text-primary"
-                            title="Forum Diskusi"
-                        >
-                            <MessageSquare class="h-5 w-5" />
-                        </Button>
-                    </Link>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        @click="$emit('edit', classroom)"
-                        class="h-10 w-10 rounded-full transition-colors hover:bg-primary/10 hover:text-primary"
-                        title="Edit Kelas"
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    class="h-10 w-10 rounded-full transition-colors hover:bg-primary/10 hover:text-primary"
+                                    as-child
+                                >
+                                    <Link :href="discussionIndex(classroom.slug).url">
+                                        <MessageSquare class="h-5 w-5" />
+                                    </Link>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Forum Diskusi</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider
+                        :delay-duration="250"
+                        :content="{side: 'bottom'}"
                     >
-                        <Edit class="h-5 w-5" />
-                    </Button>
-                    <Button
-                        v-if="classroom.is_published"
-                        variant="ghost"
-                        size="icon"
-                        @click="$emit('unpublish', classroom)"
-                        class="h-10 w-10 rounded-full transition-colors hover:bg-amber-100 hover:text-amber-600 dark:hover:bg-amber-900/30 dark:hover:text-amber-500"
-                        title="Batalkan Publikasi"
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    @click="$emit('edit', classroom)"
+                                    class="h-10 w-10 rounded-full transition-colors hover:bg-primary/10 hover:text-primary"
+                                >
+                                    <Edit class="h-5 w-5" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Edit Kelas</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider
+                        :delay-duration="250"
+                        :content="{side: 'bottom'}"
                     >
-                        <EyeOff class="h-5 w-5" />
-                    </Button>
-                    <Button
-                        v-else
-                        variant="ghost"
-                        size="icon"
-                        @click="$emit('publish', classroom)"
-                        class="h-10 w-10 rounded-full transition-colors hover:bg-emerald-100 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-500"
-                        title="Publikasikan Kelas"
-                    >
-                        <Globe class="h-5 w-5" />
-                    </Button>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    @click="classroom.is_published ? $emit('unpublish', classroom) : $emit('publish', classroom)"
+                                    :class="[
+                                        'h-10 w-10 rounded-full transition-colors',
+                                        classroom.is_published ? 'hover:bg-amber-100 hover:text-amber-600 dark:hover:bg-amber-900/30 dark:hover:text-amber-500' : 'hover:bg-emerald-100 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-500',
+                                    ]"
+                                >
+                                    <EyeOff v-if="classroom.is_published" class="h-5 w-5" />
+                                    <Globe v-else class="h-5 w-5" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>{{ classroom.is_published ? 'Batalkan Publikasi' : 'Publikasikan Kelas' }}</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
 
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    @click="$emit('delete', classroom.id)"
-                    class="h-10 w-10 rounded-full text-destructive transition-colors hover:bg-destructive/10 hover:text-destructive"
-                    title="Hapus Kelas"
+                <TooltipProvider
+                    :delay-duration="250"
+                    :content="{side: 'bottom'}"
                 >
-                    <Trash2 class="h-5 w-5" />
-                </Button>
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                @click="$emit('delete', classroom.id)"
+                                class="h-10 w-10 rounded-full text-destructive transition-colors hover:bg-destructive/10 hover:text-destructive"
+                            >
+                                <Trash2 class="h-5 w-5" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Hapus Kelas</TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
             </div>
 
             <!-- Student Discovery Enroll Footer -->

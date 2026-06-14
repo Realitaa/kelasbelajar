@@ -27,6 +27,12 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import type { Classroom } from '@/types';
 
 const props = defineProps<{
@@ -470,15 +476,20 @@ function getContextMenuItems(item: any) {
                 </div>
             </template>
             <template v-else>
-                <UTooltip text="Kembali ke Manajemen Objek Pembelajaran" arrow>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        @click="emit('return-manage')"
-                    >
-                        <UIcon name="i-lucide-x" class="size-4" />
-                    </Button>
-                </UTooltip>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                @click="emit('return-manage')"
+                            >
+                                <UIcon name="i-lucide-x" class="size-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Kembali ke Manajemen Objek Pembelajaran</TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
             </template>
         </div>
 

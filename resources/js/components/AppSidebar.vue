@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { House, Compass } from '@lucide/vue';
+import { House, Compass, LayoutDashboard } from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -21,16 +21,24 @@ const page = usePage();
 const userRole = computed(() => page.props.auth.user.role);
 
 const mainNavItems = computed<NavItem[]>(() => {
-    const items: NavItem[] = [
-        {
-            title:
-                userRole.value === 'educator'
-                    ? 'Manajemen Kelas'
-                    : 'Kelas Saya',
-            href: index(),
-            icon: House,
-        },
-    ];
+    const items: NavItem[] = [];
+
+    if (userRole.value === 'administrator') {
+        items.push({
+            title: 'Dashboard',
+            href: '/dashboard',
+            icon: LayoutDashboard,
+        });
+    }
+
+    items.push({
+        title:
+            userRole.value === 'educator'
+                ? 'Manajemen Kelas'
+                : 'Kelas Saya',
+        href: index(),
+        icon: House,
+    });
 
     if (userRole.value === 'student') {
         items.push({
