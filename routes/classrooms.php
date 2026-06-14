@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\ClassroomDiscoveryController;
+use App\Http\Controllers\ClassroomDiscussionController;
 use App\Http\Controllers\ClassroomLearningContentController;
 use App\Http\Controllers\ClassroomModuleController;
 use App\Http\Controllers\ClassroomQuizController;
@@ -15,6 +16,13 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('classrooms', [ClassroomController::class, 'index'])->name('classrooms.index');
     Route::get('classrooms/{classroom:slug}', [ClassroomController::class, 'show'])->name('classrooms.show');
+
+    // Discussion Forum
+    Route::get('classrooms/{classroom:slug}/discussion', [ClassroomDiscussionController::class, 'index'])->name('classrooms.discussion.index');
+    Route::post('classrooms/{classroom:slug}/discussion/comments', [ClassroomDiscussionController::class, 'storeComment'])->name('classrooms.discussion.comments.store');
+    Route::put('classrooms/{classroom:slug}/discussion/comments/{comment}', [ClassroomDiscussionController::class, 'updateComment'])->name('classrooms.discussion.comments.update');
+    Route::delete('classrooms/{classroom:slug}/discussion/comments/{comment}', [ClassroomDiscussionController::class, 'destroyComment'])->name('classrooms.discussion.comments.destroy');
+
     Route::post('classrooms', [ClassroomController::class, 'store'])->name('classrooms.store');
     Route::put('classrooms/{classroom}', [ClassroomController::class, 'update'])->name('classrooms.update');
     Route::delete('classrooms/{classroom}', [ClassroomController::class, 'destroy'])->name('classrooms.destroy');

@@ -1,3 +1,5 @@
+import type { User } from './auth';
+
 interface Classroom {
     id: number;
     title: string;
@@ -6,6 +8,7 @@ interface Classroom {
     thumbnail_path: string;
     description: string | null;
     is_published: boolean;
+    educator_id: number;
     modules?: ClassroomModule[];
     educator?: {
         id: number;
@@ -82,4 +85,28 @@ interface QuizSubmission {
     is_passing: boolean;
 }
 
-export type { Classroom, ClassroomModule, ModuleObject, LearningContent, Quiz, QuizSubmission, Module, LessonObject };
+interface ClassroomComment {
+    id: number;
+    classroom_id: number;
+    user_id: number;
+    parent_id: number | null;
+    content: any;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+    user: User;
+    replies?: ClassroomComment[];
+}
+
+export type {
+    Classroom,
+    ClassroomModule,
+    ModuleObject,
+    LearningContent,
+    Quiz,
+    QuizSubmission,
+    Module,
+    LessonObject,
+    ClassroomComment,
+};
+

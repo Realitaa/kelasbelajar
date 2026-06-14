@@ -42,6 +42,16 @@ class Classroom extends Model
     }
 
     /**
+     * Get the comments for the classroom.
+     *
+     * @return HasMany<ClassroomComment, $this>
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(ClassroomComment::class)->orderBy('created_at', 'desc');
+    }
+
+    /**
      * Get the modules for the classroom.
      *
      * @return HasMany<ClassroomModule, $this>

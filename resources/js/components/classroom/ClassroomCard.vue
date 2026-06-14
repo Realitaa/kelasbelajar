@@ -9,6 +9,7 @@ import {
     Users,
     Check,
     UserPlus,
+    MessageSquare,
 } from '@lucide/vue';
 import { useClipboard } from '@vueuse/core';
 import { ref, computed } from 'vue';
@@ -25,7 +26,8 @@ import {
     DialogDescription,
 } from '@/components/ui/dialog';
 import { useAppearance } from '@/composables/useAppearance';
-import { manage } from '@/routes/classrooms';
+import { manage, show } from '@/routes/classrooms';
+import { index as discussionIndex } from '@/routes/classrooms/discussion';
 import type { Classroom } from '@/types';
 
 const props = withDefaults(
@@ -139,16 +141,12 @@ function formatDate(dateString: string) {
         <div class="flex flex-1 flex-col p-6 pt-2">
             <div class="mb-4">
                 <Link
-                    v-if="userRole === 'educator'"
-                    :href="manage(classroom.slug)"
+                    :href="
+                        userRole === 'educator'
+                            ? manage(classroom.slug)
+                            : show(classroom.slug)
+                    "
                 >
-                    <h3
-                        class="line-clamp-1 text-xl font-bold tracking-tight transition-colors group-hover:text-primary hover:underline"
-                    >
-                        {{ classroom.title }}
-                    </h3>
-                </Link>
-                <Link v-else :href="`/classrooms/${classroom.slug}`">
                     <h3
                         class="line-clamp-1 max-w-[85%] text-xl font-bold tracking-tight transition-colors group-hover:text-primary hover:underline"
                     >
@@ -202,6 +200,19 @@ function formatDate(dateString: string) {
                     >
                         <Users class="h-5 w-5" />
                     </Button>
+                    <Link
+                        :href="discussionIndex(classroom.slug).url"
+                        class="inline-flex"
+                    >
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            class="h-10 w-10 rounded-full transition-colors hover:bg-primary/10 hover:text-primary"
+                            title="Forum Diskusi"
+                        >
+                            <MessageSquare class="h-5 w-5" />
+                        </Button>
+                    </Link>
                     <Button
                         variant="ghost"
                         size="icon"

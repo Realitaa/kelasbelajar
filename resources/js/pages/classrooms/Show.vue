@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
+import { Head, router, Link } from '@inertiajs/vue3';
 import {
     Play,
     Lock,
     CheckCircle2,
     Award,
     BookOpen,
+    MessageSquare,
 } from '@lucide/vue';
 import PreviewRenderer from '@/components/PreviewRenderer.vue';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { show } from '@/routes/classrooms';
+import { index as discussionIndex } from '@/routes/classrooms/discussion';
 import { start } from '@/routes/classrooms/quizzes';
 import type { Classroom, QuizSubmission, Module, LessonObject } from '@/types';
 
@@ -90,28 +92,47 @@ function countTotalLessons() {
                     class="absolute right-20 -bottom-10 h-60 w-60 rounded-full bg-white/10 blur-3xl"
                 ></div>
 
-                <div class="relative z-10 max-w-3xl space-y-3">
-                    <span
-                        class="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-xs select-none"
-                    >
-                        <BookOpen class="size-3.5" />
-                        {{ countTotalLessons() }} Objek Pembelajaran
-                    </span>
+                <div
+                    class="relative z-10 flex flex-col justify-between gap-6 md:flex-row md:items-center"
+                >
+                    <div class="max-w-3xl space-y-3">
+                        <span
+                            class="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-xs select-none"
+                        >
+                            <BookOpen class="size-3.5" />
+                            {{ countTotalLessons() }} Objek Pembelajaran
+                        </span>
 
-                    <h1
-                        class="text-2xl font-extrabold tracking-tight md:text-3xl"
-                    >
-                        {{ classroom.title }}
-                    </h1>
+                        <h1
+                            class="text-2xl font-extrabold tracking-tight md:text-3xl"
+                        >
+                            {{ classroom.title }}
+                        </h1>
 
-                    <p
-                        class="max-w-2xl text-sm leading-relaxed text-blue-100 md:text-base"
-                    >
-                        {{
-                            classroom.description ||
-                            'Selamat datang di kelas! Ikuti setiap modul secara bertahap dan selesaikan kuis untuk melanjutkan ke materi berikutnya.'
-                        }}
-                    </p>
+                        <p
+                            class="max-w-2xl text-sm leading-relaxed text-blue-100 md:text-base"
+                        >
+                            {{
+                                classroom.description ||
+                                'Selamat datang di kelas! Ikuti setiap modul secara bertahap dan selesaikan kuis untuk melanjutkan ke materi berikutnya.'
+                            }}
+                        </p>
+                    </div>
+
+                    <div class="shrink-0">
+                        <Link
+                            :href="discussionIndex(classroom.slug).url"
+                            class="inline-flex"
+                        >
+                            <Button
+                                variant="secondary"
+                                class="cursor-pointer gap-2 border-0 bg-white/20 font-semibold text-white shadow-xs backdrop-blur-xs transition-all hover:bg-white/30"
+                            >
+                                <MessageSquare class="size-4" />
+                                <span>Forum Diskusi</span>
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
             </div>
 
@@ -230,13 +251,25 @@ function countTotalLessons() {
                                     </p>
                                 </div>
                                 <div class="shrink-0">
-                                    <form @submit.prevent="router.post(start.url({ classroom: classroom.slug, quiz: activeObject.object.id }))">
+                                    <form
+                                        @submit.prevent="
+                                            router.post(
+                                                start.url({
+                                                    classroom: classroom.slug,
+                                                    quiz: activeObject.object
+                                                        .id,
+                                                }),
+                                            )
+                                        "
+                                    >
                                         <Button
                                             type="submit"
                                             size="lg"
                                             class="cursor-pointer bg-blue-600 font-semibold text-white shadow-sm hover:bg-blue-700"
                                         >
-                                            <Play class="mr-2 size-4 fill-white" />
+                                            <Play
+                                                class="mr-2 size-4 fill-white"
+                                            />
                                             Mulai Kuis
                                         </Button>
                                     </form>
