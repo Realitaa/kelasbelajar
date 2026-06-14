@@ -6,6 +6,7 @@ use App\Http\Controllers\ClassroomLearningContentController;
 use App\Http\Controllers\ClassroomModuleController;
 use App\Http\Controllers\ClassroomQuizController;
 use App\Http\Controllers\ModuleObjectController;
+use App\Http\Controllers\StudentQuizController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -37,4 +38,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('classrooms/{classroom:slug}/quizzes/{quiz}', [ClassroomQuizController::class, 'show'])->name('classrooms.quizzes.show');
     Route::put('classrooms/{classroom:slug}/quizzes/{quiz}/questions', [ClassroomQuizController::class, 'updateQuestions'])->name('classrooms.quizzes.update-questions');
+
+    // Quiz Taking
+    Route::post('classrooms/{classroom:slug}/quizzes/{quiz}/start', [StudentQuizController::class, 'start'])->name('classrooms.quizzes.start');
+    Route::get('quizzes/{session}/take', [StudentQuizController::class, 'take'])->name('quizzes.take');
+    Route::get('quizzes/{session}/questions/{index}', [StudentQuizController::class, 'getQuestion'])->name('quizzes.question');
+    Route::post('quizzes/{session}/answer', [StudentQuizController::class, 'saveAnswer'])->name('quizzes.answer');
+    Route::post('quizzes/{session}/submit', [StudentQuizController::class, 'submit'])->name('quizzes.submit');
 });

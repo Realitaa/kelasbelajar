@@ -10,6 +10,8 @@ import {
 import PreviewRenderer from '@/components/PreviewRenderer.vue';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { show } from '@/routes/classrooms';
+import { start } from '@/routes/classrooms/quizzes';
 import type { Classroom, QuizSubmission, Module, LessonObject } from '@/types';
 
 const props = defineProps<{
@@ -39,7 +41,7 @@ function selectObject(item: LessonObject) {
     }
 
     router.get(
-        `/classrooms/${props.classroom.slug}`,
+        show.url(props.classroom.slug),
         { object_id: item.id },
         {
             preserveScroll: true,
@@ -228,14 +230,16 @@ function countTotalLessons() {
                                     </p>
                                 </div>
                                 <div class="shrink-0">
-                                    <!-- A placeholder action button since quiz taking will be handled later -->
-                                    <Button
-                                        size="lg"
-                                        class="cursor-pointer bg-blue-600 font-semibold text-white shadow-sm hover:bg-blue-700"
-                                    >
-                                        <Play class="mr-2 size-4 fill-white" />
-                                        Mulai Kuis
-                                    </Button>
+                                    <form @submit.prevent="router.post(start.url({ classroom: classroom.slug, quiz: activeObject.object.id }))">
+                                        <Button
+                                            type="submit"
+                                            size="lg"
+                                            class="cursor-pointer bg-blue-600 font-semibold text-white shadow-sm hover:bg-blue-700"
+                                        >
+                                            <Play class="mr-2 size-4 fill-white" />
+                                            Mulai Kuis
+                                        </Button>
+                                    </form>
                                 </div>
                             </div>
 

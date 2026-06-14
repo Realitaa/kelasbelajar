@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->unsignedInteger('passing_grade')->default(70);
+            $table->unsignedInteger('time_limit')->default(30);
             $table->timestamps();
 
             $table->index('created_by');

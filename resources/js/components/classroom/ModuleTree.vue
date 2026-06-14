@@ -105,6 +105,7 @@ const objectForm = useForm({
     title: '',
     description: '',
     passing_grade: 70,
+    time_limit: 30,
 });
 
 const reorderForm = useForm({
@@ -168,6 +169,7 @@ function openEditObject(objectItem: any) {
     if (objectForm.type === 'quiz') {
         objectForm.description = objectItem.object.description;
         objectForm.passing_grade = objectItem.object.passing_grade;
+        objectForm.time_limit = objectItem.object.time_limit || 30;
     }
 
     isObjectModalOpen.value = true;
@@ -180,6 +182,7 @@ function submitObject() {
             {
                 onSuccess: () => {
                     isObjectModalOpen.value = false;
+                    objectForm.reset();
                 },
             },
         );
@@ -189,6 +192,7 @@ function submitObject() {
             {
                 onSuccess: () => {
                     isObjectModalOpen.value = false;
+                    objectForm.reset();
                 },
             },
         );
@@ -731,6 +735,21 @@ function getContextMenuItems(item: any) {
                                 class="text-sm text-red-500"
                             >
                                 {{ objectForm.errors.passing_grade }}
+                            </p>
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label required>Waktu Kuis (Menit)</Label>
+                            <Input
+                                v-model="objectForm.time_limit"
+                                type="number"
+                                min="1"
+                            />
+                            <p
+                                v-if="objectForm.errors.time_limit"
+                                class="text-sm text-red-500"
+                            >
+                                {{ objectForm.errors.time_limit }}
                             </p>
                         </div>
                     </template>

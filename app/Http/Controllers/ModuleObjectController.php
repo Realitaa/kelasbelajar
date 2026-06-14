@@ -27,6 +27,7 @@ class ModuleObjectController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'passing_grade' => 'nullable|integer|min:0|max:100',
+            'time_limit' => 'nullable|integer|min:1',
         ]);
 
         $position = $module->objects()->max('position') + 1;
@@ -42,6 +43,7 @@ class ModuleObjectController extends Controller
                 'title' => $validated['title'],
                 'description' => $validated['description'] ?? '',
                 'passing_grade' => $validated['passing_grade'] ?? 70,
+                'time_limit' => $validated['time_limit'] ?? 30,
                 'created_by' => $request->user()->id,
             ]);
         }
@@ -69,6 +71,7 @@ class ModuleObjectController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'passing_grade' => 'nullable|integer|min:0|max:100',
+            'time_limit' => 'nullable|integer|min:1',
         ]);
 
         $actualObject = $object->object;
@@ -82,6 +85,7 @@ class ModuleObjectController extends Controller
                 'title' => $validated['title'],
                 'description' => $validated['description'] ?? '',
                 'passing_grade' => $validated['passing_grade'] ?? 70,
+                'time_limit' => $validated['time_limit'] ?? 30,
             ]);
         }
 

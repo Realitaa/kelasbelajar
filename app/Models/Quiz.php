@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
     'description',
     'created_by',
     'passing_grade',
+    'time_limit',
 ])]
 class Quiz extends Model
 {
@@ -25,6 +26,7 @@ class Quiz extends Model
     {
         return [
             'passing_grade' => 'integer',
+            'time_limit' => 'integer',
         ];
     }
 

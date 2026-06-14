@@ -22,6 +22,7 @@ class QuizFactory extends Factory
             'title' => fake()->sentence(),
             'description' => fake()->paragraph(),
             'passing_grade' => fake()->randomElement([60, 70, 80]),
+            'time_limit' => fake()->randomElement([15, 30, 45, 60]),
             'created_by' => User::factory(),
         ];
     }
