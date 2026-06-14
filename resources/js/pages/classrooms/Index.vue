@@ -115,18 +115,30 @@ defineOptions({
 
 <template>
     <div>
-        <Head :title="userRole === 'educator' ? 'Manajemen Kelas' : 'Kelas Saya'" />
+        <Head
+            :title="userRole === 'educator' ? 'Manajemen Kelas' : 'Kelas Saya'"
+        />
 
         <div class="flex h-full flex-1 flex-col gap-6 p-6">
             <!-- Dashboard Greeting Header -->
             <PageHeader
-                :title="userRole === 'educator' ? 'Manajemen Kelas' : 'Kelas Saya'"
-                :description="userRole === 'educator' ? 'Kelola kelas-kelas Anda, publikasikan materi, dan pantau siswa.' : 'Lihat kelas yang Anda ikuti dan mulai belajar.'"
-                :links="userRole === 'educator' ? {
-                    title: 'Buat Kelas Baru',
-                    onClick: openCreateDialog,
-                    icon: Plus,
-                } : undefined"
+                :title="
+                    userRole === 'educator' ? 'Manajemen Kelas' : 'Kelas Saya'
+                "
+                :description="
+                    userRole === 'educator'
+                        ? 'Kelola kelas-kelas Anda, publikasikan materi, dan pantau siswa.'
+                        : 'Lihat kelas yang Anda ikuti dan mulai belajar.'
+                "
+                :links="
+                    userRole === 'educator'
+                        ? {
+                              title: 'Buat Kelas Baru',
+                              onClick: openCreateDialog,
+                              icon: Plus,
+                          }
+                        : undefined
+                "
             />
 
             <!-- Main Content Grid / Empty State -->
@@ -138,7 +150,11 @@ defineOptions({
                     <BookOpen class="h-12 w-12" />
                 </div>
                 <h3 class="mt-6 text-xl font-bold tracking-tight">
-                    {{ userRole === 'educator' ? 'Belum Ada Kelas' : 'Belum Bergabung dengan Kelas' }}
+                    {{
+                        userRole === 'educator'
+                            ? 'Belum Ada Kelas'
+                            : 'Belum Bergabung dengan Kelas'
+                    }}
                 </h3>
                 <p class="mt-2 max-w-sm text-sm text-muted-foreground">
                     {{
@@ -147,7 +163,11 @@ defineOptions({
                             : 'Anda belum bergabung ke kelas manapun. Silakan pergi ke halaman discovery untuk mendaftar ke kelas.'
                     }}
                 </p>
-                <Button v-if="userRole === 'educator'" @click="openCreateDialog" class="mt-6 gap-2">
+                <Button
+                    v-if="userRole === 'educator'"
+                    @click="openCreateDialog"
+                    class="mt-6 gap-2"
+                >
                     <Plus class="h-4 w-4" />
                     Buat Kelas Pertama
                 </Button>

@@ -16,7 +16,7 @@ const extensions = [
     StarterKit,
     Image.configure({ inline: true }),
     Youtube.configure({ inline: false, width: 640, height: 480 }),
-    Mathematics.configure({ katexOptions: { throwOnError: false } })
+    Mathematics.configure({ katexOptions: { throwOnError: false } }),
 ];
 
 const containerRef = ref<HTMLElement | null>(null);
@@ -27,9 +27,15 @@ const blocks = computed(() => {
     }
 
     try {
-        const json = typeof props.content === 'string' ? JSON.parse(props.content) : props.content;
-        
-        if (!json || (Object.keys(json).length === 0 && json.constructor === Object)) {
+        const json =
+            typeof props.content === 'string'
+                ? JSON.parse(props.content)
+                : props.content;
+
+        if (
+            !json ||
+            (Object.keys(json).length === 0 && json.constructor === Object)
+        ) {
             return [];
         }
 
@@ -60,8 +66,9 @@ function renderMath() {
         if (!containerRef.value) {
             return;
         }
-        
-        const mathElements = containerRef.value.querySelectorAll('[data-latex]');
+
+        const mathElements =
+            containerRef.value.querySelectorAll('[data-latex]');
         mathElements.forEach((el) => {
             const latex = el.getAttribute('data-latex') || '';
             const isBlock = el.getAttribute('data-type') === 'block-math';
@@ -78,9 +85,13 @@ function renderMath() {
     });
 }
 
-watch(() => props.content, () => {
-    renderMath();
-}, { immediate: true, deep: true });
+watch(
+    () => props.content,
+    () => {
+        renderMath();
+    },
+    { immediate: true, deep: true },
+);
 
 onMounted(() => {
     renderMath();
@@ -90,10 +101,16 @@ onMounted(() => {
 <template>
     <div ref="containerRef" class="tiptap-preview px-4 py-2">
         <template v-for="(node, index) in blocks" :key="index">
-            <SlideshowPreview v-if="node.type === 'slideshow'" :images="node.attrs?.images || []" />
+            <SlideshowPreview
+                v-if="node.type === 'slideshow'"
+                :images="node.attrs?.images || []"
+            />
             <div v-else v-html="renderHtmlNode(node)"></div>
         </template>
-        <div v-if="blocks.length === 0" class="text-muted-foreground italic text-sm text-center py-8">
+        <div
+            v-if="blocks.length === 0"
+            class="py-8 text-center text-sm text-muted-foreground italic"
+        >
             Belum ada konten.
         </div>
     </div>

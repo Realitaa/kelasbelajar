@@ -27,15 +27,16 @@ const embedUrl = computed(() => {
     if (!url.value.trim()) {
         return '';
     }
-    
+
     // Regex to capture YouTube video IDs
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const regExp =
+        /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.value.match(regExp);
-    
+
     if (match && match[2].length === 11) {
         return `https://www.youtube.com/embed/${match[2]}`;
     }
-    
+
     return '';
 });
 
@@ -64,7 +65,8 @@ function closeModal() {
             <DialogHeader>
                 <DialogTitle>Sisipkan Video YouTube</DialogTitle>
                 <DialogDescription>
-                    Masukkan URL video YouTube yang ingin Anda sisipkan ke dalam materi.
+                    Masukkan URL video YouTube yang ingin Anda sisipkan ke dalam
+                    materi.
                 </DialogDescription>
             </DialogHeader>
 
@@ -81,23 +83,39 @@ function closeModal() {
 
                 <div class="grid gap-2">
                     <Label>Pratinjau Video</Label>
-                    <div class="w-full aspect-video rounded-md border border-input bg-muted/40 overflow-hidden flex items-center justify-center relative">
+                    <div
+                        class="relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-md border border-input bg-muted/40"
+                    >
                         <iframe
                             v-if="isValidYoutube"
                             :src="embedUrl"
-                            class="w-full h-full"
+                            class="h-full w-full"
                             frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allow="
+                                accelerometer;
+                                autoplay;
+                                clipboard-write;
+                                encrypted-media;
+                                gyroscope;
+                                picture-in-picture;
+                            "
                             allowfullscreen
                         ></iframe>
-                        <span v-else class="text-xs text-muted-foreground italic">Masukkan tautan YouTube valid untuk pratinjau...</span>
+                        <span
+                            v-else
+                            class="text-xs text-muted-foreground italic"
+                            >Masukkan tautan YouTube valid untuk
+                            pratinjau...</span
+                        >
                     </div>
                 </div>
             </div>
 
             <DialogFooter>
                 <Button variant="outline" @click="closeModal">Batal</Button>
-                <Button @click="handleInsert" :disabled="!isValidYoutube">Sisipkan</Button>
+                <Button @click="handleInsert" :disabled="!isValidYoutube"
+                    >Sisipkan</Button
+                >
             </DialogFooter>
         </DialogContent>
     </Dialog>

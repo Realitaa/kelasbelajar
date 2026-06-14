@@ -3,13 +3,14 @@
 namespace Database\Factories;
 
 use App\Models\Quiz;
+use App\Models\QuizSubmission;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Quiz>
+ * @extends Factory<QuizSubmission>
  */
-class QuizFactory extends Factory
+class QuizSubmissionFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,10 +20,10 @@ class QuizFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => fake()->sentence(),
-            'description' => fake()->paragraph(),
-            'passing_grade' => fake()->randomElement([60, 70, 80]),
-            'created_by' => User::factory(),
+            'quiz_id' => Quiz::factory(),
+            'student_id' => User::factory()->student(),
+            'score' => fake()->numberBetween(0, 100),
+            'submitted_at' => now(),
         ];
     }
 }

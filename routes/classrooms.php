@@ -13,6 +13,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('classrooms/{classroom:slug}/enroll', [ClassroomDiscoveryController::class, 'enroll'])->name('classrooms.enroll');
 
     Route::get('classrooms', [ClassroomController::class, 'index'])->name('classrooms.index');
+    Route::get('classrooms/{classroom:slug}', [ClassroomController::class, 'show'])->name('classrooms.show');
     Route::post('classrooms', [ClassroomController::class, 'store'])->name('classrooms.store');
     Route::put('classrooms/{classroom}', [ClassroomController::class, 'update'])->name('classrooms.update');
     Route::delete('classrooms/{classroom}', [ClassroomController::class, 'destroy'])->name('classrooms.destroy');

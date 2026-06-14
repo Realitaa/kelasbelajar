@@ -129,12 +129,15 @@ function openEditModule(module: any) {
 
 function submitModule() {
     if (moduleForm.id) {
-        moduleForm.put(updateModule([props.classroom.slug, moduleForm.id]).url, {
-            onSuccess: () => {
-                isModuleModalOpen.value = false;
-                moduleForm.reset();
+        moduleForm.put(
+            updateModule([props.classroom.slug, moduleForm.id]).url,
+            {
+                onSuccess: () => {
+                    isModuleModalOpen.value = false;
+                    moduleForm.reset();
+                },
             },
-        });
+        );
     } else {
         moduleForm.post(storeModule(props.classroom.slug).url, {
             onSuccess: () => {
@@ -293,7 +296,7 @@ function cancelOrder() {
     }
 }
 
-// UTree formatting 
+// UTree formatting
 const treeItems = computed<TreeItem[]>(() => {
     if (!props.classroom?.modules) {
         return [];
@@ -378,15 +381,22 @@ function getContextMenuItems(item: any) {
                     icon: isQuiz ? 'i-lucide-settings' : 'i-lucide-file-text',
                     onSelect: () => openEditObject(item.original),
                 },
-                ...(isQuiz ? [{
-                    label: 'Edit Soal Kuis',
-                    icon: 'i-lucide-edit',
-                    onSelect: () => emit('edit-quiz', item.original),
-                }] : [{
-                    label: 'Edit Isi Materi',
-                    icon: 'i-lucide-edit',
-                    onSelect: () => emit('edit-content', item.original),
-                }]),
+                ...(isQuiz
+                    ? [
+                          {
+                              label: 'Edit Soal Kuis',
+                              icon: 'i-lucide-edit',
+                              onSelect: () => emit('edit-quiz', item.original),
+                          },
+                      ]
+                    : [
+                          {
+                              label: 'Edit Isi Materi',
+                              icon: 'i-lucide-edit',
+                              onSelect: () =>
+                                  emit('edit-content', item.original),
+                          },
+                      ]),
             ],
             [
                 {
@@ -402,7 +412,10 @@ function getContextMenuItems(item: any) {
 </script>
 
 <template>
-    <Card class="flex h-full flex-col px-4 gap-0" :class="isManage ? 'w-full' : 'w-1/3'">
+    <Card
+        class="flex h-full flex-col gap-0 px-4"
+        :class="isManage ? 'w-full' : 'w-1/3'"
+    >
         <!-- Header -->
         <div
             class="mb-4 flex shrink-0 items-center justify-between border-b border-border pb-3"
@@ -426,10 +439,7 @@ function getContextMenuItems(item: any) {
                         <ArrowUpDown class="size-4" />
                         Urutkan Objek Kelas
                     </Button>
-                    <Button
-                        @click="openCreateModule"
-                        v-if="!orderingMode"
-                    >
+                    <Button @click="openCreateModule" v-if="!orderingMode">
                         <Plus class="size-4" />
                         Tambah Modul
                     </Button>
@@ -637,7 +647,12 @@ function getContextMenuItems(item: any) {
                             placeholder="Contoh: Pengenalan Dasar"
                             autofocus
                         />
-                        <p v-if="moduleForm.errors.title" class="text-sm text-red-500">{{ moduleForm.errors.title }}</p>
+                        <p
+                            v-if="moduleForm.errors.title"
+                            class="text-sm text-red-500"
+                        >
+                            {{ moduleForm.errors.title }}
+                        </p>
                     </div>
 
                     <DialogFooter>
@@ -648,9 +663,7 @@ function getContextMenuItems(item: any) {
                             :disabled="moduleForm.processing"
                             >Batal</Button
                         >
-                        <Button
-                            type="submit"
-                            :disabled="moduleForm.processing"
+                        <Button type="submit" :disabled="moduleForm.processing"
                             >Simpan</Button
                         >
                     </DialogFooter>
@@ -681,7 +694,12 @@ function getContextMenuItems(item: any) {
                             placeholder="Masukkan judul"
                             autofocus
                         />
-                        <p v-if="objectForm.errors.title" class="text-sm text-red-500">{{ objectForm.errors.title }}</p>
+                        <p
+                            v-if="objectForm.errors.title"
+                            class="text-sm text-red-500"
+                        >
+                            {{ objectForm.errors.title }}
+                        </p>
                     </div>
 
                     <template v-if="objectForm.type === 'quiz'">
@@ -690,9 +708,14 @@ function getContextMenuItems(item: any) {
                             <textarea
                                 v-model="objectForm.description"
                                 placeholder="Instruksi pengerjaan kuis..."
-                                class="flex min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                class="flex min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                             ></textarea>
-                            <p v-if="objectForm.errors.description" class="text-sm text-red-500">{{ objectForm.errors.description }}</p>
+                            <p
+                                v-if="objectForm.errors.description"
+                                class="text-sm text-red-500"
+                            >
+                                {{ objectForm.errors.description }}
+                            </p>
                         </div>
 
                         <div class="grid gap-2">
@@ -703,7 +726,12 @@ function getContextMenuItems(item: any) {
                                 min="0"
                                 max="100"
                             />
-                            <p v-if="objectForm.errors.passing_grade" class="text-sm text-red-500">{{ objectForm.errors.passing_grade }}</p>
+                            <p
+                                v-if="objectForm.errors.passing_grade"
+                                class="text-sm text-red-500"
+                            >
+                                {{ objectForm.errors.passing_grade }}
+                            </p>
                         </div>
                     </template>
 
@@ -715,9 +743,7 @@ function getContextMenuItems(item: any) {
                             :disabled="objectForm.processing"
                             >Batal</Button
                         >
-                        <Button
-                            type="submit"
-                            :disabled="objectForm.processing"
+                        <Button type="submit" :disabled="objectForm.processing"
                             >Simpan</Button
                         >
                     </DialogFooter>

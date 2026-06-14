@@ -14,11 +14,19 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
     'title',
     'description',
     'created_by',
+    'passing_grade',
 ])]
 class Quiz extends Model
 {
     /** @use HasFactory<QuizFactory> */
     use HasFactory;
+
+    protected function casts(): array
+    {
+        return [
+            'passing_grade' => 'integer',
+        ];
+    }
 
     /**
      * @return BelongsTo<User, $this>

@@ -58,7 +58,11 @@ const lastPage = computed(() => Math.ceil(props.total / props.perPage));
                             {{ item.value }}
                         </Link>
                     </PaginationItem>
-                    <PaginationEllipsis v-else :key="item.type" :index="index" />
+                    <PaginationEllipsis
+                        v-else
+                        :key="item.type"
+                        :index="index"
+                    />
                 </template>
 
                 <PaginationNext as-child :disabled="currentPage >= lastPage">

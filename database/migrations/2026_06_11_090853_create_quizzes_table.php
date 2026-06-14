@@ -18,6 +18,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
             $table->string('title');
             $table->text('description')->nullable();
+            $table->unsignedInteger('passing_grade')->default(70);
             $table->timestamps();
 
             $table->index('created_by');

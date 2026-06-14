@@ -49,4 +49,37 @@ interface ClassroomModule {
     objects?: ModuleObject[];
 }
 
-export type { Classroom, ClassroomModule, ModuleObject, LearningContent, Quiz };
+interface LessonObject {
+    id: number;
+    module_id: number;
+    object_type: string;
+    object_id: number;
+    position: number;
+    can_access: boolean;
+    is_completed: boolean;
+    object: {
+        id: number;
+        title: string;
+        content?: any;
+        description?: string;
+        passing_grade?: number;
+        highest_score?: number | null;
+    };
+}
+
+interface Module {
+    id: number;
+    classroom_id: number;
+    title: string;
+    position: number;
+    objects: LessonObject[];
+}
+
+interface QuizSubmission {
+    id: number;
+    score: number;
+    submitted_at: string;
+    is_passing: boolean;
+}
+
+export type { Classroom, ClassroomModule, ModuleObject, LearningContent, Quiz, QuizSubmission, Module, LessonObject };

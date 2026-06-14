@@ -15,7 +15,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-
 defineProps<{
     open: boolean;
 }>();
@@ -61,8 +60,10 @@ function handleUpload() {
             }
         },
         onError: () => {
-            toast.error('Gagal mengunggah gambar. Pastikan ukuran file maksimal 2MB.');
-        }
+            toast.error(
+                'Gagal mengunggah gambar. Pastikan ukuran file maksimal 2MB.',
+            );
+        },
     });
 }
 
@@ -85,16 +86,33 @@ function closeModal() {
             <div class="grid gap-4 py-4">
                 <div class="grid gap-2">
                     <Label htmlFor="image-file" required>File Gambar</Label>
-                    <Input id="image-file" type="file" accept="image/*" @change="handleFileChange" />
+                    <Input
+                        id="image-file"
+                        type="file"
+                        accept="image/*"
+                        @change="handleFileChange"
+                    />
                 </div>
-                <div v-if="http.processing" class="text-sm text-muted-foreground">
+                <div
+                    v-if="http.processing"
+                    class="text-sm text-muted-foreground"
+                >
                     Mengunggah...
                 </div>
             </div>
 
             <DialogFooter>
-                <Button variant="outline" @click="closeModal" :disabled="http.processing">Batal</Button>
-                <Button @click="handleUpload" :disabled="!file || http.processing">Unggah</Button>
+                <Button
+                    variant="outline"
+                    @click="closeModal"
+                    :disabled="http.processing"
+                    >Batal</Button
+                >
+                <Button
+                    @click="handleUpload"
+                    :disabled="!file || http.processing"
+                    >Unggah</Button
+                >
             </DialogFooter>
         </DialogContent>
     </Dialog>

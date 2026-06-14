@@ -23,7 +23,10 @@ const userRole = computed(() => page.props.auth.user.role);
 const mainNavItems = computed<NavItem[]>(() => {
     const items: NavItem[] = [
         {
-            title: userRole.value === 'educator' ? 'Manajemen Kelas' : 'Kelas Saya',
+            title:
+                userRole.value === 'educator'
+                    ? 'Manajemen Kelas'
+                    : 'Kelas Saya',
             href: index(),
             icon: House,
         },

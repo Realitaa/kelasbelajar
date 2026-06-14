@@ -26,7 +26,7 @@ provide('isEducator', props.isEducator);
 
 const value = computed({
     get: () => props.modelValue,
-    set: (val) => emit('update:modelValue', val)
+    set: (val) => emit('update:modelValue', val),
 });
 
 const isImageModalOpen = ref(false);
@@ -34,7 +34,11 @@ const isMathModalOpen = ref(false);
 const isYoutubeModalOpen = ref(false);
 const editorRef = ref<any>(null);
 
-const mathToEdit = ref<{ latex: string; isBlock: boolean; pos?: number } | null>(null);
+const mathToEdit = ref<{
+    latex: string;
+    isBlock: boolean;
+    pos?: number;
+} | null>(null);
 
 watch(isMathModalOpen, (isOpen) => {
     if (!isOpen) {
@@ -49,13 +53,13 @@ const extensions = computed(() => {
             inlineOptions: {
                 onClick: (node: any, pos: number) => {
                     editorRef.value?.editor?.commands?.setNodeSelection?.(pos);
-                }
+                },
             },
             blockOptions: {
                 onClick: (node: any, pos: number) => {
                     editorRef.value?.editor?.commands?.setNodeSelection?.(pos);
-                }
-            }
+                },
+            },
         }),
         Youtube.configure({
             inline: false,
@@ -65,7 +69,7 @@ const extensions = computed(() => {
         Image.configure({
             inline: true,
             allowBase64: true,
-        })
+        }),
     ];
 
     if (props.isEducator) {
@@ -80,35 +84,121 @@ const toolbarItems = computed(() => {
     const items: any[][] = [
         [
             { kind: 'undo', icon: 'i-lucide-undo', tooltip: { text: 'Batal' } },
-            { kind: 'redo', icon: 'i-lucide-redo', tooltip: { text: 'Ulangi' } }
+            {
+                kind: 'redo',
+                icon: 'i-lucide-redo',
+                tooltip: { text: 'Ulangi' },
+            },
         ],
         [
-            { kind: 'heading', level: 1, icon: 'i-lucide-heading-1', tooltip: { text: 'Judul 1' } },
-            { kind: 'heading', level: 2, icon: 'i-lucide-heading-2', tooltip: { text: 'Judul 2' } },
-            { kind: 'heading', level: 3, icon: 'i-lucide-heading-3', tooltip: { text: 'Judul 3' } },
-            { kind: 'heading', level: 4, icon: 'i-lucide-heading-4', tooltip: { text: 'Judul 4' } },
-            { kind: 'heading', level: 5, icon: 'i-lucide-heading-5', tooltip: { text: 'Judul 5' } },
-            { kind: 'heading', level: 6, icon: 'i-lucide-heading-6', tooltip: { text: 'Judul 6' } }
+            {
+                kind: 'heading',
+                level: 1,
+                icon: 'i-lucide-heading-1',
+                tooltip: { text: 'Judul 1' },
+            },
+            {
+                kind: 'heading',
+                level: 2,
+                icon: 'i-lucide-heading-2',
+                tooltip: { text: 'Judul 2' },
+            },
+            {
+                kind: 'heading',
+                level: 3,
+                icon: 'i-lucide-heading-3',
+                tooltip: { text: 'Judul 3' },
+            },
+            {
+                kind: 'heading',
+                level: 4,
+                icon: 'i-lucide-heading-4',
+                tooltip: { text: 'Judul 4' },
+            },
+            {
+                kind: 'heading',
+                level: 5,
+                icon: 'i-lucide-heading-5',
+                tooltip: { text: 'Judul 5' },
+            },
+            {
+                kind: 'heading',
+                level: 6,
+                icon: 'i-lucide-heading-6',
+                tooltip: { text: 'Judul 6' },
+            },
         ],
         [
-            { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold', tooltip: { text: 'Tebal' } },
-            { kind: 'mark', mark: 'italic', icon: 'i-lucide-italic', tooltip: { text: 'Miring' } },
-            { kind: 'mark', mark: 'underline', icon: 'i-lucide-underline', tooltip: { text: 'Garis Bawah' } },
-            { kind: 'mark', mark: 'strike', icon: 'i-lucide-strikethrough', tooltip: { text: 'Coret' } }
+            {
+                kind: 'mark',
+                mark: 'bold',
+                icon: 'i-lucide-bold',
+                tooltip: { text: 'Tebal' },
+            },
+            {
+                kind: 'mark',
+                mark: 'italic',
+                icon: 'i-lucide-italic',
+                tooltip: { text: 'Miring' },
+            },
+            {
+                kind: 'mark',
+                mark: 'underline',
+                icon: 'i-lucide-underline',
+                tooltip: { text: 'Garis Bawah' },
+            },
+            {
+                kind: 'mark',
+                mark: 'strike',
+                icon: 'i-lucide-strikethrough',
+                tooltip: { text: 'Coret' },
+            },
         ],
         [
-            { kind: 'bulletList', icon: 'i-lucide-list', tooltip: { text: 'Daftar Bulat' } },
-            { kind: 'orderedList', icon: 'i-lucide-list-ordered', tooltip: { text: 'Daftar Angka' } }
+            {
+                kind: 'bulletList',
+                icon: 'i-lucide-list',
+                tooltip: { text: 'Daftar Bulat' },
+            },
+            {
+                kind: 'orderedList',
+                icon: 'i-lucide-list-ordered',
+                tooltip: { text: 'Daftar Angka' },
+            },
         ],
         [
-            { kind: 'alignLeft', icon: 'i-lucide-align-left', tooltip: { text: 'Rata Kiri' } },
-            { kind: 'alignCenter', icon: 'i-lucide-align-center', tooltip: { text: 'Rata Tengah' } },
-            { kind: 'alignRight', icon: 'i-lucide-align-right', tooltip: { text: 'Rata Kanan' } },
-            { kind: 'justify', icon: 'i-lucide-align-justify', tooltip: { text: 'Rata Kanan Kiri' } }
+            {
+                kind: 'alignLeft',
+                icon: 'i-lucide-align-left',
+                tooltip: { text: 'Rata Kiri' },
+            },
+            {
+                kind: 'alignCenter',
+                icon: 'i-lucide-align-center',
+                tooltip: { text: 'Rata Tengah' },
+            },
+            {
+                kind: 'alignRight',
+                icon: 'i-lucide-align-right',
+                tooltip: { text: 'Rata Kanan' },
+            },
+            {
+                kind: 'justify',
+                icon: 'i-lucide-align-justify',
+                tooltip: { text: 'Rata Kanan Kiri' },
+            },
         ],
         [
-            { kind: 'codeBlock', icon: 'i-lucide-code', tooltip: { text: 'Blok Kode' } },
-            { kind: 'link', icon: 'i-lucide-link', tooltip: { text: 'Tautan' } }
+            {
+                kind: 'codeBlock',
+                icon: 'i-lucide-code',
+                tooltip: { text: 'Blok Kode' },
+            },
+            {
+                kind: 'link',
+                icon: 'i-lucide-link',
+                tooltip: { text: 'Tautan' },
+            },
         ],
         [
             {
@@ -116,23 +206,23 @@ const toolbarItems = computed(() => {
                 tooltip: { text: 'Matematika' },
                 onClick: () => {
                     isMathModalOpen.value = true;
-                }
+                },
             },
             {
                 icon: 'i-lucide-youtube',
                 tooltip: { text: 'Youtube Video' },
                 onClick: () => {
                     isYoutubeModalOpen.value = true;
-                }
+                },
             },
             {
                 icon: 'i-lucide-image',
                 tooltip: { text: 'Gambar' },
                 onClick: () => {
                     isImageModalOpen.value = true;
-                }
-            }
-        ]
+                },
+            },
+        ],
     ];
 
     if (props.isEducator) {
@@ -143,10 +233,10 @@ const toolbarItems = computed(() => {
                 if (editorRef.value?.editor) {
                     editorRef.value.editor.commands.insertContent({
                         type: 'slideshow',
-                        attrs: { images: [] }
+                        attrs: { images: [] },
                     });
                 }
-            }
+            },
         });
     }
 
@@ -169,15 +259,19 @@ const mathBubbleItems = computed(() => [
                 const { selection } = state;
                 const node = selection.node;
 
-                if (node && (node.type.name === 'inlineMath' || node.type.name === 'blockMath')) {
+                if (
+                    node &&
+                    (node.type.name === 'inlineMath' ||
+                        node.type.name === 'blockMath')
+                ) {
                     mathToEdit.value = {
                         latex: node.attrs.latex || '',
                         isBlock: node.type.name === 'blockMath',
-                        pos: selection.from
+                        pos: selection.from,
                     };
                     isMathModalOpen.value = true;
                 }
-            }
+            },
         },
         {
             icon: 'i-lucide-trash-2',
@@ -198,9 +292,9 @@ const mathBubbleItems = computed(() => [
                 } else if (node && node.type.name === 'blockMath') {
                     editor.commands.deleteBlockMath({ pos: selection.from });
                 }
-            }
-        }
-    ]
+            },
+        },
+    ],
 ]);
 
 function shouldShowMathBubble({ editor }: { editor: any }) {
@@ -266,12 +360,17 @@ function handleYoutubeInsert(url: string) {
             v-model="value"
             :placeholder="placeholder || 'Mulai menulis...'"
             :extensions="extensions"
-            :class="cn('flex flex-col h-full border border-border rounded-lg overflow-hidden bg-background focus-within:border-primary/50 transition-colors', props.class)"
+            :class="
+                cn(
+                    'flex h-full flex-col overflow-hidden rounded-lg border border-border bg-background transition-colors focus-within:border-primary/50',
+                    props.class,
+                )
+            "
         >
             <UEditorToolbar
                 :editor="editor"
                 :items="toolbarItems"
-                class="border-b border-border px-3 py-1.5 bg-muted/30 overflow-x-auto shrink-0 mb-2"
+                class="mb-2 shrink-0 overflow-x-auto border-b border-border bg-muted/30 px-3 py-1.5"
             />
 
             <UEditorToolbar
@@ -282,13 +381,19 @@ function handleYoutubeInsert(url: string) {
             />
         </UEditor>
 
-        <ImageUploadModal v-model:open="isImageModalOpen" @insert="handleImageInsert" />
+        <ImageUploadModal
+            v-model:open="isImageModalOpen"
+            @insert="handleImageInsert"
+        />
         <MathInsertModal
             v-model:open="isMathModalOpen"
             :initial-latex="mathToEdit?.latex || ''"
             :initial-is-block="mathToEdit ? mathToEdit.isBlock : true"
             @insert="handleMathInsert"
         />
-        <YoutubeInsertModal v-model:open="isYoutubeModalOpen" @insert="handleYoutubeInsert" />
+        <YoutubeInsertModal
+            v-model:open="isYoutubeModalOpen"
+            @insert="handleYoutubeInsert"
+        />
     </UApp>
 </template>

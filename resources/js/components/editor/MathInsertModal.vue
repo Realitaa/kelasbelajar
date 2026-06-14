@@ -14,14 +14,17 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 
-const props = withDefaults(defineProps<{
-    open: boolean;
-    initialLatex?: string;
-    initialIsBlock?: boolean;
-}>(), {
-    initialLatex: '',
-    initialIsBlock: true,
-});
+const props = withDefaults(
+    defineProps<{
+        open: boolean;
+        initialLatex?: string;
+        initialIsBlock?: boolean;
+    }>(),
+    {
+        initialLatex: '',
+        initialIsBlock: true,
+    },
+);
 
 const emit = defineEmits<{
     (e: 'update:open', value: boolean): void;
@@ -31,12 +34,15 @@ const emit = defineEmits<{
 const latex = ref('');
 const isBlock = ref('true'); // 'true' = Block Math, 'false' = Inline Math
 
-watch(() => props.open, (isOpen) => {
-    if (isOpen) {
-        latex.value = props.initialLatex;
-        isBlock.value = props.initialIsBlock ? 'true' : 'false';
-    }
-});
+watch(
+    () => props.open,
+    (isOpen) => {
+        if (isOpen) {
+            latex.value = props.initialLatex;
+            isBlock.value = props.initialIsBlock ? 'true' : 'false';
+        }
+    },
+);
 const previewHtml = ref('');
 const previewError = ref('');
 
@@ -75,8 +81,8 @@ watch([latex, isBlock], () => {
 
 function handleInsert() {
     if (!latex.value.trim()) {
-return;
-}
+        return;
+    }
 
     emit('insert', {
         latex: latex.value,
@@ -100,7 +106,8 @@ function closeModal() {
             <DialogHeader>
                 <DialogTitle>Sisipkan Formula Matematika</DialogTitle>
                 <DialogDescription>
-                    Tulis formula LaTeX di bawah ini. Anda dapat memilih tipe tampilan inline atau terpisah.
+                    Tulis formula LaTeX di bawah ini. Anda dapat memilih tipe
+                    tampilan inline atau terpisah.
                 </DialogDescription>
             </DialogHeader>
 
@@ -121,22 +128,35 @@ function closeModal() {
                     <RadioGroup v-model="isBlock" class="flex gap-4">
                         <div class="flex items-center space-x-2">
                             <RadioGroupItem value="true" id="math-block" />
-                            <Label for="math-block" class="cursor-pointer">Terpisah (Centered / Baris Baru)</Label>
+                            <Label for="math-block" class="cursor-pointer"
+                                >Terpisah (Centered / Baris Baru)</Label
+                            >
                         </div>
                         <div class="flex items-center space-x-2">
                             <RadioGroupItem value="false" id="math-inline" />
-                            <Label for="math-inline" class="cursor-pointer">Sejajar Teks (Inline)</Label>
+                            <Label for="math-inline" class="cursor-pointer"
+                                >Sejajar Teks (Inline)</Label
+                            >
                         </div>
                     </RadioGroup>
                 </div>
 
                 <div class="grid gap-2">
                     <Label>Pratinjau</Label>
-                    <div class="min-h-[80px] w-full rounded-md border border-input bg-muted/40 p-4 flex items-center justify-center overflow-x-auto">
+                    <div
+                        class="flex min-h-[80px] w-full items-center justify-center overflow-x-auto rounded-md border border-input bg-muted/40 p-4"
+                    >
                         <div v-if="previewHtml" v-html="previewHtml"></div>
-                        <span v-else class="text-xs text-muted-foreground italic">Formula matematika akan dirender di sini...</span>
+                        <span
+                            v-else
+                            class="text-xs text-muted-foreground italic"
+                            >Formula matematika akan dirender di sini...</span
+                        >
                     </div>
-                    <div v-if="previewError" class="text-xs text-destructive mt-1 font-mono break-all">
+                    <div
+                        v-if="previewError"
+                        class="mt-1 font-mono text-xs break-all text-destructive"
+                    >
                         {{ previewError }}
                     </div>
                 </div>
@@ -144,7 +164,11 @@ function closeModal() {
 
             <DialogFooter>
                 <Button variant="outline" @click="closeModal">Batal</Button>
-                <Button @click="handleInsert" :disabled="!latex.trim() || !!previewError">Sisipkan</Button>
+                <Button
+                    @click="handleInsert"
+                    :disabled="!latex.trim() || !!previewError"
+                    >Sisipkan</Button
+                >
             </DialogFooter>
         </DialogContent>
     </Dialog>

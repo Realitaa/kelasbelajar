@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ClassroomStoreRequest;
 use App\Http\Requests\ClassroomUpdateRequest;
 use App\Models\Classroom;
+use App\Models\Quiz;
+use App\Models\QuizSubmission;
 use App\Services\ClassroomService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -117,6 +119,129 @@ class ClassroomController extends Controller
         ]);
 
         return redirect()->back();
+    }
+
+    /**
+     * Display the classroom content page for student.
+     */
+    public function show(Request $request, Classroom $classroom): Response
+    {
+        Gate::authorize('view', $classroom);
+
+        $user = $request->user();
+
+        // Load modules with objects and their nested object details
+        $classroom->load([
+            'modules' => function ($q) {
+                $q->orderBy('position');
+            },
+            'modules.objects' => function ($q) {
+                $q->orderBy('position');
+            },
+            'modules.objects.object',
+        ]);
+
+        // Get all quiz IDs in this classroom to retrieve submissions in one query
+        $quizIds = [];
+        foreach ($classroom->modules as $module) {
+            foreach ($module->objects as $obj) {
+                if ($obj->object_type === Quiz::class) {
+                    $quizIds[] = $obj->object_id;
+                }
+            }
+        }
+
+        // Fetch submissions for this student
+        $submissions = QuizSubmission::where('student_id', $user->id)
+            ->whereIn('quiz_id', $quizIds)
+            ->get();
+
+        // Flatten objects to determine access sequentially
+        $flatObjects = [];
+        foreach ($classroom->modules as $module) {
+            foreach ($module->objects as $obj) {
+                $flatObjects[] = $obj;
+            }
+        }
+
+        // Determine completes & access sequentially
+        $canAccess = true;
+        foreach ($flatObjects as $obj) {
+            // Student is allowed to access if $canAccess is true
+            $obj->can_access = $canAccess;
+
+            if ($obj->object_type === Quiz::class) {
+                $quiz = $obj->object;
+                $quizSubmissions = $submissions->where('quiz_id', $obj->object_id);
+
+                // Highest score matters
+                $maxScore = $quizSubmissions->max('score');
+                $passingGrade = $quiz?->passing_grade ?? 70;
+
+                $obj->is_completed = ! is_null($maxScore) && $maxScore >= $passingGrade;
+
+                if ($quiz) {
+                    $quiz->highest_score = $maxScore;
+                }
+            } else {
+                // LearningContent is always completed automatically
+                $obj->is_completed = true;
+            }
+
+            // Next object is accessible only if this one was accessible AND is completed
+            $canAccess = $canAccess && $obj->is_completed;
+        }
+
+        // Determine active object
+        $activeObjectId = $request->query('object_id');
+        $activeObject = null;
+
+        if ($activeObjectId) {
+            foreach ($flatObjects as $obj) {
+                if ((int) $obj->id === (int) $activeObjectId && $obj->can_access) {
+                    $activeObject = $obj;
+                    break;
+                }
+            }
+        }
+
+        // If no active object specified or not accessible, default to first accessible one
+        if (! $activeObject) {
+            foreach ($flatObjects as $obj) {
+                if ($obj->can_access) {
+                    $activeObject = $obj;
+                    break;
+                }
+            }
+        }
+
+        // If we still don't have an active object (e.g. classroom has no objects), pick first if any
+        if (! $activeObject && count($flatObjects) > 0) {
+            $activeObject = $flatObjects[0];
+        }
+
+        // If active object is a quiz, load historical submissions for this specific quiz
+        $activeQuizSubmissions = collect();
+        if ($activeObject && $activeObject->object_type === Quiz::class) {
+            $activeQuizSubmissions = QuizSubmission::where('quiz_id', $activeObject->object_id)
+                ->where('student_id', $user->id)
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(function ($sub) use ($activeObject) {
+                    return [
+                        'id' => $sub->id,
+                        'score' => $sub->score,
+                        'submitted_at' => $sub->submitted_at ? $sub->submitted_at->toIso8601String() : $sub->created_at->toIso8601String(),
+                        'is_passing' => $sub->score >= ($activeObject->object->passing_grade ?? 70),
+                    ];
+                });
+        }
+
+        return Inertia::render('classrooms/Show', [
+            'classroom' => $classroom,
+            'activeObject' => $activeObject,
+            'activeQuizSubmissions' => $activeQuizSubmissions,
+        ]);
     }
 
     /**

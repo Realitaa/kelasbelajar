@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import "@nuxt/ui";
+@import '@nuxt/ui';
 
 @import 'tw-animate-css';
 
@@ -179,9 +179,8 @@
     display: block;
     width: 100%;
 }
-.tiptap-mathematics-render[data-type="block-math"] {
+.tiptap-mathematics-render[data-type='block-math'] {
     display: block;
     text-align: center;
     margin: 1.5rem 0;
 }
-

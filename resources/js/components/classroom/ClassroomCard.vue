@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { Link, usePage, useHttp } from '@inertiajs/vue3';
-import { Edit, Trash2, Copy, Globe, EyeOff, Users, Check, UserPlus } from '@lucide/vue';
+import {
+    Edit,
+    Trash2,
+    Copy,
+    Globe,
+    EyeOff,
+    Users,
+    Check,
+    UserPlus,
+} from '@lucide/vue';
 import { useClipboard } from '@vueuse/core';
 import { ref, computed } from 'vue';
 import { toast } from 'vue-sonner';
@@ -26,7 +35,7 @@ const props = withDefaults(
     }>(),
     {
         showEnrollAction: false,
-    }
+    },
 );
 
 defineEmits<{
@@ -38,7 +47,9 @@ defineEmits<{
 }>();
 
 const isEnrolled = computed(() => {
-    return !!(props.classroom.enrollments && props.classroom.enrollments.length > 0);
+    return !!(
+        props.classroom.enrollments && props.classroom.enrollments.length > 0
+    );
 });
 
 const page = usePage();
@@ -64,14 +75,14 @@ function showStudents() {
         onError: (err: any) => {
             toast.error('Gagal mengambil daftar siswa');
             console.error(err);
-        }
+        },
     });
 }
 
 function formatDate(dateString: string) {
     if (!dateString) {
-return '';
-}
+        return '';
+    }
 
     const date = new Date(dateString);
 
@@ -99,7 +110,10 @@ return '';
                 class="absolute inset-0 bg-linear-to-t from-card via-transparent to-transparent opacity-90"
             ></div>
             <!-- Status Badge -->
-            <div class="absolute top-3 left-3 z-10">
+            <div
+                v-if="userRole == 'educator'"
+                class="absolute top-3 left-3 z-10"
+            >
                 <Badge
                     :variant="classroom.is_published ? 'default' : 'secondary'"
                 >
@@ -124,7 +138,10 @@ return '';
         <!-- Content Area -->
         <div class="flex flex-1 flex-col p-6 pt-2">
             <div class="mb-4">
-                <Link v-if="userRole === 'educator'" :href="manage(classroom.slug)">
+                <Link
+                    v-if="userRole === 'educator'"
+                    :href="manage(classroom.slug)"
+                >
                     <h3
                         class="line-clamp-1 text-xl font-bold tracking-tight transition-colors group-hover:text-primary hover:underline"
                     >
@@ -133,7 +150,7 @@ return '';
                 </Link>
                 <Link v-else :href="`/classrooms/${classroom.slug}`">
                     <h3
-                        class="line-clamp-1 text-xl font-bold tracking-tight transition-colors group-hover:text-primary hover:underline max-w-[85%]"
+                        class="line-clamp-1 max-w-[85%] text-xl font-bold tracking-tight transition-colors group-hover:text-primary hover:underline"
                     >
                         {{ classroom.title }}
                     </h3>
@@ -156,7 +173,10 @@ return '';
                     v-if="userRole === 'student' && classroom.educator"
                     class="mt-1 text-xs text-muted-foreground"
                 >
-                    Pengajar: <span class="font-medium text-foreground">{{ classroom.educator.name }}</span>
+                    Pengajar:
+                    <span class="font-medium text-foreground">{{
+                        classroom.educator.name
+                    }}</span>
                 </p>
             </div>
 
@@ -231,7 +251,7 @@ return '';
             >
                 <div
                     v-if="isEnrolled"
-                    class="flex w-full items-center justify-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 py-2.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 select-none animate-in fade-in zoom-in duration-300"
+                    class="flex w-full animate-in items-center justify-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 py-2.5 text-xs font-semibold text-emerald-600 duration-300 select-none fade-in zoom-in dark:text-emerald-400"
                 >
                     <Check class="h-4 w-4" />
                     <span>Sudah Bergabung</span>
@@ -239,7 +259,7 @@ return '';
                 <Button
                     v-else
                     @click="$emit('enroll', classroom)"
-                    class="w-full gap-1.5 py-2.5 font-bold transition-all hover:scale-[1.01] hover:shadow-xs active:scale-[0.99] cursor-pointer"
+                    class="w-full cursor-pointer gap-1.5 py-2.5 font-bold transition-all hover:scale-[1.01] hover:shadow-xs active:scale-[0.99]"
                 >
                     <UserPlus class="h-4 w-4" />
                     <span>Gabung Kelas</span>
@@ -250,40 +270,62 @@ return '';
         <Dialog v-model:open="isStudentsModalOpen">
             <DialogContent class="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle class="flex items-center gap-2 text-xl font-bold tracking-tight">
+                    <DialogTitle
+                        class="flex items-center gap-2 text-xl font-bold tracking-tight"
+                    >
                         <Users class="h-5 w-5 text-primary" />
                         <span>Siswa Terdaftar</span>
                     </DialogTitle>
-                    <DialogDescription class="text-sm text-muted-foreground mt-1">
+                    <DialogDescription
+                        class="mt-1 text-sm text-muted-foreground"
+                    >
                         Daftar siswa yang telah bergabung ke kelas
-                        <span class="font-semibold text-foreground bg-primary/10 px-1.5 py-0.5 rounded-sm">{{ classroom.title }}</span>.
+                        <span
+                            class="rounded-sm bg-primary/10 px-1.5 py-0.5 font-semibold text-foreground"
+                            >{{ classroom.title }}</span
+                        >.
                     </DialogDescription>
                 </DialogHeader>
 
                 <!-- Skeleton Loader -->
                 <div v-if="http.processing" class="space-y-4 py-4">
-                    <div v-for="i in 3" :key="i" class="flex items-center space-x-4 animate-pulse">
+                    <div
+                        v-for="i in 3"
+                        :key="i"
+                        class="flex animate-pulse items-center space-x-4"
+                    >
                         <div class="h-10 w-10 rounded-full bg-muted"></div>
-                        <div class="space-y-2 flex-1">
-                            <div class="h-4 bg-muted rounded w-1/3"></div>
-                            <div class="h-3 bg-muted rounded w-1/2"></div>
+                        <div class="flex-1 space-y-2">
+                            <div class="h-4 w-1/3 rounded bg-muted"></div>
+                            <div class="h-3 w-1/2 rounded bg-muted"></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Student List / Empty State -->
                 <div v-else class="py-4">
-                    <div v-if="students.length === 0" class="flex flex-col items-center justify-center py-8 text-center animate-in fade-in duration-300">
-                        <div class="rounded-full bg-primary/10 p-4 text-primary mb-3 ring-8 ring-primary/5">
+                    <div
+                        v-if="students.length === 0"
+                        class="flex animate-in flex-col items-center justify-center py-8 text-center duration-300 fade-in"
+                    >
+                        <div
+                            class="mb-3 rounded-full bg-primary/10 p-4 text-primary ring-8 ring-primary/5"
+                        >
                             <Users class="h-8 w-8" />
                         </div>
-                        <p class="text-sm font-semibold text-foreground">Belum Ada Siswa</p>
-                        <p class="text-xs text-muted-foreground mt-1.5 max-w-[280px]">
+                        <p class="text-sm font-semibold text-foreground">
+                            Belum Ada Siswa
+                        </p>
+                        <p
+                            class="mt-1.5 max-w-[280px] text-xs text-muted-foreground"
+                        >
                             Bagikan kode kelas
                             <span
-                                @click="copyClassroomCode(classroom.unique_code)"
+                                @click="
+                                    copyClassroomCode(classroom.unique_code)
+                                "
                                 title="Klik untuk menyalin kode"
-                                class="font-mono bg-muted hover:bg-muted/80 cursor-pointer px-1.5 py-0.5 rounded font-semibold text-foreground border border-border/60 transition-colors"
+                                class="cursor-pointer rounded border border-border/60 bg-muted px-1.5 py-0.5 font-mono font-semibold text-foreground transition-colors hover:bg-muted/80"
                             >
                                 {{ classroom.unique_code }}
                             </span>
@@ -291,24 +333,43 @@ return '';
                         </p>
                     </div>
 
-                    <div v-else class="max-h-[300px] overflow-y-auto space-y-3 pr-1 animate-in fade-in duration-300">
+                    <div
+                        v-else
+                        class="max-h-[300px] animate-in space-y-3 overflow-y-auto pr-1 duration-300 fade-in"
+                    >
                         <div
                             v-for="student in students"
                             :key="student.id"
-                            class="flex items-center justify-between p-2.5 rounded-xl hover:bg-muted/60 border border-transparent hover:border-border/40 transition-all duration-200"
+                            class="flex items-center justify-between rounded-xl border border-transparent p-2.5 transition-all duration-200 hover:border-border/40 hover:bg-muted/60"
                         >
                             <div class="flex items-center gap-3">
-                                <Avatar class="h-10 w-10 shadow-xs ring-1 ring-border/30">
-                                    <AvatarFallback class="bg-primary/10 text-primary font-bold text-sm">
-                                        {{ student.name.charAt(0).toUpperCase() }}
+                                <Avatar
+                                    class="h-10 w-10 shadow-xs ring-1 ring-border/30"
+                                >
+                                    <AvatarFallback
+                                        class="bg-primary/10 text-sm font-bold text-primary"
+                                    >
+                                        {{
+                                            student.name.charAt(0).toUpperCase()
+                                        }}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div>
-                                    <p class="text-sm font-semibold leading-none text-foreground">{{ student.name }}</p>
-                                    <p class="text-xs text-muted-foreground mt-1.5 select-all">{{ student.email }}</p>
+                                    <p
+                                        class="text-sm leading-none font-semibold text-foreground"
+                                    >
+                                        {{ student.name }}
+                                    </p>
+                                    <p
+                                        class="mt-1.5 text-xs text-muted-foreground select-all"
+                                    >
+                                        {{ student.email }}
+                                    </p>
                                 </div>
                             </div>
-                            <span class="text-[10px] text-muted-foreground bg-muted/80 border px-2.5 py-1 rounded-full font-medium">
+                            <span
+                                class="rounded-full border bg-muted/80 px-2.5 py-1 text-[10px] font-medium text-muted-foreground"
+                            >
                                 {{ formatDate(student.enrolled_at) }}
                             </span>
                         </div>

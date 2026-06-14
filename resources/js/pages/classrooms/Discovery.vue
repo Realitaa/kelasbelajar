@@ -33,7 +33,7 @@ const performSearch = useDebounceFn((queryVal: string) => {
         {
             preserveState: true,
             replace: true,
-        }
+        },
     );
 }, 300);
 
@@ -47,7 +47,7 @@ const enrollInClassroom = (classroom: Classroom) => {
         {},
         {
             preserveScroll: true,
-        }
+        },
     );
 };
 
@@ -75,13 +75,17 @@ defineOptions({
             />
 
             <!-- Search Area -->
-            <div class="relative w-full max-w-sm animate-in slide-in-from-top-4 duration-300">
-                <Search class="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
+            <div
+                class="relative w-full max-w-sm animate-in duration-300 slide-in-from-top-4"
+            >
+                <Search
+                    class="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground"
+                />
                 <Input
                     type="text"
                     placeholder="Cari kelas, pengajar, atau kode kelas..."
                     v-model="searchQuery"
-                    class="pl-9 pr-4"
+                    class="pr-4 pl-9"
                 />
             </div>
 
@@ -97,11 +101,13 @@ defineOptions({
                     Kelas Tidak Ditemukan
                 </h3>
                 <p class="mt-2 max-w-sm text-sm text-muted-foreground">
-                    Tidak ada kelas publik yang sesuai dengan pencarian Anda. Silakan coba kata kunci lain atau periksa kembali kode kelas Anda.
+                    Tidak ada kelas publik yang sesuai dengan pencarian Anda.
+                    Silakan coba kata kunci lain atau periksa kembali kode kelas
+                    Anda.
                 </p>
             </div>
 
-            <div v-else class="space-y-6 animate-in fade-in duration-300">
+            <div v-else class="animate-in space-y-6 duration-300 fade-in">
                 <div
                     class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                 >
