@@ -235,7 +235,11 @@ describe('classroom publication', function () {
 
         actingAs($educator)
             ->post(route('classrooms.unpublish', $classroom->id))
-            ->assertStatus(403); // Or validation error, assuming forbidden for now
+            ->assertRedirectBack()
+            ->assertInertiaFlash('toast', [
+                'type' => 'error',
+                'message' => 'Kelas tidak dapat dibatalkan karena memiliki peserta.',
+            ]);
 
         expect($classroom->fresh()->is_published)->toBeTrue();
     });

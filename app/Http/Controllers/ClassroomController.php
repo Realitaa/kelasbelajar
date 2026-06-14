@@ -111,6 +111,15 @@ class ClassroomController extends Controller
     {
         Gate::authorize('unpublish', $classroom);
 
+        if ($classroom->enrollments()->exists()) {
+            Inertia::flash('toast', [
+                'type' => 'error',
+                'message' => 'Kelas tidak dapat dibatalkan karena memiliki peserta.',
+            ]);
+
+            return redirect()->back();
+        }
+
         $this->classroomService->unpublishClassroom($classroom);
 
         Inertia::flash('toast', [

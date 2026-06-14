@@ -76,8 +76,6 @@ class ClassroomPolicy
      */
     public function unpublish(User $user, Classroom $classroom): bool
     {
-        return $user->role === 'educator'
-            && $classroom->educator_id === $user->id
-            && ! $classroom->enrollments()->exists();
+        return $user->role === 'educator' && $classroom->educator_id === $user->id;
     }
 }
