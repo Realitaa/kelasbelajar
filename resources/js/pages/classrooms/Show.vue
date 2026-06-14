@@ -83,21 +83,14 @@ function countTotalLessons() {
         >
             <!-- Top Hero Header Card -->
             <div
-                class="relative overflow-hidden rounded-2xl bg-linear-to-r from-blue-600 via-indigo-600 to-violet-700 p-6 text-white shadow-lg md:p-8"
+                class="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-lg md:p-8"
             >
-                <div
-                    class="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-2xl"
-                ></div>
-                <div
-                    class="absolute right-20 -bottom-10 h-60 w-60 rounded-full bg-white/10 blur-3xl"
-                ></div>
-
                 <div
                     class="relative z-10 flex flex-col justify-between gap-6 md:flex-row md:items-center"
                 >
                     <div class="max-w-3xl space-y-3">
                         <span
-                            class="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-xs select-none"
+                            class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold backdrop-blur-xs select-none"
                         >
                             <BookOpen class="size-3.5" />
                             {{ countTotalLessons() }} Objek Pembelajaran
@@ -109,9 +102,7 @@ function countTotalLessons() {
                             {{ classroom.title }}
                         </h1>
 
-                        <p
-                            class="max-w-2xl text-sm leading-relaxed text-blue-100 md:text-base"
-                        >
+                        <p class="max-w-2xl text-sm leading-relaxed md:text-base">
                             {{
                                 classroom.description ||
                                 'Selamat datang di kelas! Ikuti setiap modul secara bertahap dan selesaikan kuis untuk melanjutkan ke materi berikutnya.'
@@ -126,7 +117,7 @@ function countTotalLessons() {
                         >
                             <Button
                                 variant="secondary"
-                                class="cursor-pointer gap-2 border-0 bg-white/20 font-semibold text-white shadow-xs backdrop-blur-xs transition-all hover:bg-white/30"
+                                class="cursor-pointer gap-2 font-semibold shadow-xs backdrop-blur-xs transition-all"
                             >
                                 <MessageSquare class="size-4" />
                                 <span>Forum Diskusi</span>
