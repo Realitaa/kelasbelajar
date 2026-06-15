@@ -25,6 +25,7 @@ class Quiz extends Model
     protected function casts(): array
     {
         return [
+            'created_by' => 'integer',
             'passing_grade' => 'integer',
             'time_limit' => 'integer',
         ];

@@ -19,6 +19,13 @@ class ClassroomModule extends Model
     /** @use HasFactory<ClassroomModuleFactory> */
     use HasFactory;
 
+    protected function casts(): array
+    {
+        return [
+            'classroom_id' => 'integer',
+        ];
+    }
+
     /**
      * @return BelongsTo<Classroom, $this>
      */

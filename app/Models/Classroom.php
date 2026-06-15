@@ -27,6 +27,7 @@ class Classroom extends Model
     protected function casts(): array
     {
         return [
+            'educator_id' => 'integer',
             'is_published' => 'boolean',
         ];
     }

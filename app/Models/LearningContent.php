@@ -33,6 +33,7 @@ class LearningContent extends Model
     protected function casts(): array
     {
         return [
+            'created_by' => 'integer',
             'content' => 'array',
         ];
     }

@@ -20,6 +20,8 @@ class QuizSession extends Model
     protected function casts(): array
     {
         return [
+            'student_id' => 'integer',
+            'quiz_id' => 'integer',
             'questions_order' => 'array',
             'options_order' => 'array',
             'answers' => 'array',

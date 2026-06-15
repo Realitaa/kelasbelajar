@@ -13,6 +13,14 @@ class Media extends Model
     /** @use HasFactory<MediaFactory> */
     use HasFactory;
 
+    protected function casts(): array
+    {
+        return [
+            'uploaded_by' => 'integer',
+            'fileable_id' => 'integer',
+        ];
+    }
+
     protected $table = 'media';
 
     protected $fillable = [

@@ -23,6 +23,8 @@ class ClassroomEnrollment extends Model
     protected function casts(): array
     {
         return [
+            'classroom_id' => 'integer',
+            'student_id' => 'integer',
             'enrolled_at' => 'datetime',
         ];
     }
