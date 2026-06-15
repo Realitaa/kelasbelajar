@@ -20,6 +20,14 @@ class ModuleObject extends Model
     /** @use HasFactory<ModuleObjectFactory> */
     use HasFactory;
 
+    protected function casts(): array
+    {
+        return [
+            'module_id' => 'integer',
+            'object_id' => 'integer',
+        ];
+    }
+
     /**
      * @return BelongsTo<ClassroomModule, $this>
      */

@@ -21,6 +21,7 @@ class QuizOption extends Model
     protected function casts(): array
     {
         return [
+            'question_id' => 'integer',
             'option' => 'array',
             'is_correct' => 'boolean',
         ];

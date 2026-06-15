@@ -20,6 +20,8 @@ class QuizSubmission extends Model
     protected function casts(): array
     {
         return [
+            'quiz_id' => 'integer',
+            'student_id' => 'integer',
             'score' => 'integer',
             'submitted_at' => 'datetime',
         ];

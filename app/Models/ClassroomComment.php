@@ -24,6 +24,9 @@ class ClassroomComment extends Model
     protected function casts(): array
     {
         return [
+            'classroom_id' => 'integer',
+            'user_id' => 'integer',
+            'parent_id' => 'integer',
             'content' => 'array',
         ];
     }
