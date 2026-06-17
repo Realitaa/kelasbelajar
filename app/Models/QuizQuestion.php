@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'quiz_id',
+    'type',
     'question',
+    'solution',
     'position',
 ])]
 class QuizQuestion extends Model
@@ -24,6 +26,7 @@ class QuizQuestion extends Model
         return [
             'quiz_id' => 'integer',
             'question' => 'array',
+            'solution' => 'array',
         ];
     }
 

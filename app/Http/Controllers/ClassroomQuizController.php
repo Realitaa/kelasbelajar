@@ -40,7 +40,9 @@ class ClassroomQuizController extends Controller
         $validated = $request->validate([
             'questions' => 'present|array',
             'questions.*.id' => 'nullable|integer',
+            'questions.*.type' => 'required|string|in:PG,PG MCMA,PG K',
             'questions.*.question' => 'required', // Tiptap JSON array
+            'questions.*.solution' => 'nullable|array', // Tiptap JSON array
             'questions.*.options' => 'required|array|min:2',
             'questions.*.options.*.id' => 'nullable|integer',
             'questions.*.options.*.option' => 'required', // Tiptap JSON array
@@ -56,7 +58,7 @@ class ClassroomQuizController extends Controller
                 }
             }
 
-            if ($correctCount !== 1) {
+            if ($question['type'] === 'PG' && $correctCount !== 1) {
                 throw ValidationException::withMessages([
                     "questions.{$qIndex}.options" => 'Exactly one option must be marked as the correct answer.',
                 ]);
@@ -89,12 +91,16 @@ class ClassroomQuizController extends Controller
 
                 if (! $question) {
                     $question = $quiz->questions()->create([
+                        'type' => $qData['type'],
                         'question' => $qData['question'],
+                        'solution' => $qData['solution'] ?? null,
                         'position' => $index + 1,
                     ]);
                 } else {
                     $question->update([
+                        'type' => $qData['type'],
                         'question' => $qData['question'],
+                        'solution' => $qData['solution'] ?? null,
                         'position' => $index + 1,
                     ]);
                 }

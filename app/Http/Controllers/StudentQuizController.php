@@ -32,15 +32,13 @@ class StudentQuizController extends Controller
                 $this->calculateAndSubmit($session);
 
                 return redirect()->route('classrooms.show', [
-                    'classroom' => $classroom->slug, 
-                    'object_id' => $moduleObject->id
+                    'classroom' => $classroom->slug,
+                    'object_id' => $moduleObject->id,
                 ])->with('toast', ['type' => 'error', 'message' => 'Waktu kuis telah habis dan disubmit otomatis.']);
             }
 
             return redirect()->route('quizzes.take', $session->id);
         }
-
-
 
         // Create new session
         $questions = $quiz->questions()->with('options')->get();
@@ -82,7 +80,7 @@ class StudentQuizController extends Controller
 
             return redirect()->route('classrooms.show', [
                 'classroom' => $classroomSlug,
-                'object_id' => $moduleObject->id
+                'object_id' => $moduleObject->id,
             ])->with('toast', ['type' => 'error', 'message' => 'Waktu kuis telah habis.']);
         }
 
@@ -173,7 +171,7 @@ class StudentQuizController extends Controller
 
         $moduleObject = $session->quiz->moduleObjects()->first();
         $classroomSlug = $moduleObject->module->classroom->slug;
-        
+
         $this->calculateAndSubmit($session);
 
         Inertia::flash('toast', [
@@ -183,7 +181,7 @@ class StudentQuizController extends Controller
 
         return redirect()->route('classrooms.show', [
             'classroom' => $classroomSlug,
-            'object_id' => $moduleObject->id
+            'object_id' => $moduleObject->id,
         ]);
     }
 

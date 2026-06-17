@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { router, useHttp } from '@inertiajs/vue3';
-import { Plus, CheckCheck } from '@lucide/vue';
+import { Plus, CheckCheck, CircleQuestionMark } from '@lucide/vue';
 import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue';
 import { toast } from 'vue-sonner';
 import {
@@ -19,6 +19,13 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
     Tooltip,
@@ -44,7 +51,9 @@ interface Option {
 
 interface Question {
     id?: number;
+    type: 'PG' | 'PG MCMA' | 'PG K';
     question: any;
+    solution: any;
     options: Option[];
 }
 
@@ -106,6 +115,12 @@ async function fetchQuestions(silent = false) {
                 fetchedQuestions.length === 0
             ) {
                 fetchedQuestions = [createEmptyQuestion()];
+            } else {
+                fetchedQuestions = fetchedQuestions.map(q => ({
+                    ...q,
+                    type: q.type || 'PG',
+                    solution: q.solution || { type: 'doc', content: [] }
+                }));
             }
 
             originalQuestions.value = JSON.parse(
@@ -144,7 +159,9 @@ watch(
 
 function createEmptyQuestion(): Question {
     return {
+        type: 'PG',
         question: { type: 'doc', content: [] },
+        solution: { type: 'doc', content: [] },
         options: [
             { option: { type: 'doc', content: [] }, is_correct: true },
             { option: { type: 'doc', content: [] }, is_correct: false },
@@ -193,19 +210,27 @@ function handleDeleteOption(qIndex: number, optIndex: number) {
 
     showConfirmModal('Hapus Opsi', 'Yakin ingin menghapus opsi ini?', () => {
         // If we're deleting the correct option, assign correctness to the first available remaining option
-        if (questions.value[qIndex].options[optIndex].is_correct) {
+        const q = questions.value[qIndex];
+
+        if (q.type === 'PG' && q.options[optIndex].is_correct) {
             const nextCorrectIndex = optIndex === 0 ? 1 : 0;
-            questions.value[qIndex].options[nextCorrectIndex].is_correct = true;
+            q.options[nextCorrectIndex].is_correct = true;
         }
 
-        questions.value[qIndex].options.splice(optIndex, 1);
+        q.options.splice(optIndex, 1);
     });
 }
 
 function setCorrectOption(qIndex: number, optIndex: number) {
-    questions.value[qIndex].options.forEach((opt, idx) => {
-        opt.is_correct = idx === optIndex;
-    });
+    const q = questions.value[qIndex];
+
+    if (q.type === 'PG') {
+        q.options.forEach((opt, idx) => {
+            opt.is_correct = idx === optIndex;
+        });
+    } else {
+        q.options[optIndex].is_correct = !q.options[optIndex].is_correct;
+    }
 }
 
 function handleSave() {
@@ -405,20 +430,56 @@ onBeforeUnmount(() => {
                             >
                                 Pertanyaan {{ activeQuestionIndex + 1 }}
                             </h4>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                class="text-destructive hover:bg-destructive/10"
-                                @click="
-                                    handleDeleteQuestion(activeQuestionIndex)
-                                "
-                            >
-                                <UIcon
-                                    name="i-lucide-trash-2"
-                                    class="mr-2 size-4"
-                                />
-                                Hapus Pertanyaan
-                            </Button>
+                            <div class="flex gap-2">
+                                <TooltipProvider
+                                    :delay-duration="250"
+                                    :content="{ side: 'left' }"
+                                >
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <CircleQuestionMark class="size-4" />
+                                        </TooltipTrigger>
+                                        <TooltipContent class="max-w-100">
+                                            <div class="flex flex-col items-center gap-2">
+                                                <h3 class="text-base font-medium">
+                                                    Tipe Soal:
+                                                </h3>
+                                                <ul class="text-sm">
+                                                    <li><span class="font-semibold">PG (Pilihan Ganda):</span> bentuk penilaian objektif di mana responden diminta untuk memilih jawaban yang paling tepat dari beberapa pilihan (opsi) yang telah disediakan.</li>
+                                                    <li><span class="font-semibold">PG MCMA (Pilihan Ganda Multiple Choice Multiple Answers):</span> jenis soal pilihan ganda di mana peserta harus memilih lebih dari satu jawaban benar dari beberapa pilihan yang disediakan.</li>
+                                                    <li><span class="font-semibold">PG K (Pilihan Ganda Kompleks):</span> jenis soal pilihan ganda yang jawabannya disajikan dalam bentuk tabel atau daftar pernyataan, di mana peserta harus menentukan pilihan "Benar/Salah" untuk setiap pernyataan yang diberikan.</li>
+                                                </ul>
+                                            </div>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                                <Select
+                                    v-model="questions[activeQuestionIndex].type"
+                                >
+                                    <SelectTrigger class="h-8 w-30">
+                                        <SelectValue placeholder="Tipe Soal" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="PG">PG</SelectItem>
+                                        <SelectItem value="PG MCMA">PG MCMA</SelectItem>
+                                        <SelectItem value="PG K">PG K</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    class="text-destructive hover:bg-destructive/10"
+                                    @click="
+                                        handleDeleteQuestion(activeQuestionIndex)
+                                    "
+                                >
+                                    <UIcon
+                                        name="i-lucide-trash-2"
+                                        class="mr-2 size-4"
+                                    />
+                                    Hapus Pertanyaan
+                                </Button>
+                            </div>
                         </div>
                         <div
                             class="overflow-hidden rounded-md border bg-card shadow-sm"
@@ -480,6 +541,8 @@ onBeforeUnmount(() => {
                                             <Tooltip>
                                                 <TooltipTrigger
                                                     class="flex w-full items-center gap-1 rounded-md bg-green-500 px-2.5 py-2.5 text-xs font-semibold text-white shadow-sm select-none"
+                                                    :class="questions[activeQuestionIndex].type !== 'PG' ? 'cursor-pointer hover:bg-green-600' : ''"
+                                                    @click="questions[activeQuestionIndex].type !== 'PG' ? setCorrectOption(activeQuestionIndex, optIdx) : null"
                                                 >
                                                     <UIcon
                                                         name="i-lucide-check-circle-2"
@@ -537,6 +600,24 @@ onBeforeUnmount(() => {
                             </div>
                         </div>
                     </div>
+
+                    <!-- Solution Field -->
+                    <div class="space-y-2 border-t border-border pt-4">
+                        <h4 class="font-medium text-foreground">
+                            Penyelesaian (Opsional)
+                        </h4>
+                        <div
+                            class="overflow-hidden rounded-md border bg-card shadow-sm"
+                        >
+                            <RichEditor
+                                v-model="
+                                    questions[activeQuestionIndex].solution
+                                "
+                                :is-educator="isEducator"
+                                class="min-h-40"
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 <!-- PREVIEW TAB -->
@@ -566,8 +647,8 @@ onBeforeUnmount(() => {
                             />
                         </div>
 
-                        <!-- Options List -->
-                        <div class="space-y-3 pt-2">
+                        <!-- Options List (PG & PG MCMA) -->
+                        <div v-if="questions[activeQuestionIndex].type !== 'PG K'" class="space-y-3 pt-2">
                             <div
                                 v-for="(opt, optIdx) in questions[
                                     activeQuestionIndex
@@ -607,6 +688,54 @@ onBeforeUnmount(() => {
                                 >
                                     Jawaban Benar
                                 </Badge>
+                            </div>
+                        </div>
+
+                        <!-- Options Table (PG K) -->
+                        <div v-else class="pt-2">
+                            <div class="overflow-x-auto rounded-lg border border-border">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-muted/50 text-muted-foreground">
+                                        <tr>
+                                            <th class="px-4 py-3 font-medium w-12 text-center">#</th>
+                                            <th class="px-4 py-3 font-medium">Pernyataan</th>
+                                            <th class="px-4 py-3 font-medium w-24 text-center">Benar</th>
+                                            <th class="px-4 py-3 font-medium w-24 text-center">Salah</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-border">
+                                        <tr v-for="(opt, optIdx) in questions[activeQuestionIndex].options" :key="optIdx" class="bg-card">
+                                            <td class="px-4 py-3 text-center font-medium">{{ String.fromCharCode(65 + optIdx) }}</td>
+                                            <td class="px-4 py-3">
+                                                <div class="prose prose-sm dark:prose-invert max-w-none">
+                                                    <PreviewRenderer :content="opt.option" />
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-3 text-center">
+                                                <div class="flex justify-center">
+                                                    <div class="flex size-5 items-center justify-center rounded-full border-2" :class="opt.is_correct ? 'border-green-500 bg-green-500/10 text-green-500' : 'border-muted-foreground/40'">
+                                                        <div v-if="opt.is_correct" class="size-2.5 rounded-full bg-green-500"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-3 text-center">
+                                                <div class="flex justify-center">
+                                                    <div class="flex size-5 items-center justify-center rounded-full border-2" :class="!opt.is_correct ? 'border-green-500 bg-green-500/10 text-green-500' : 'border-muted-foreground/40'">
+                                                        <div v-if="!opt.is_correct" class="size-2.5 rounded-full bg-green-500"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Solution Preview -->
+                        <div v-if="questions[activeQuestionIndex].solution && questions[activeQuestionIndex].solution.content && questions[activeQuestionIndex].solution.content.length > 0" class="mt-6 space-y-2 border-t border-border pt-4">
+                            <span class="text-sm font-semibold text-muted-foreground">Penyelesaian:</span>
+                            <div class="prose prose-sm dark:prose-invert max-w-none rounded-lg border border-border bg-green-50/30 p-5 dark:bg-green-950/10">
+                                <PreviewRenderer :content="questions[activeQuestionIndex].solution" />
                             </div>
                         </div>
                     </div>

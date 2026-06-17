@@ -142,7 +142,7 @@ it('submits quiz properly and deletes session', function () {
     $response = post(route('quizzes.submit', $session->id));
     $response->assertRedirect(route('classrooms.show', [
         'classroom' => $this->classroom->slug,
-        'object_id' => $this->module->objects()->first()->id
+        'object_id' => $this->module->objects()->first()->id,
     ]));
 
     expect(QuizSession::count())->toBe(0);
@@ -183,7 +183,7 @@ it('auto submits and calculates score when answering after time is up', function
     $response = post(route('classrooms.quizzes.start', [$this->classroom->slug, $this->quiz->id]));
     $response->assertRedirect(route('classrooms.show', [
         'classroom' => $this->classroom->slug,
-        'object_id' => $this->module->objects()->first()->id
+        'object_id' => $this->module->objects()->first()->id,
     ]));
 
     expect(QuizSession::count())->toBe(0);

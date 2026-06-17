@@ -129,7 +129,9 @@ describe('Validation & Quiz Business Rules', function () {
         ]), [
             'questions' => [
                 [
+                    'type' => 'PG',
                     'question' => ['type' => 'doc', 'content' => []],
+                    'solution' => ['type' => 'doc', 'content' => []],
                     'options' => [
                         ['option' => ['type' => 'doc', 'content' => []], 'is_correct' => true],
                         // Only 1 option
@@ -158,7 +160,9 @@ describe('Validation & Quiz Business Rules', function () {
         ]), [
             'questions' => [
                 [
+                    'type' => 'PG',
                     'question' => ['type' => 'doc', 'content' => []],
+                    'solution' => ['type' => 'doc', 'content' => []],
                     'options' => [
                         ['option' => ['type' => 'doc', 'content' => []], 'is_correct' => false],
                         ['option' => ['type' => 'doc', 'content' => []], 'is_correct' => false],
@@ -176,7 +180,9 @@ describe('Validation & Quiz Business Rules', function () {
         ]), [
             'questions' => [
                 [
+                    'type' => 'PG',
                     'question' => ['type' => 'doc', 'content' => []],
+                    'solution' => ['type' => 'doc', 'content' => []],
                     'options' => [
                         ['option' => ['type' => 'doc', 'content' => []], 'is_correct' => true],
                         ['option' => ['type' => 'doc', 'content' => []], 'is_correct' => true],
@@ -187,6 +193,44 @@ describe('Validation & Quiz Business Rules', function () {
         ]);
 
         $response2->assertSessionHasErrors('questions.0.options');
+    });
+
+    it('allows PG MCMA and PG K to have multiple correct answers', function () {
+        $educator = User::factory()->create(['role' => 'educator']);
+        $classroom = Classroom::factory()->create(['educator_id' => $educator->id]);
+        $module = ClassroomModule::factory()->create(['classroom_id' => $classroom->id]);
+        $quiz = Quiz::factory()->create(['created_by' => $educator->id]);
+        ModuleObject::factory()->create([
+            'module_id' => $module->id,
+            'object_id' => $quiz->id,
+            'object_type' => Quiz::class,
+        ]);
+
+        $response = $this->actingAs($educator)->put(route('classrooms.quizzes.update-questions', [
+            'classroom' => $classroom->slug,
+            'quiz' => $quiz->id,
+        ]), [
+            'questions' => [
+                [
+                    'type' => 'PG MCMA',
+                    'question' => ['type' => 'doc', 'content' => []],
+                    'options' => [
+                        ['option' => ['type' => 'doc', 'content' => []], 'is_correct' => true],
+                        ['option' => ['type' => 'doc', 'content' => []], 'is_correct' => true],
+                    ],
+                ],
+                [
+                    'type' => 'PG K',
+                    'question' => ['type' => 'doc', 'content' => []],
+                    'options' => [
+                        ['option' => ['type' => 'doc', 'content' => []], 'is_correct' => false],
+                        ['option' => ['type' => 'doc', 'content' => []], 'is_correct' => false],
+                    ],
+                ],
+            ],
+        ]);
+
+        $response->assertSessionDoesntHaveErrors();
     });
 });
 
@@ -212,7 +256,9 @@ describe('Sync & Database Integrity', function () {
         ]), [
             'questions' => [
                 [
+                    'type' => 'PG',
                     'question' => $questionJson,
+                    'solution' => null,
                     'options' => [
                         ['option' => $option1Json, 'is_correct' => true],
                         ['option' => $option2Json, 'is_correct' => false],
@@ -254,7 +300,9 @@ describe('Sync & Database Integrity', function () {
 
         $question = QuizQuestion::create([
             'quiz_id' => $quiz->id,
+            'type' => 'PG',
             'question' => ['type' => 'doc'],
+            'solution' => ['type' => 'doc', 'text' => 'old solution'],
             'position' => 1,
         ]);
 
@@ -280,7 +328,9 @@ describe('Sync & Database Integrity', function () {
             'questions' => [
                 [
                     'id' => $question->id,
+                    'type' => 'PG',
                     'question' => $newQuestionJson,
+                    'solution' => ['type' => 'doc', 'text' => 'new solution'],
                     'options' => [
                         ['id' => $option1->id, 'option' => $newOption1Json, 'is_correct' => false],
                         ['id' => $option2->id, 'option' => ['type' => 'doc', 'text' => 'old 2'], 'is_correct' => true],
@@ -318,12 +368,14 @@ describe('Sync & Database Integrity', function () {
 
         $question1 = QuizQuestion::create([
             'quiz_id' => $quiz->id,
+            'type' => 'PG',
             'question' => ['type' => 'doc'],
             'position' => 1,
         ]);
 
         $question2 = QuizQuestion::create([
             'quiz_id' => $quiz->id,
+            'type' => 'PG',
             'question' => ['type' => 'doc'],
             'position' => 2,
         ]);
@@ -347,6 +399,7 @@ describe('Sync & Database Integrity', function () {
             'questions' => [
                 [
                     'id' => $question1->id,
+                    'type' => 'PG',
                     'question' => ['type' => 'doc'],
                     'options' => [
                         ['id' => $option1->id, 'option' => ['type' => 'doc'], 'is_correct' => true],
@@ -377,12 +430,14 @@ describe('Sync & Database Integrity', function () {
 
         $question1 = QuizQuestion::create([
             'quiz_id' => $quiz->id,
+            'type' => 'PG',
             'question' => ['type' => 'doc'],
             'position' => 1,
         ]);
 
         $question2 = QuizQuestion::create([
             'quiz_id' => $quiz->id,
+            'type' => 'PG',
             'question' => ['type' => 'doc'],
             'position' => 2,
         ]);
@@ -394,6 +449,7 @@ describe('Sync & Database Integrity', function () {
             'questions' => [
                 [
                     'id' => $question2->id,
+                    'type' => 'PG',
                     'question' => ['type' => 'doc'],
                     'options' => [
                         ['option' => ['type' => 'doc'], 'is_correct' => true],
@@ -402,6 +458,7 @@ describe('Sync & Database Integrity', function () {
                 ],
                 [
                     'id' => $question1->id,
+                    'type' => 'PG',
                     'question' => ['type' => 'doc'],
                     'options' => [
                         ['option' => ['type' => 'doc'], 'is_correct' => true],
