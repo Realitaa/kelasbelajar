@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
@@ -20,6 +22,8 @@ defineOptions({
         description: 'Lengkapi data Anda di bawah ini untuk mendaftar gratis',
     },
 });
+
+const role = ref('student');
 </script>
 
 <template>
@@ -91,6 +95,21 @@ defineOptions({
                     :passwordrules="passwordRules"
                 />
                 <InputError :message="errors.password_confirmation" />
+            </div>
+
+            <div class="grid gap-2">
+                <Label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Daftar Sebagai</Label>
+                <RadioGroup v-model="role" name="role" class="flex gap-6 mt-1">
+                    <div class="flex items-center space-x-2.5">
+                        <RadioGroupItem id="role-student" value="student" />
+                        <Label for="role-student" class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer select-none">Siswa</Label>
+                    </div>
+                    <div class="flex items-center space-x-2.5">
+                        <RadioGroupItem id="role-educator" value="educator" />
+                        <Label for="role-educator" class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer select-none">Pengajar</Label>
+                    </div>
+                </RadioGroup>
+                <InputError :message="errors.role" />
             </div>
 
             <Button
