@@ -8,6 +8,7 @@ import { TableCell } from '@tiptap/extension-table/cell';
 import { TableHeader } from '@tiptap/extension-table/header';
 import { TableRow } from '@tiptap/extension-table/row';
 import { Table } from '@tiptap/extension-table/table';
+import TextAlign from '@tiptap/extension-text-align';
 import Youtube from '@tiptap/extension-youtube';
 import { computed, ref, provide, watch } from 'vue';
 import 'katex/dist/katex.min.css';
@@ -82,6 +83,9 @@ const extensions = computed(() => {
         TableRow,
         TableHeader,
         TableCell,
+        TextAlign.configure({
+            types: ['heading', 'paragraph'],
+        }),
     ];
 
     if (props.isEducator) {
@@ -104,40 +108,79 @@ const toolbarItems = computed(() => {
         ],
         [
             {
-                kind: 'heading',
-                level: 1,
-                icon: 'i-lucide-heading-1',
-                tooltip: { text: 'Judul 1' },
-            },
-            {
-                kind: 'heading',
-                level: 2,
-                icon: 'i-lucide-heading-2',
-                tooltip: { text: 'Judul 2' },
-            },
-            {
-                kind: 'heading',
-                level: 3,
-                icon: 'i-lucide-heading-3',
-                tooltip: { text: 'Judul 3' },
-            },
-            {
-                kind: 'heading',
-                level: 4,
-                icon: 'i-lucide-heading-4',
-                tooltip: { text: 'Judul 4' },
-            },
-            {
-                kind: 'heading',
-                level: 5,
-                icon: 'i-lucide-heading-5',
-                tooltip: { text: 'Judul 5' },
-            },
-            {
-                kind: 'heading',
-                level: 6,
-                icon: 'i-lucide-heading-6',
-                tooltip: { text: 'Judul 6' },
+                icon: 'i-lucide-type',
+                tooltip: { text: 'Format Teks & Perataan' },
+                items: [
+                    [
+                        {
+                            kind: 'heading',
+                            level: 1,
+                            icon: 'i-lucide-heading-1',
+                            label: 'Judul 1',
+                        },
+                        {
+                            kind: 'heading',
+                            level: 2,
+                            icon: 'i-lucide-heading-2',
+                            label: 'Judul 2',
+                        },
+                        {
+                            kind: 'heading',
+                            level: 3,
+                            icon: 'i-lucide-heading-3',
+                            label: 'Judul 3',
+                        },
+                        {
+                            kind: 'heading',
+                            level: 4,
+                            icon: 'i-lucide-heading-4',
+                            label: 'Judul 4',
+                        },
+                        {
+                            kind: 'heading',
+                            level: 5,
+                            icon: 'i-lucide-heading-5',
+                            label: 'Judul 5',
+                        },
+                        {
+                            kind: 'heading',
+                            level: 6,
+                            icon: 'i-lucide-heading-6',
+                            label: 'Judul 6',
+                        },
+                        {
+                            kind: 'paragraph',
+                            icon: 'i-lucide-pilcrow',
+                            label: 'Paragraf',
+                        },
+                    ],
+                    [
+                        {
+                            kind: 'textAlign',
+                            align: 'left',
+                            icon: 'i-lucide-align-left',
+                            label: 'Rata Kiri',
+                        },
+                        {
+                            kind: 'textAlign',
+                            align: 'center',
+                            icon: 'i-lucide-align-center',
+                            label: 'Rata Tengah',
+                        },
+                        {
+                            kind: 'textAlign',
+                            align: 'right',
+                            icon: 'i-lucide-align-right',
+                            label: 'Rata Kanan',
+                        },
+                        {
+                            kind: 'textAlign',
+                            align: 'justify',
+                            icon: 'i-lucide-align-justify',
+                            label: 'Rata Kanan Kiri',
+                        },
+                    ],
+                ],
             },
         ],
         [
@@ -176,28 +219,6 @@ const toolbarItems = computed(() => {
                 kind: 'orderedList',
                 icon: 'i-lucide-list-ordered',
                 tooltip: { text: 'Daftar Angka' },
-            },
-        ],
-        [
-            {
-                kind: 'alignLeft',
-                icon: 'i-lucide-align-left',
-                tooltip: { text: 'Rata Kiri' },
-            },
-            {
-                kind: 'alignCenter',
-                icon: 'i-lucide-align-center',
-                tooltip: { text: 'Rata Tengah' },
-            },
-            {
-                kind: 'alignRight',
-                icon: 'i-lucide-align-right',
-                tooltip: { text: 'Rata Kanan' },
-            },
-            {
-                kind: 'justify',
-                icon: 'i-lucide-align-justify',
-                tooltip: { text: 'Rata Kanan Kiri' },
             },
         ],
         [
@@ -245,7 +266,7 @@ const toolbarItems = computed(() => {
     ];
 
     if (props.isEducator) {
-        items[6].push({
+        items[items.length - 1].push({
             icon: 'vaadin:presentation',
             tooltip: { text: 'Slideshow' },
             onClick: () => {
@@ -526,7 +547,7 @@ function handleTableInsert(payload: {
 .ProseMirror table .selectedCell:after {
     z-index: 2;
     position: absolute;
-    content: "";
+    content: '';
     left: 0;
     right: 0;
     top: 0;

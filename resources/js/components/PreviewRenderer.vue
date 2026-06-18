@@ -5,6 +5,7 @@ import { TableCell } from '@tiptap/extension-table/cell';
 import { TableHeader } from '@tiptap/extension-table/header';
 import { TableRow } from '@tiptap/extension-table/row';
 import { Table } from '@tiptap/extension-table/table';
+import TextAlign from '@tiptap/extension-text-align';
 import Youtube from '@tiptap/extension-youtube';
 import { generateHTML } from '@tiptap/html';
 import StarterKit from '@tiptap/starter-kit';
@@ -25,6 +26,9 @@ const extensions = [
     TableRow,
     TableHeader,
     TableCell,
+    TextAlign.configure({
+        types: ['heading', 'paragraph'],
+    }),
 ];
 
 const containerRef = ref<HTMLElement | null>(null);
