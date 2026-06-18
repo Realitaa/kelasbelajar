@@ -83,7 +83,7 @@ function countTotalLessons() {
         >
             <!-- Top Hero Header Card -->
             <div
-                class="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-lg md:p-8"
+                class="relative overflow-hidden rounded-2xl bg-white p-6 shadow-lg md:p-8 dark:bg-slate-900"
             >
                 <div
                     class="relative z-10 flex flex-col justify-between gap-6 md:flex-row md:items-center"
@@ -102,7 +102,9 @@ function countTotalLessons() {
                             {{ classroom.title }}
                         </h1>
 
-                        <p class="max-w-2xl text-sm leading-relaxed md:text-base">
+                        <p
+                            class="max-w-2xl text-sm leading-relaxed md:text-base"
+                        >
                             {{
                                 classroom.description ||
                                 'Selamat datang di kelas! Ikuti setiap modul secara bertahap dan selesaikan kuis untuk melanjutkan ke materi berikutnya.'

@@ -487,7 +487,10 @@ function getContextMenuItems(item: any) {
                                 <UIcon name="i-lucide-x" class="size-4" />
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Kembali ke Manajemen Objek Pembelajaran</TooltipContent>
+                        <TooltipContent
+                            >Kembali ke Manajemen Objek
+                            Pembelajaran</TooltipContent
+                        >
                     </Tooltip>
                 </TooltipProvider>
             </template>

@@ -161,12 +161,14 @@ function formatDate(dateString: string) {
                 </Link>
                 <TooltipProvider
                     :delay-duration="250"
-                    :content="{side: 'right'}"
+                    :content="{ side: 'right' }"
                 >
                     <Tooltip>
                         <TooltipTrigger>
                             <p
-                                @click="copyClassroomCode(classroom.unique_code)"
+                                @click="
+                                    copyClassroomCode(classroom.unique_code)
+                                "
                                 class="line-clamp-1 flex cursor-pointer items-center gap-2 font-mono text-xs font-medium tracking-wider text-muted-foreground"
                             >
                                 <span> Kode: {{ classroom.unique_code }} </span>
@@ -208,7 +210,7 @@ function formatDate(dateString: string) {
                 <div class="flex gap-1">
                     <TooltipProvider
                         :delay-duration="250"
-                        :content="{side: 'bottom'}"
+                        :content="{ side: 'bottom' }"
                     >
                         <Tooltip>
                             <TooltipTrigger>
@@ -221,12 +223,14 @@ function formatDate(dateString: string) {
                                     <Users class="h-5 w-5" />
                                 </Button>
                             </TooltipTrigger>
-                            <TooltipContent>Lihat Siswa Terdaftar</TooltipContent>
+                            <TooltipContent
+                                >Lihat Siswa Terdaftar</TooltipContent
+                            >
                         </Tooltip>
                     </TooltipProvider>
                     <TooltipProvider
                         :delay-duration="250"
-                        :content="{side: 'bottom'}"
+                        :content="{ side: 'bottom' }"
                     >
                         <Tooltip>
                             <TooltipTrigger>
@@ -236,7 +240,11 @@ function formatDate(dateString: string) {
                                     class="h-10 w-10 rounded-full transition-colors hover:bg-primary/10 hover:text-primary"
                                     as-child
                                 >
-                                    <Link :href="discussionIndex(classroom.slug).url">
+                                    <Link
+                                        :href="
+                                            discussionIndex(classroom.slug).url
+                                        "
+                                    >
                                         <MessageSquare class="h-5 w-5" />
                                     </Link>
                                 </Button>
@@ -246,7 +254,7 @@ function formatDate(dateString: string) {
                     </TooltipProvider>
                     <TooltipProvider
                         :delay-duration="250"
-                        :content="{side: 'bottom'}"
+                        :content="{ side: 'bottom' }"
                     >
                         <Tooltip>
                             <TooltipTrigger>
@@ -264,31 +272,44 @@ function formatDate(dateString: string) {
                     </TooltipProvider>
                     <TooltipProvider
                         :delay-duration="250"
-                        :content="{side: 'bottom'}"
+                        :content="{ side: 'bottom' }"
                     >
                         <Tooltip>
                             <TooltipTrigger>
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    @click="classroom.is_published ? $emit('unpublish', classroom) : $emit('publish', classroom)"
+                                    @click="
+                                        classroom.is_published
+                                            ? $emit('unpublish', classroom)
+                                            : $emit('publish', classroom)
+                                    "
                                     :class="[
                                         'h-10 w-10 rounded-full transition-colors',
-                                        classroom.is_published ? 'hover:bg-amber-100 hover:text-amber-600 dark:hover:bg-amber-900/30 dark:hover:text-amber-500' : 'hover:bg-emerald-100 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-500',
+                                        classroom.is_published
+                                            ? 'hover:bg-amber-100 hover:text-amber-600 dark:hover:bg-amber-900/30 dark:hover:text-amber-500'
+                                            : 'hover:bg-emerald-100 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-500',
                                     ]"
                                 >
-                                    <EyeOff v-if="classroom.is_published" class="h-5 w-5" />
+                                    <EyeOff
+                                        v-if="classroom.is_published"
+                                        class="h-5 w-5"
+                                    />
                                     <Globe v-else class="h-5 w-5" />
                                 </Button>
                             </TooltipTrigger>
-                            <TooltipContent>{{ classroom.is_published ? 'Batalkan Publikasi' : 'Publikasikan Kelas' }}</TooltipContent>
+                            <TooltipContent>{{
+                                classroom.is_published
+                                    ? 'Batalkan Publikasi'
+                                    : 'Publikasikan Kelas'
+                            }}</TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
                 </div>
 
                 <TooltipProvider
                     :delay-duration="250"
-                    :content="{side: 'bottom'}"
+                    :content="{ side: 'bottom' }"
                 >
                     <Tooltip>
                         <TooltipTrigger>

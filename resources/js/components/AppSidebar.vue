@@ -32,10 +32,7 @@ const mainNavItems = computed<NavItem[]>(() => {
     }
 
     items.push({
-        title:
-            userRole.value === 'educator'
-                ? 'Manajemen Kelas'
-                : 'Kelas Saya',
+        title: userRole.value === 'educator' ? 'Manajemen Kelas' : 'Kelas Saya',
         href: index(),
         icon: House,
     });

@@ -4,6 +4,10 @@ import UEditor from '@nuxt/ui/components/Editor.vue';
 import UEditorToolbar from '@nuxt/ui/components/EditorToolbar.vue';
 import Image from '@tiptap/extension-image';
 import { Mathematics } from '@tiptap/extension-mathematics';
+import { TableCell } from '@tiptap/extension-table/cell';
+import { TableHeader } from '@tiptap/extension-table/header';
+import { TableRow } from '@tiptap/extension-table/row';
+import { Table } from '@tiptap/extension-table/table';
 import Youtube from '@tiptap/extension-youtube';
 import { computed, ref, provide, watch } from 'vue';
 import 'katex/dist/katex.min.css';
@@ -11,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { SlideshowExtension } from './editor/extensions/SlideshowExtension';
 import ImageUploadModal from './editor/ImageUploadModal.vue';
 import MathInsertModal from './editor/MathInsertModal.vue';
+import TableInsertModal from './editor/TableInsertModal.vue';
 import YoutubeInsertModal from './editor/YoutubeInsertModal.vue';
 
 const props = defineProps<{
@@ -32,6 +37,7 @@ const value = computed({
 const isImageModalOpen = ref(false);
 const isMathModalOpen = ref(false);
 const isYoutubeModalOpen = ref(false);
+const isTableModalOpen = ref(false);
 const editorRef = ref<any>(null);
 
 const mathToEdit = ref<{
@@ -70,6 +76,12 @@ const extensions = computed(() => {
             inline: true,
             allowBase64: true,
         }),
+        Table.configure({
+            resizable: true,
+        }),
+        TableRow,
+        TableHeader,
+        TableCell,
     ];
 
     if (props.isEducator) {
@@ -202,6 +214,13 @@ const toolbarItems = computed(() => {
         ],
         [
             {
+                icon: 'i-lucide-table',
+                tooltip: { text: 'Tabel' },
+                onClick: () => {
+                    isTableModalOpen.value = true;
+                },
+            },
+            {
                 icon: 'i-lucide-sigma',
                 tooltip: { text: 'Matematika' },
                 onClick: () => {
@@ -301,6 +320,66 @@ function shouldShowMathBubble({ editor }: { editor: any }) {
     return editor.isActive('inlineMath') || editor.isActive('blockMath');
 }
 
+const tableBubbleItems = computed(() => [
+    [
+        {
+            icon: 'i-lucide-arrow-up-to-line',
+            tooltip: { text: 'Tambah Baris Sebelum' },
+            onClick: () => editorRef.value?.editor?.commands.addRowBefore(),
+        },
+        {
+            icon: 'i-lucide-arrow-down-to-line',
+            tooltip: { text: 'Tambah Baris Sesudah' },
+            onClick: () => editorRef.value?.editor?.commands.addRowAfter(),
+        },
+        {
+            icon: 'i-lucide-trash',
+            tooltip: { text: 'Hapus Baris' },
+            onClick: () => editorRef.value?.editor?.commands.deleteRow(),
+        },
+    ],
+    [
+        {
+            icon: 'i-lucide-arrow-left-to-line',
+            tooltip: { text: 'Tambah Kolom Sebelum' },
+            onClick: () => editorRef.value?.editor?.commands.addColumnBefore(),
+        },
+        {
+            icon: 'i-lucide-arrow-right-to-line',
+            tooltip: { text: 'Tambah Kolom Sesudah' },
+            onClick: () => editorRef.value?.editor?.commands.addColumnAfter(),
+        },
+        {
+            icon: 'i-lucide-trash-2',
+            tooltip: { text: 'Hapus Kolom' },
+            onClick: () => editorRef.value?.editor?.commands.deleteColumn(),
+        },
+    ],
+    [
+        {
+            icon: 'i-lucide-combine',
+            tooltip: { text: 'Gabung Sel' },
+            onClick: () => editorRef.value?.editor?.commands.mergeCells(),
+        },
+        {
+            icon: 'i-lucide-split-square-horizontal',
+            tooltip: { text: 'Pisah Sel' },
+            onClick: () => editorRef.value?.editor?.commands.splitCell(),
+        },
+    ],
+    [
+        {
+            icon: 'i-lucide-table-properties',
+            tooltip: { text: 'Hapus Tabel' },
+            onClick: () => editorRef.value?.editor?.commands.deleteTable(),
+        },
+    ],
+]);
+
+function shouldShowTableBubble({ editor }: { editor: any }) {
+    return editor.isActive('table');
+}
+
 function handleImageInsert(src: string) {
     if (editorRef.value?.editor) {
         editorRef.value.editor.commands.setImage({ src });
@@ -350,6 +429,16 @@ function handleYoutubeInsert(url: string) {
         editorRef.value.editor.commands.setYoutubeVideo({ src: url });
     }
 }
+
+function handleTableInsert(payload: {
+    rows: number;
+    cols: number;
+    withHeaderRow: boolean;
+}) {
+    if (editorRef.value?.editor) {
+        editorRef.value.editor.commands.insertTable(payload);
+    }
+}
 </script>
 
 <template>
@@ -379,11 +468,21 @@ function handleYoutubeInsert(url: string) {
                 :items="mathBubbleItems"
                 :should-show="shouldShowMathBubble"
             />
+            <UEditorToolbar
+                :editor="editor"
+                layout="bubble"
+                :items="tableBubbleItems"
+                :should-show="shouldShowTableBubble"
+            />
         </UEditor>
 
         <ImageUploadModal
             v-model:open="isImageModalOpen"
             @insert="handleImageInsert"
+        />
+        <TableInsertModal
+            v-model:open="isTableModalOpen"
+            @insert="handleTableInsert"
         />
         <MathInsertModal
             v-model:open="isMathModalOpen"
@@ -397,3 +496,53 @@ function handleYoutubeInsert(url: string) {
         />
     </UApp>
 </template>
+
+<style>
+.ProseMirror table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+    margin-top: 1.6em;
+    margin-bottom: 1.6em;
+    overflow: hidden;
+}
+
+.ProseMirror table td,
+.ProseMirror table th {
+    min-width: 1em;
+    border: 1px solid var(--color-border);
+    padding: 0.5em 0.75em;
+    vertical-align: top;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.ProseMirror table th {
+    font-weight: 600;
+    text-align: left;
+    background-color: var(--color-muted);
+}
+
+.ProseMirror table .selectedCell:after {
+    z-index: 2;
+    position: absolute;
+    content: "";
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: rgba(200, 200, 255, 0.4);
+    pointer-events: none;
+}
+
+.ProseMirror table .column-resize-handle {
+    position: absolute;
+    right: -2px;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    z-index: 20;
+    background-color: var(--color-primary);
+    pointer-events: none;
+}
+</style>

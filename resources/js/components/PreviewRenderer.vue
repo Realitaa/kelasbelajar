@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import Image from '@tiptap/extension-image';
 import { Mathematics } from '@tiptap/extension-mathematics';
+import { TableCell } from '@tiptap/extension-table/cell';
+import { TableHeader } from '@tiptap/extension-table/header';
+import { TableRow } from '@tiptap/extension-table/row';
+import { Table } from '@tiptap/extension-table/table';
 import Youtube from '@tiptap/extension-youtube';
 import { generateHTML } from '@tiptap/html';
 import StarterKit from '@tiptap/starter-kit';
@@ -17,6 +21,10 @@ const extensions = [
     Image.configure({ inline: true }),
     Youtube.configure({ inline: false, width: 640, height: 480 }),
     Mathematics.configure({ katexOptions: { throwOnError: false } }),
+    Table.configure({ resizable: true }),
+    TableRow,
+    TableHeader,
+    TableCell,
 ];
 
 const containerRef = ref<HTMLElement | null>(null);
@@ -220,5 +228,30 @@ onMounted(() => {
     color: var(--color-primary);
     text-decoration: underline;
     font-weight: 500;
+}
+
+.tiptap-preview table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+    margin-top: 1.6em;
+    margin-bottom: 1.6em;
+    overflow: hidden;
+}
+
+.tiptap-preview table td,
+.tiptap-preview table th {
+    min-width: 1em;
+    border: 1px solid var(--color-border);
+    padding: 0.5em 0.75em;
+    vertical-align: top;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.tiptap-preview table th {
+    font-weight: 600;
+    text-align: left;
+    background-color: var(--color-muted);
 }
 </style>
