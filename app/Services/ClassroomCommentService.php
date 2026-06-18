@@ -9,6 +9,10 @@ use Illuminate\Support\Collection;
 
 class ClassroomCommentService
 {
+    public function __construct(protected TiptapSanitizer $sanitizer)
+    {
+    }
+
     /**
      * Get discussion forum comments for the given classroom.
      *
@@ -68,7 +72,7 @@ class ClassroomCommentService
             'classroom_id' => $classroom->id,
             'user_id' => $user->id,
             'parent_id' => $parentId,
-            'content' => $data['content'],
+            'content' => $this->sanitizer->sanitize($data['content']) ?? [],
         ]);
     }
 
@@ -80,7 +84,7 @@ class ClassroomCommentService
     public function updateComment(ClassroomComment $comment, array $data): ClassroomComment
     {
         $comment->update([
-            'content' => $data['content'],
+            'content' => $this->sanitizer->sanitize($data['content']) ?? [],
         ]);
 
         return $comment;
