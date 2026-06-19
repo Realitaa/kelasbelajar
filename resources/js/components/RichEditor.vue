@@ -472,10 +472,13 @@ function handleTableInsert(payload: {
             :extensions="extensions"
             :class="
                 cn(
-                    'flex h-full flex-col overflow-hidden rounded-lg border border-border bg-background transition-colors focus-within:border-primary/50',
+                    'flex h-full max-h-[95vh] flex-col overflow-hidden rounded-lg border border-border bg-background transition-colors focus-within:border-primary/50',
                     props.class,
                 )
             "
+            :ui="{
+                content: 'relative size-full flex-1 max-h-[95vh] overflow-auto'
+            }"
         >
             <UEditorToolbar
                 :editor="editor"
