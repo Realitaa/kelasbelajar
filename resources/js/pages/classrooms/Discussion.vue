@@ -5,7 +5,6 @@ import {
     MessageSquare,
     Trash2,
     Edit2,
-    CornerDownRight,
     X,
     Clock,
     Reply,
@@ -111,7 +110,7 @@ function submitNewComment() {
     });
 }
 
-function submitReply(parentId: number) {
+function submitReply() {
     replyForm.post(storeComment.url(props.classroom.slug), {
         onSuccess: () => {
             activeReplyId.value = null;

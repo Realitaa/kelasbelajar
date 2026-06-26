@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useHttp } from '@inertiajs/vue3';
 import UApp from '@nuxt/ui/components/App.vue';
 import UEditor from '@nuxt/ui/components/Editor.vue';
 import UEditorToolbar from '@nuxt/ui/components/EditorToolbar.vue';
@@ -10,11 +11,10 @@ import { TableRow } from '@tiptap/extension-table/row';
 import { Table } from '@tiptap/extension-table/table';
 import TextAlign from '@tiptap/extension-text-align';
 import Youtube from '@tiptap/extension-youtube';
-import { useHttp } from '@inertiajs/vue3';
 import { computed, ref, provide, watch } from 'vue';
 import 'katex/dist/katex.min.css';
-import { upload, show } from '@/actions/App/Http/Controllers/FileController';
 import { toast } from 'vue-sonner';
+import { upload, show } from '@/actions/App/Http/Controllers/FileController';
 import { cn } from '@/lib/utils';
 import { SlideshowExtension } from './editor/extensions/SlideshowExtension';
 import ImageUploadModal from './editor/ImageUploadModal.vue';
@@ -470,7 +470,10 @@ const uploadHttp = useHttp({
 
 function uploadFile(file: File, view: any, pos?: number) {
     if (uploadHttp.processing) {
-        toast.error('Ada pengunggahan gambar yang sedang berjalan. Silakan tunggu.');
+        toast.error(
+            'Ada pengunggahan gambar yang sedang berjalan. Silakan tunggu.',
+        );
+
         return;
     }
 
@@ -488,14 +491,18 @@ function uploadFile(file: File, view: any, pos?: number) {
                 const node = schema.nodes.image.create({ src: imageUrl });
 
                 let transaction;
+
                 if (typeof pos === 'number') {
                     transaction = view.state.tr.insert(pos, node);
                 } else {
                     transaction = view.state.tr.replaceSelectionWith(node);
                 }
+
                 view.dispatch(transaction);
             } else {
-                toast.error(response.message || 'Gagal mengunggah gambar.', { id: toastId });
+                toast.error(response.message || 'Gagal mengunggah gambar.', {
+                    id: toastId,
+                });
             }
         },
         onError: () => {
@@ -509,13 +516,14 @@ function uploadFile(file: File, view: any, pos?: number) {
 
 function handlePasteEvent(view: any, event: ClipboardEvent) {
     const items = Array.from(event.clipboardData?.items || []);
-    const imageItems = items.filter(item => item.type.startsWith('image/'));
+    const imageItems = items.filter((item) => item.type.startsWith('image/'));
 
     if (imageItems.length > 0) {
         event.preventDefault();
 
-        imageItems.forEach(item => {
+        imageItems.forEach((item) => {
             const file = item.getAsFile();
+
             if (file) {
                 uploadFile(file, view);
             }
@@ -523,25 +531,30 @@ function handlePasteEvent(view: any, event: ClipboardEvent) {
 
         return true;
     }
+
     return false;
 }
 
 function handleDropEvent(view: any, event: DragEvent) {
     const files = Array.from(event.dataTransfer?.files || []);
-    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
 
     if (imageFiles.length > 0) {
         event.preventDefault();
 
-        const coordinates = view.posAtCoords({ left: event.clientX, top: event.clientY });
+        const coordinates = view.posAtCoords({
+            left: event.clientX,
+            top: event.clientY,
+        });
         const pos = coordinates ? coordinates.pos : view.state.selection.from;
 
-        imageFiles.forEach(file => {
+        imageFiles.forEach((file) => {
             uploadFile(file, view, pos);
         });
 
         return true;
     }
+
     return false;
 }
 </script>
@@ -561,7 +574,7 @@ function handleDropEvent(view: any, event: DragEvent) {
                 )
             "
             :ui="{
-                content: 'relative size-full flex-1 max-h-[95vh] overflow-auto'
+                content: 'relative size-full flex-1 max-h-[95vh] overflow-auto',
             }"
             :editor-props="{
                 handlePaste: handlePasteEvent,
