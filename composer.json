@@ -61,12 +61,23 @@
         "lint:check": [
             "pint --parallel --test"
         ],
+        "format": [
+            "pint --parallel",
+            "npm run format",
+            "npm run lint"
+        ],
+        "deploy": [
+            "bash scripts/deploy.sh"
+        ],
         "ci:check": [
             "Composer\\Config::disableProcessTimeout",
             "npm run lint:check",
             "npm run format:check",
             "npm run types:check",
             "@test"
+        ],
+        "types:check": [
+            "phpstan analyse"
         ],
         "test": [
             "@php artisan config:clear --ansi",
