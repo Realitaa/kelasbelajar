@@ -9,9 +9,7 @@ use Illuminate\Support\Collection;
 
 class ClassroomCommentService
 {
-    public function __construct(protected TiptapSanitizer $sanitizer)
-    {
-    }
+    public function __construct(protected TiptapSanitizer $sanitizer) {}
 
     /**
      * Get discussion forum comments for the given classroom.

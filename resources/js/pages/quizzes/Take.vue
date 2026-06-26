@@ -63,10 +63,20 @@ const loadQuestion = (index: number) => {
 
     http.get(question.url({ session: props.session.id, index }), {
         onSuccess: (response: any) => {
-            currentQuestion.value = response.data ? response.data : response;
-            selectedAnswer.value = response.data
-                ? response.data.answer
-                : response.answer;
+            const data = response.data ? response.data : response;
+            currentQuestion.value = data;
+            
+            if (data.answer !== null && data.answer !== undefined) {
+                selectedAnswer.value = data.answer;
+            } else {
+                if (data.type === 'PG MCMA') {
+                    selectedAnswer.value = [];
+                } else if (data.type === 'PG K') {
+                    selectedAnswer.value = {};
+                } else {
+                    selectedAnswer.value = null;
+                }
+            }
         },
         onError: (errors: any) => {
             if (errors.error === 'Waktu habis') {
@@ -154,6 +164,27 @@ const confirmSubmit = async () => {
 
 const selectSingleOption = (optionId: number) => {
     selectedAnswer.value = optionId;
+    saveAnswer();
+};
+
+const toggleMcmaOption = (optionId: number) => {
+    if (!Array.isArray(selectedAnswer.value)) {
+        selectedAnswer.value = [];
+    }
+    const index = selectedAnswer.value.indexOf(optionId);
+    if (index === -1) {
+        selectedAnswer.value.push(optionId);
+    } else {
+        selectedAnswer.value.splice(index, 1);
+    }
+    saveAnswer();
+};
+
+const setPgKOption = (optionId: number, value: boolean) => {
+    if (!selectedAnswer.value || typeof selectedAnswer.value !== 'object') {
+        selectedAnswer.value = {};
+    }
+    selectedAnswer.value[optionId] = value;
     saveAnswer();
 };
 
@@ -304,25 +335,36 @@ onUnmounted(() => {
                         </div>
 
                         <!-- Options -->
-                        <div class="space-y-3">
+                        <div class="space-y-3" v-if="currentQuestion.type !== 'PG K'">
                             <label
                                 v-for="(option, idx) in currentQuestion.options"
                                 :key="option.id"
                                 class="flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all hover:bg-slate-50 dark:hover:bg-slate-900/50"
                                 :class="
-                                    selectedAnswer === option.id
+                                    (currentQuestion.type === 'PG' && selectedAnswer === option.id) ||
+                                    (currentQuestion.type === 'PG MCMA' && Array.isArray(selectedAnswer) && selectedAnswer.includes(option.id))
                                         ? 'border-blue-600 bg-blue-50/50 dark:border-blue-500 dark:bg-blue-900/20'
                                         : 'border-slate-200 dark:border-slate-800'
                                 "
                             >
                                 <div class="mt-1 flex h-5 items-center">
                                     <input
+                                        v-if="currentQuestion.type === 'PG'"
                                         type="radio"
                                         :name="'question_' + currentQuestion.id"
                                         :value="option.id"
                                         :checked="selectedAnswer === option.id"
                                         @change="selectSingleOption(option.id)"
                                         class="h-4 w-4 border-slate-300 text-blue-600 focus:ring-blue-600 dark:border-slate-700 dark:bg-slate-900 dark:ring-offset-slate-950"
+                                    />
+                                    <input
+                                        v-else
+                                        type="checkbox"
+                                        :name="'question_' + currentQuestion.id + '_' + option.id"
+                                        :value="option.id"
+                                        :checked="Array.isArray(selectedAnswer) && selectedAnswer.includes(option.id)"
+                                        @change="toggleMcmaOption(option.id)"
+                                        class="h-4 w-4 border-slate-300 rounded text-blue-600 focus:ring-blue-600 dark:border-slate-700 dark:bg-slate-900 dark:ring-offset-slate-950"
                                     />
                                 </div>
                                 <div
@@ -347,6 +389,48 @@ onUnmounted(() => {
                                     </div>
                                 </div>
                             </label>
+                        </div>
+
+                        <!-- PG K Table -->
+                        <div v-else class="pt-2">
+                            <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-50 text-slate-500 dark:bg-slate-900/50 dark:text-slate-400">
+                                        <tr>
+                                            <th class="px-4 py-3 font-medium w-12 text-center">#</th>
+                                            <th class="px-4 py-3 font-medium">Pernyataan</th>
+                                            <th class="px-4 py-3 font-medium w-24 text-center">Benar</th>
+                                            <th class="px-4 py-3 font-medium w-24 text-center">Salah</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                                        <tr v-for="(option, idx) in currentQuestion.options" :key="option.id" class="bg-white dark:bg-slate-950">
+                                            <td class="px-4 py-3 text-center font-bold text-slate-400">{{ String.fromCharCode(65 + idx) }}</td>
+                                            <td class="px-4 py-3">
+                                                <div class="prose prose-sm prose-slate dark:prose-invert flex-1 max-w-none">
+                                                    <PreviewRenderer :content="option.option" />
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-3 text-center" @click="setPgKOption(option.id, true)">
+                                                <input
+                                                    type="radio"
+                                                    :name="'pgk_' + currentQuestion.id + '_' + option.id"
+                                                    :checked="selectedAnswer && typeof selectedAnswer === 'object' && selectedAnswer[option.id] === true"
+                                                    class="h-4 w-4 cursor-pointer border-slate-300 text-blue-600 focus:ring-blue-600 dark:border-slate-700 dark:bg-slate-900 dark:ring-offset-slate-950"
+                                                />
+                                            </td>
+                                            <td class="px-4 py-3 text-center" @click="setPgKOption(option.id, false)">
+                                                <input
+                                                    type="radio"
+                                                    :name="'pgk_' + currentQuestion.id + '_' + option.id"
+                                                    :checked="selectedAnswer && typeof selectedAnswer === 'object' && selectedAnswer[option.id] === false"
+                                                    class="h-4 w-4 cursor-pointer border-slate-300 text-rose-600 focus:ring-rose-600 dark:border-slate-700 dark:bg-slate-900 dark:ring-offset-slate-950"
+                                                />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
                         <!-- Navigation Footer -->

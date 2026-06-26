@@ -9,6 +9,7 @@ use App\Models\QuizQuestion;
 use App\Models\QuizSession;
 use App\Models\QuizSubmission;
 use App\Models\User;
+use App\Services\StudentQuizService;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
@@ -189,4 +190,85 @@ it('auto submits and calculates score when answering after time is up', function
     expect(QuizSession::count())->toBe(0);
     $submission = QuizSubmission::first();
     expect($submission->score)->toBe(100); // 100 because the correct answer was saved before time was up
+});
+
+it('grades PG MCMA questions correctly with all or nothing logic', function () {
+    // Create a PG MCMA question
+    $mcmaQuestion = QuizQuestion::create(['quiz_id' => $this->quiz->id, 'type' => 'PG MCMA', 'question' => [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'MCMA']]]], 'position' => 2]);
+    $opt1 = QuizOption::create(['question_id' => $mcmaQuestion->id, 'is_correct' => true, 'option' => []]);
+    $opt2 = QuizOption::create(['question_id' => $mcmaQuestion->id, 'is_correct' => true, 'option' => []]);
+    $opt3 = QuizOption::create(['question_id' => $mcmaQuestion->id, 'is_correct' => false, 'option' => []]);
+
+    actingAs($this->student);
+    post(route('classrooms.quizzes.start', [$this->classroom->slug, $this->quiz->id]));
+    $session = QuizSession::first();
+
+    // Partial correct (missed one correct option) -> Should be 0 points
+    post(route('quizzes.answer', $session->id), [
+        'question_id' => $mcmaQuestion->id,
+        'answer' => [$opt1->id],
+    ]);
+
+    // Also answer question 1 incorrectly to isolate scoring to mcmaQuestion
+    post(route('quizzes.answer', $session->id), [
+        'question_id' => $this->question1->id,
+        'answer' => $this->option1B->id, // Wrong
+    ]);
+
+    // Fast calculate
+    $service = app(StudentQuizService::class);
+    $session->refresh();
+    $service->calculateAndSubmit($session);
+
+    $submission = QuizSubmission::orderBy('id', 'desc')->first();
+    expect($submission->score)->toBe(0);
+
+    // New session, perfect answer
+    QuizSubmission::query()->delete();
+    $session = $service->startSession($this->classroom, $this->quiz, $this->student->id);
+
+    post(route('quizzes.answer', $session->id), [
+        'question_id' => $mcmaQuestion->id,
+        'answer' => [$opt1->id, $opt2->id], // Perfect
+    ]);
+    $session->refresh();
+    $service->calculateAndSubmit($session);
+
+    $submission = QuizSubmission::orderBy('id', 'desc')->first();
+    // 1 out of 2 questions correct = 50%
+    expect($submission->score)->toBe(50);
+});
+
+it('grades PG K questions correctly with partial scoring', function () {
+    // Create a PG K question
+    $pgkQuestion = QuizQuestion::create(['quiz_id' => $this->quiz->id, 'type' => 'PG K', 'question' => [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'PGK']]]], 'position' => 2]);
+    $opt1 = QuizOption::create(['question_id' => $pgkQuestion->id, 'is_correct' => true, 'option' => []]); // True
+    $opt2 = QuizOption::create(['question_id' => $pgkQuestion->id, 'is_correct' => false, 'option' => []]); // False
+
+    actingAs($this->student);
+    post(route('classrooms.quizzes.start', [$this->classroom->slug, $this->quiz->id]));
+    $session = QuizSession::first();
+
+    // Answer PG K partially correct (opt1 correct, opt2 incorrect evaluation)
+    post(route('quizzes.answer', $session->id), [
+        'question_id' => $pgkQuestion->id,
+        'answer' => [
+            $opt1->id => true, // Correct evaluation
+            $opt2->id => true, // Wrong evaluation (should be false)
+        ],
+    ]);
+
+    // Also answer question 1 incorrectly
+    post(route('quizzes.answer', $session->id), [
+        'question_id' => $this->question1->id,
+        'answer' => $this->option1B->id, // Wrong
+    ]);
+
+    $service = app(StudentQuizService::class);
+    $session->refresh();
+    $service->calculateAndSubmit($session);
+
+    $submission = QuizSubmission::orderBy('id', 'desc')->first();
+    // PG K points = 1/2 = 0.5. Total points = 0.5. Total questions = 2. Score = 0.5 / 2 * 100 = 25
+    expect($submission->score)->toBe(25);
 });

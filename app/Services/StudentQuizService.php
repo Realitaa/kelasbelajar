@@ -75,6 +75,7 @@ class StudentQuizService
 
         return [
             'id' => $question->id,
+            'type' => $question->type,
             'question' => $question->question,
             'options' => $shuffledOptions,
             'answer' => $session->answers[$question->id] ?? null,
@@ -99,19 +100,53 @@ class StudentQuizService
         $answers = $session->answers ?? [];
 
         if ($totalQuestions > 0) {
-            $correctCount = 0;
+            $totalPoints = 0;
+
             foreach ($questions as $question) {
                 $studentAnswer = $answers[$question->id] ?? null;
 
                 if ($studentAnswer !== null) {
-                    $correctOption = $question->options->where('is_correct', true)->first();
-                    if ($correctOption && (int) $studentAnswer === $correctOption->id) {
-                        $correctCount++;
+                    if ($question->type === 'PG') {
+                        $correctOption = $question->options->where('is_correct', true)->first();
+                        if ($correctOption && (int) $studentAnswer === $correctOption->id) {
+                            $totalPoints += 1;
+                        }
+                    } elseif ($question->type === 'PG MCMA') {
+                        // studentAnswer should be an array of option IDs
+                        if (is_array($studentAnswer)) {
+                            $correctOptionIds = $question->options->where('is_correct', true)->pluck('id')->toArray();
+                            $incorrectOptionIds = $question->options->where('is_correct', false)->pluck('id')->toArray();
+
+                            $selectedCorrectCount = count(array_intersect($studentAnswer, $correctOptionIds));
+                            $selectedIncorrectCount = count(array_intersect($studentAnswer, $incorrectOptionIds));
+
+                            // All or nothing grading
+                            if ($selectedIncorrectCount === 0 && $selectedCorrectCount === count($correctOptionIds)) {
+                                $totalPoints += 1;
+                            }
+                        }
+                    } elseif ($question->type === 'PG K') {
+                        // studentAnswer should be an associative array: optionId => boolean
+                        if (is_array($studentAnswer)) {
+                            $correctEvaluations = 0;
+                            $optionsCount = $question->options->count();
+
+                            foreach ($question->options as $option) {
+                                $expected = (bool) $option->is_correct;
+                                if (isset($studentAnswer[$option->id]) && (bool) $studentAnswer[$option->id] === $expected) {
+                                    $correctEvaluations++;
+                                }
+                            }
+
+                            if ($optionsCount > 0) {
+                                $totalPoints += ($correctEvaluations / $optionsCount);
+                            }
+                        }
                     }
                 }
             }
 
-            $score = round(($correctCount / $totalQuestions) * 100);
+            $score = round(($totalPoints / $totalQuestions) * 100);
         }
 
         QuizSubmission::create([
