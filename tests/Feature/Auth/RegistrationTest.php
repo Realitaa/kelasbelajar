@@ -23,7 +23,7 @@ describe('new user can register as', function () {
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertRedirect(route('classrooms.index', absolute: false));
 
         $user = auth()->user();
         expect($user->role)->toBe('student');
@@ -39,7 +39,7 @@ describe('new user can register as', function () {
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertRedirect(route('classrooms.index', absolute: false));
 
         $user = auth()->user();
         expect($user->role)->toBe('educator');
