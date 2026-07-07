@@ -10,11 +10,10 @@ import {
     X,
     Check,
     Sparkles,
-    GraduationCap,
 } from '@lucide/vue';
 import { useBrowserLocation } from '@vueuse/core';
-import AppLogo from '@/components/AppLogo.vue';
 import { ref } from 'vue';
+import AppLogo from '@/components/AppLogo.vue';
 import { login, register, dashboard } from '@/routes';
 import { index } from '@/routes/classrooms';
 

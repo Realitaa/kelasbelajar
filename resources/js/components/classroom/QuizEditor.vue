@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { router, useHttp } from '@inertiajs/vue3';
-import { Plus, CheckCheck, CircleQuestionMark } from '@lucide/vue';
+import { Plus, CheckCheck } from '@lucide/vue';
 import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue';
 import { toast } from 'vue-sonner';
 import {
@@ -8,6 +8,7 @@ import {
     updateQuestions,
 } from '@/actions/App/Http/Controllers/ClassroomQuizController';
 import PreviewRenderer from '@/components/PreviewRenderer.vue';
+import QuestionTypeTooltip from '@/components/QuestionTypeTooltip.vue';
 import RichEditor from '@/components/RichEditor.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -431,76 +432,7 @@ onBeforeUnmount(() => {
                                 Pertanyaan {{ activeQuestionIndex + 1 }}
                             </h4>
                             <div class="flex gap-2">
-                                <TooltipProvider
-                                    :delay-duration="250"
-                                    :content="{ side: 'left' }"
-                                >
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <CircleQuestionMark
-                                                class="size-4"
-                                            />
-                                        </TooltipTrigger>
-                                        <TooltipContent class="max-w-100">
-                                            <div
-                                                class="flex flex-col items-center gap-2"
-                                            >
-                                                <h3
-                                                    class="text-base font-medium"
-                                                >
-                                                    Tipe Soal:
-                                                </h3>
-                                                <ul class="text-sm">
-                                                    <li>
-                                                        <span
-                                                            class="font-semibold"
-                                                            >PG (Pilihan
-                                                            Ganda):</span
-                                                        >
-                                                        bentuk penilaian
-                                                        objektif di mana
-                                                        responden diminta untuk
-                                                        memilih jawaban yang
-                                                        paling tepat dari
-                                                        beberapa pilihan (opsi)
-                                                        yang telah disediakan.
-                                                    </li>
-                                                    <li>
-                                                        <span
-                                                            class="font-semibold"
-                                                            >PG MCMA (Pilihan
-                                                            Ganda Multiple
-                                                            Choice Multiple
-                                                            Answers):</span
-                                                        >
-                                                        jenis soal pilihan ganda
-                                                        di mana peserta harus
-                                                        memilih lebih dari satu
-                                                        jawaban benar dari
-                                                        beberapa pilihan yang
-                                                        disediakan.
-                                                    </li>
-                                                    <li>
-                                                        <span
-                                                            class="font-semibold"
-                                                            >PG K (Pilihan Ganda
-                                                            Kompleks):</span
-                                                        >
-                                                        jenis soal pilihan ganda
-                                                        yang jawabannya
-                                                        disajikan dalam bentuk
-                                                        tabel atau daftar
-                                                        pernyataan, di mana
-                                                        peserta harus menentukan
-                                                        pilihan "Benar/Salah"
-                                                        untuk setiap pernyataan
-                                                        yang diberikan.
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
+                                <QuestionTypeTooltip />
                                 <Select
                                     v-model="
                                         questions[activeQuestionIndex].type

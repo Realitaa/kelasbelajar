@@ -1,9 +1,9 @@
 import { createInertiaApp } from '@inertiajs/vue3';
 import ui from '@nuxt/ui/vue-plugin';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import VueViewer from 'v-viewer';
 import { createApp, h } from 'vue';
 import type { DefineComponent } from 'vue';
-import VueViewer from 'v-viewer';
 import 'viewerjs/dist/viewer.css';
 import { initializeTheme } from '@/composables/useAppearance';
 import AppLayout from '@/layouts/AppLayout.vue';
