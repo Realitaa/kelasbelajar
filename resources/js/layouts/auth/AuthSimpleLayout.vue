@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { GraduationCap } from '@lucide/vue';
+import AppLogo from '@/components/AppLogo.vue';
 import { home } from '@/routes';
 
 defineProps<{
@@ -27,11 +27,10 @@ defineProps<{
                         :href="home()"
                         class="flex flex-col items-center gap-2 font-medium"
                     >
-                        <div
-                            class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-md shadow-blue-500/20 transition-transform hover:scale-105"
-                        >
-                            <GraduationCap class="h-7 w-7" />
-                        </div>
+                        <AppLogo
+                            :icon-only="true"
+                            class="scale-125 transition-transform hover:scale-135"
+                        />
                         <span class="sr-only">{{ title }}</span>
                     </Link>
                     <div class="space-y-1 text-center">

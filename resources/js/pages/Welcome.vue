@@ -13,6 +13,7 @@ import {
     GraduationCap,
 } from '@lucide/vue';
 import { useBrowserLocation } from '@vueuse/core';
+import AppLogo from '@/components/AppLogo.vue';
 import { ref } from 'vue';
 import { login, register, dashboard } from '@/routes';
 import { index } from '@/routes/classrooms';
@@ -112,11 +113,7 @@ const faqs = [
             >
                 <!-- Logo -->
                 <div class="flex items-center gap-2">
-                    <div
-                        class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/20"
-                    >
-                        <GraduationCap class="h-6 w-6" />
-                    </div>
+                    <AppLogo :icon-only="true" />
                     <span
                         class="text-xl font-bold tracking-tight text-[#111827] dark:text-white"
                         >Kelas<span class="text-blue-600">Belajar</span></span
@@ -656,11 +653,7 @@ const faqs = [
                     <!-- Column 1: Brand description -->
                     <div class="col-span-2 flex flex-col gap-6 md:col-span-4">
                         <div class="flex items-center gap-2">
-                            <div
-                                class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white"
-                            >
-                                <GraduationCap class="h-6 w-6" />
-                            </div>
+                            <AppLogo :icon-only="true" />
                             <span
                                 class="text-xl font-bold tracking-tight text-[#111827] dark:text-white"
                                 >Kelas<span class="text-blue-600"
