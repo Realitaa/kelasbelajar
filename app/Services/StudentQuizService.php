@@ -90,7 +90,7 @@ class StudentQuizService
         $session->update(['answers' => $answers]);
     }
 
-    public function calculateAndSubmit(QuizSession $session): void
+    public function calculateAndSubmit(QuizSession $session): QuizSubmission
     {
         $quiz = $session->quiz;
         $questions = $quiz->questions()->with('options')->get()->keyBy('id');
@@ -149,13 +149,18 @@ class StudentQuizService
             $score = round(($totalPoints / $totalQuestions) * 100);
         }
 
-        QuizSubmission::create([
+        $submission = QuizSubmission::create([
             'student_id' => $session->student_id,
             'quiz_id' => $quiz->id,
             'score' => $score,
             'submitted_at' => now(),
+            'questions_order' => $session->questions_order,
+            'options_order' => $session->options_order,
+            'answers' => $session->answers,
         ]);
 
         $session->delete();
+
+        return $submission;
     }
 }

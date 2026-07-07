@@ -14,6 +14,7 @@ import { Card } from '@/components/ui/card';
 import { show } from '@/routes/classrooms';
 import { index as discussionIndex } from '@/routes/classrooms/discussion';
 import { start } from '@/routes/classrooms/quizzes';
+import { show as showSubmission } from '@/routes/quizzes/submissions';
 import type { Classroom, QuizSubmission, Module, LessonObject } from '@/types';
 
 const props = defineProps<{
@@ -302,9 +303,14 @@ function countTotalLessons() {
                                                     Nilai
                                                 </th>
                                                 <th
-                                                    class="px-4 py-3 text-right font-bold"
+                                                    class="px-4 py-3 text-center font-bold"
                                                 >
                                                     Status
+                                                </th>
+                                                <th
+                                                    class="px-4 py-3 text-right font-bold"
+                                                >
+                                                    Aksi
                                                 </th>
                                             </tr>
                                         </thead>
@@ -318,7 +324,7 @@ function countTotalLessons() {
                                                 "
                                             >
                                                 <td
-                                                    colspan="4"
+                                                    colspan="5"
                                                     class="py-8 text-center text-slate-400 italic"
                                                 >
                                                     Belum ada riwayat pengerjaan
@@ -356,7 +362,7 @@ function countTotalLessons() {
                                                     {{ sub.score }}%
                                                 </td>
                                                 <td
-                                                    class="px-4 py-3.5 text-right"
+                                                    class="px-4 py-3.5 text-center"
                                                 >
                                                     <span
                                                         class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold select-none"
@@ -380,6 +386,20 @@ function countTotalLessons() {
                                                                 : 'Tidak Lulus'
                                                         }}
                                                     </span>
+                                                </td>
+                                                <td
+                                                    class="px-4 py-3.5 text-right"
+                                                >
+                                                    <Link
+                                                        :href="
+                                                            showSubmission.url(
+                                                                sub.id,
+                                                            )
+                                                        "
+                                                        class="text-sm font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+                                                    >
+                                                        Lihat Detail
+                                                    </Link>
                                                 </td>
                                             </tr>
                                         </tbody>

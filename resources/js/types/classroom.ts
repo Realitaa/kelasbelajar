@@ -83,6 +83,9 @@ interface QuizSubmission {
     score: number;
     submitted_at: string;
     is_passing: boolean;
+    questions_order?: number[];
+    options_order?: Record<number, number[]>;
+    answers?: Record<number, any>;
 }
 
 interface ClassroomComment {

@@ -12,6 +12,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'student_id',
     'score',
     'submitted_at',
+    'questions_order',
+    'options_order',
+    'answers',
 ])]
 class QuizSubmission extends Model
 {
@@ -24,6 +27,9 @@ class QuizSubmission extends Model
             'student_id' => 'integer',
             'score' => 'integer',
             'submitted_at' => 'datetime',
+            'questions_order' => 'array',
+            'options_order' => 'array',
+            'answers' => 'array',
         ];
     }
 

@@ -141,10 +141,9 @@ it('submits quiz properly and deletes session', function () {
     ]);
 
     $response = post(route('quizzes.submit', $session->id));
-    $response->assertRedirect(route('classrooms.show', [
-        'classroom' => $this->classroom->slug,
-        'object_id' => $this->module->objects()->first()->id,
-    ]));
+
+    $submission = QuizSubmission::first();
+    $response->assertRedirect(route('quizzes.submissions.show', $submission->id));
 
     expect(QuizSession::count())->toBe(0);
 
@@ -182,13 +181,10 @@ it('auto submits and calculates score when answering after time is up', function
     // Session still exists until they hit start, take, or submit.
     // Try to hit start -> should auto submit
     $response = post(route('classrooms.quizzes.start', [$this->classroom->slug, $this->quiz->id]));
-    $response->assertRedirect(route('classrooms.show', [
-        'classroom' => $this->classroom->slug,
-        'object_id' => $this->module->objects()->first()->id,
-    ]));
 
     expect(QuizSession::count())->toBe(0);
     $submission = QuizSubmission::first();
+    $response->assertRedirect(route('quizzes.submissions.show', $submission->id));
     expect($submission->score)->toBe(100); // 100 because the correct answer was saved before time was up
 });
 

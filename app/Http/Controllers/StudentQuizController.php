@@ -7,6 +7,7 @@ use App\Http\Requests\StudentQuizSessionRequest;
 use App\Models\Classroom;
 use App\Models\Quiz;
 use App\Models\QuizSession;
+use App\Models\QuizSubmission;
 use App\Services\StudentQuizService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -28,13 +29,10 @@ class StudentQuizController extends Controller
 
         // Check if expired
         if (now()->greaterThan($session->expires_at)) {
-            $moduleObject = $session->quiz->moduleObjects()->first();
-            $studentQuizService->calculateAndSubmit($session);
+            $submission = $studentQuizService->calculateAndSubmit($session);
 
-            return redirect()->route('classrooms.show', [
-                'classroom' => $classroom->slug,
-                'object_id' => $moduleObject->id,
-            ])->with('toast', ['type' => 'error', 'message' => 'Waktu kuis telah habis dan disubmit otomatis.']);
+            return redirect()->route('quizzes.submissions.show', $submission->id)
+                ->with('toast', ['type' => 'error', 'message' => 'Waktu kuis telah habis dan disubmit otomatis.']);
         }
 
         return redirect()->route('quizzes.take', $session->id);
@@ -46,12 +44,10 @@ class StudentQuizController extends Controller
         $classroomSlug = $moduleObject->module->classroom->slug;
 
         if (now()->greaterThan($session->expires_at)) {
-            $studentQuizService->calculateAndSubmit($session);
+            $submission = $studentQuizService->calculateAndSubmit($session);
 
-            return redirect()->route('classrooms.show', [
-                'classroom' => $classroomSlug,
-                'object_id' => $moduleObject->id,
-            ])->with('toast', ['type' => 'error', 'message' => 'Waktu kuis telah habis.']);
+            return redirect()->route('quizzes.submissions.show', $submission->id)
+                ->with('toast', ['type' => 'error', 'message' => 'Waktu kuis telah habis.']);
         }
 
         $session->load('quiz');
@@ -92,19 +88,34 @@ class StudentQuizController extends Controller
 
     public function submit(StudentQuizSessionRequest $request, QuizSession $session, StudentQuizService $studentQuizService): RedirectResponse
     {
-        $moduleObject = $session->quiz->moduleObjects()->first();
-        $classroomSlug = $moduleObject->module->classroom->slug;
-
-        $studentQuizService->calculateAndSubmit($session);
+        $submission = $studentQuizService->calculateAndSubmit($session);
 
         Inertia::flash('toast', [
             'type' => 'success',
             'message' => 'Kuis berhasil disubmit.',
         ]);
 
-        return redirect()->route('classrooms.show', [
-            'classroom' => $classroomSlug,
-            'object_id' => $moduleObject->id,
+        return redirect()->route('quizzes.submissions.show', $submission->id);
+    }
+
+    public function showSubmission(Request $request, QuizSubmission $submission)
+    {
+        if ($submission->student_id !== $request->user()->id) {
+            abort(403);
+        }
+
+        $submission->load([
+            'quiz',
+            'quiz.questions' => fn ($q) => $q->withTrashed(),
+            'quiz.questions.options' => fn ($q) => $q->withTrashed(),
+        ]);
+
+        $moduleObject = $submission->quiz->moduleObjects()->first();
+
+        return Inertia::render('quizzes/SubmissionDetail', [
+            'submission' => $submission,
+            'quiz' => $submission->quiz,
+            'classroomSlug' => $moduleObject->module->classroom->slug,
         ]);
     }
 }

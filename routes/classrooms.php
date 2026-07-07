@@ -53,4 +53,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('quizzes/{session}/questions/{index}', [StudentQuizController::class, 'getQuestion'])->name('quizzes.question');
     Route::post('quizzes/{session}/answer', [StudentQuizController::class, 'saveAnswer'])->name('quizzes.answer');
     Route::post('quizzes/{session}/submit', [StudentQuizController::class, 'submit'])->name('quizzes.submit');
+    Route::get('quizzes/submissions/{submission}', [StudentQuizController::class, 'showSubmission'])->name('quizzes.submissions.show');
 });
