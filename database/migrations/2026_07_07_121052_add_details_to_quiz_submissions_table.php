@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('quiz_submissions', function (Blueprint $table) {
-            $table->json('questions_order')->nullable()->after('is_passing');
+            $table->json('questions_order')->nullable()->after('submitted_at');
             $table->json('options_order')->nullable()->after('questions_order');
             $table->json('answers')->nullable()->after('options_order');
         });
