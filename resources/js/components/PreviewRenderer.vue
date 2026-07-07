@@ -12,10 +12,27 @@ import StarterKit from '@tiptap/starter-kit';
 import katex from 'katex';
 import { computed, ref, nextTick, watch, onMounted } from 'vue';
 import SlideshowPreview from './SlideshowPreview.vue';
+import ZoomableImage from './ZoomableImage.vue';
 
 const props = defineProps<{
     content: any;
 }>();
+
+const viewerOptions = {
+    inline: false,
+    button: false,
+    navbar: false,
+    title: false,
+    toolbar: false,
+    tooltip: false,
+    movable: true,
+    zoomable: true,
+    rotatable: false,
+    scalable: true,
+    transition: true,
+    fullscreen: true,
+    keyboard: false,
+};
 
 const extensions = [
     StarterKit,
@@ -111,11 +128,21 @@ onMounted(() => {
 </script>
 
 <template>
-    <div ref="containerRef" class="tiptap-preview px-4 py-2">
+    <div
+        ref="containerRef"
+        class="tiptap-preview px-4 py-2"
+        v-viewer="viewerOptions"
+    >
         <template v-for="(node, index) in blocks" :key="index">
             <SlideshowPreview
                 v-if="node.type === 'slideshow'"
                 :images="node.attrs?.images || []"
+            />
+            <ZoomableImage
+                v-else-if="node.type === 'image'"
+                :src="node.attrs?.src"
+                :alt="node.attrs?.alt"
+                :title="node.attrs?.title"
             />
             <div v-else v-html="renderHtmlNode(node)"></div>
         </template>
@@ -257,5 +284,20 @@ onMounted(() => {
     font-weight: 600;
     text-align: left;
     background-color: var(--color-muted);
+}
+
+/* Centered styling for media elements */
+.tiptap-preview img,
+.tiptap-preview iframe,
+.tiptap-preview [data-youtube-video] {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%;
+}
+.tiptap-preview [data-youtube-video] iframe {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 </style>

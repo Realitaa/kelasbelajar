@@ -670,4 +670,19 @@ function handleDropEvent(view: any, event: DragEvent) {
     background-color: var(--color-primary);
     pointer-events: none;
 }
+
+/* Centered styling for media elements in editor */
+.ProseMirror img,
+.ProseMirror iframe,
+.ProseMirror [data-youtube-video] {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%;
+}
+.ProseMirror [data-youtube-video] iframe {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
 </style>
