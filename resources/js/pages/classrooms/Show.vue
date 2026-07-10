@@ -220,7 +220,7 @@ function countTotalLessons() {
                                         {{
                                             activeObject.object.passing_grade ??
                                             70
-                                        }}%
+                                        }}
                                     </span>
                                 </div>
                             </div>
@@ -359,7 +359,7 @@ function countTotalLessons() {
                                                 <td
                                                     class="px-4 py-3.5 text-center font-mono font-bold text-slate-800 dark:text-slate-200"
                                                 >
-                                                    {{ sub.score }}%
+                                                    {{ sub.score }}
                                                 </td>
                                                 <td
                                                     class="px-4 py-3.5 text-center"
@@ -535,7 +535,7 @@ function countTotalLessons() {
                                                         {{
                                                             obj.object
                                                                 .highest_score
-                                                        }}%</span
+                                                        }}</span
                                                     >
                                                 </template>
                                             </div>

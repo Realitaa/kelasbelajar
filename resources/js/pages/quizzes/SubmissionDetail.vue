@@ -268,8 +268,7 @@ const getPgkCellIcon = (
                         <div
                             class="my-4 text-5xl font-black tracking-tighter text-slate-900 dark:text-slate-100"
                         >
-                            {{ submission.score
-                            }}<span class="text-2xl text-slate-400">%</span>
+                            {{ submission.score }}
                         </div>
 
                         <div
@@ -307,7 +306,7 @@ const getPgkCellIcon = (
                             </h3>
                             <p class="text-xs text-rose-600 dark:text-rose-400">
                                 Maaf, kamu belum mencapai batas kelulusan
-                                (Minimum: {{ quiz.passing_grade ?? 70 }}%).
+                                (Minimum: {{ quiz.passing_grade ?? 70 }}).
                                 Silakan pelajari kembali materi sebelumnya.
                             </p>
                         </div>
@@ -382,7 +381,7 @@ const getPgkCellIcon = (
                                                     : 'text-rose-600 dark:text-rose-400'
                                             "
                                         >
-                                            {{ getQuestionScore(questionId) }}%
+                                            {{ getQuestionScore(questionId) }}
                                         </div>
                                     </div>
 
