@@ -17,13 +17,24 @@ import RichEditor from '@/components/RichEditor.vue';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Combobox } from '@/components/ui/combobox';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { show } from '@/routes/classrooms';
+import discussion from '@/routes/classrooms/discussion';
 import {
     store as storeComment,
     update as updateComment,
@@ -31,9 +42,16 @@ import {
 } from '@/routes/classrooms/discussion/comments';
 import type { Classroom, ClassroomComment } from '@/types';
 
+interface Module {
+    id: number;
+    title: string;
+}
+
 const props = defineProps<{
     classroom: Classroom;
     comments: ClassroomComment[];
+    modules: Module[];
+    selectedModuleId?: string | number;
 }>();
 
 defineOptions({
@@ -62,7 +80,33 @@ const currentUser = computed(() => page.props.auth.user);
 const newCommentForm = useForm({
     content: {} as any,
     parent_id: null as number | null,
+    module_id: 'umum' as string | number | null,
 });
+
+const comboboxOptions = computed(() => {
+    return [
+        { value: 'umum', label: 'Umum (General)' },
+        ...props.modules.map((m) => ({
+            value: m.id,
+            label: m.title,
+        })),
+    ];
+});
+
+const filterModuleId = ref(String(props.selectedModuleId || 'all'));
+
+function handleFilterChange(value: any) {
+    const query: Record<string, any> = {};
+
+    if (value && value !== 'all') {
+        query.module_id = value;
+    }
+    
+    router.get(discussion.index.url(props.classroom.slug, { query }), {}, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+}
 
 // Form for replies
 const activeReplyId = ref<number | null>(null);
@@ -102,12 +146,18 @@ function handleEditToggle(comment: ClassroomComment) {
 }
 
 function submitNewComment() {
-    newCommentForm.post(storeComment.url(props.classroom.slug), {
-        onSuccess: () => {
-            newCommentForm.reset();
-            newCommentForm.content = {};
-        },
-    });
+    newCommentForm
+        .transform((data) => ({
+            ...data,
+            module_id: data.module_id === 'umum' ? null : data.module_id,
+        }))
+        .post(storeComment.url(props.classroom.slug), {
+            onSuccess: () => {
+                newCommentForm.reset();
+                newCommentForm.content = {};
+                newCommentForm.module_id = 'umum';
+            },
+        });
 }
 
 function submitReply() {
@@ -241,6 +291,18 @@ function canEdit(comment: ClassroomComment) {
                         </div>
                     </div>
 
+                    <div class="grid gap-2">
+                        <Label class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Modul Terkait</Label>
+                        <Combobox
+                            v-model="newCommentForm.module_id"
+                            :options="comboboxOptions"
+                            placeholder="Pilih Modul (Default: Umum)"
+                            search-placeholder="Cari modul..."
+                            empty-text="Modul tidak ditemukan."
+                            class="w-full md:w-[350px]"
+                        />
+                    </div>
+
                     <div
                         class="min-h-40 rounded-lg border border-border bg-background"
                     >
@@ -273,12 +335,36 @@ function canEdit(comment: ClassroomComment) {
 
             <!-- Comments List -->
             <div class="space-y-6">
-                <h2
-                    class="flex items-center gap-2 text-lg font-bold tracking-tight text-foreground"
-                >
-                    <MessageSquare class="size-5 text-primary" />
-                    <span>Diskusi Terkini ({{ comments.length }})</span>
-                </h2>
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <h2
+                        class="flex items-center gap-2 text-lg font-bold tracking-tight text-foreground"
+                    >
+                        <MessageSquare class="size-5 text-primary" />
+                        <span>Diskusi Terkini ({{ comments.length }})</span>
+                    </h2>
+
+                    <!-- Filter Select -->
+                    <div class="w-full sm:w-64">
+                        <Select v-model="filterModuleId" @update:modelValue="handleFilterChange">
+                            <SelectTrigger class="w-full bg-background border-input">
+                                <SelectValue placeholder="Filter berdasarkan modul" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectItem value="all">Semua Diskusi</SelectItem>
+                                    <SelectItem value="umum">Umum</SelectItem>
+                                    <SelectItem
+                                        v-for="module in modules"
+                                        :key="module.id"
+                                        :value="String(module.id)"
+                                    >
+                                        {{ module.title }}
+                                    </SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
 
                 <div
                     v-if="comments.length === 0"
@@ -349,6 +435,13 @@ function canEdit(comment: ClassroomComment) {
                                             class="bg-blue-600 px-2 py-0 text-[10px] font-bold text-white hover:bg-blue-600"
                                         >
                                             Pemilik Kelas
+                                        </Badge>
+                                        <Badge
+                                            v-if="comment.module"
+                                            variant="secondary"
+                                            class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-none px-1.5 py-0 text-[10px] font-medium"
+                                        >
+                                            Modul: {{ comment.module.title }}
                                         </Badge>
                                         <Badge
                                             v-if="isEdited(comment)"
@@ -515,7 +608,7 @@ function canEdit(comment: ClassroomComment) {
                                 >
                                     <form
                                         @submit.prevent="
-                                            submitReply(comment.id)
+                                            submitReply()
                                         "
                                         class="space-y-3"
                                     >

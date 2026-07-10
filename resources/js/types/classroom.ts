@@ -93,11 +93,16 @@ interface ClassroomComment {
     classroom_id: number;
     user_id: number;
     parent_id: number | null;
+    module_id: number | null;
     content: any;
     created_at: string;
     updated_at: string;
     deleted_at: string | null;
     user: User;
+    module?: {
+        id: number;
+        title: string;
+    } | null;
     replies?: ClassroomComment[];
 }
 

@@ -16,17 +16,27 @@ class ClassroomCommentService
      *
      * @return Collection<int, ClassroomComment>
      */
-    public function getCommentsForClassroom(Classroom $classroom): Collection
+    public function getCommentsForClassroom(Classroom $classroom, ?string $moduleId = null): Collection
     {
-        $comments = ClassroomComment::withTrashed()
+        $query = ClassroomComment::withTrashed()
             ->where('classroom_id', $classroom->id)
-            ->whereNull('parent_id')
-            ->with([
-                'user:id,name,email,role',
-                'replies' => function ($query) {
-                    $query->withTrashed()->with('user:id,name,email,role')->orderBy('created_at', 'desc');
-                },
-            ])
+            ->whereNull('parent_id');
+
+        if ($moduleId !== null && $moduleId !== 'all') {
+            if ($moduleId === 'umum') {
+                $query->whereNull('module_id');
+            } else {
+                $query->where('module_id', (int) $moduleId);
+            }
+        }
+
+        $comments = $query->with([
+            'user:id,name,email,role',
+            'module:id,title',
+            'replies' => function ($query) {
+                $query->withTrashed()->with('user:id,name,email,role')->orderBy('created_at', 'desc');
+            },
+        ])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -53,23 +63,27 @@ class ClassroomCommentService
     /**
      * Create a new comment or reply.
      *
-     * @param  array{content: array, parent_id?: int|null}  $data
+     * @param  array{content: array, parent_id?: int|null, module_id?: int|null}  $data
      */
     public function createComment(User $user, Classroom $classroom, array $data): ClassroomComment
     {
         $parentId = $data['parent_id'] ?? null;
+        $moduleId = $data['module_id'] ?? null;
 
         if ($parentId !== null) {
             $parent = ClassroomComment::findOrFail($parentId);
             if ($parent->parent_id !== null) {
                 throw new \InvalidArgumentException('Cannot reply to a reply.');
             }
+            // Child inherits the parent's module_id
+            $moduleId = $parent->module_id;
         }
 
         return ClassroomComment::create([
             'classroom_id' => $classroom->id,
             'user_id' => $user->id,
             'parent_id' => $parentId,
+            'module_id' => $moduleId,
             'content' => $this->sanitizer->sanitize($data['content']) ?? [],
         ]);
     }

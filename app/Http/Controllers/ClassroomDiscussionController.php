@@ -22,9 +22,13 @@ class ClassroomDiscussionController extends Controller
     {
         Gate::authorize('view', $classroom);
 
+        $moduleId = $request->query('module_id');
+
         return Inertia::render('classrooms/Discussion', [
             'classroom' => $classroom,
-            'comments' => $commentService->getCommentsForClassroom($classroom),
+            'modules' => $classroom->modules()->get(['id', 'title']),
+            'comments' => $commentService->getCommentsForClassroom($classroom, $moduleId),
+            'selectedModuleId' => $moduleId ?? 'all',
         ]);
     }
 

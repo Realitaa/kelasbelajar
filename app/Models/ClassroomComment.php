@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'classroom_id',
     'user_id',
     'parent_id',
+    'module_id',
     'content',
 ])]
 class ClassroomComment extends Model
@@ -27,6 +28,7 @@ class ClassroomComment extends Model
             'classroom_id' => 'integer',
             'user_id' => 'integer',
             'parent_id' => 'integer',
+            'module_id' => 'integer',
             'content' => 'array',
         ];
     }
@@ -39,6 +41,16 @@ class ClassroomComment extends Model
     public function classroom(): BelongsTo
     {
         return $this->belongsTo(Classroom::class);
+    }
+
+    /**
+     * Get the module associated with the comment.
+     *
+     * @return BelongsTo<ClassroomModule, $this>
+     */
+    public function module(): BelongsTo
+    {
+        return $this->belongsTo(ClassroomModule::class, 'module_id');
     }
 
     /**
