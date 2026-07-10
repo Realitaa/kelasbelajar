@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import katex from 'katex';
 import { ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,8 +10,8 @@ import {
     DialogFooter,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import MathField from '@/components/ui/math-field/MathField.vue';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Textarea } from '@/components/ui/textarea';
 
 const props = withDefaults(
     defineProps<{
@@ -43,41 +42,6 @@ watch(
         }
     },
 );
-const previewHtml = ref('');
-const previewError = ref('');
-
-function updatePreview() {
-    if (!latex.value.trim()) {
-        previewHtml.value = '';
-        previewError.value = '';
-
-        return;
-    }
-
-    try {
-        previewHtml.value = katex.renderToString(latex.value, {
-            displayMode: isBlock.value === 'true',
-            throwOnError: true,
-        });
-        previewError.value = '';
-    } catch (error: any) {
-        previewError.value = error.message || 'Error rendering LaTeX';
-
-        // fallback render without throwing so they can see partial results
-        try {
-            previewHtml.value = katex.renderToString(latex.value, {
-                displayMode: isBlock.value === 'true',
-                throwOnError: false,
-            });
-        } catch {
-            // do nothing
-        }
-    }
-}
-
-watch([latex, isBlock], () => {
-    updatePreview();
-});
 
 function handleInsert() {
     if (!latex.value.trim()) {
@@ -95,32 +59,35 @@ function closeModal() {
     emit('update:open', false);
     latex.value = '';
     isBlock.value = 'true';
-    previewHtml.value = '';
-    previewError.value = '';
+
+    if (typeof window !== 'undefined' && (window as any).mathVirtualKeyboard) {
+        (window as any).mathVirtualKeyboard.hide();
+    }
 }
 </script>
 
 <template>
     <Dialog :open="open" @update:open="closeModal">
-        <DialogContent class="sm:max-w-[500px]">
+        <DialogContent class="sm:max-w-[600px]" @interact-outside="(e) => e.preventDefault()">
             <DialogHeader>
                 <DialogTitle>Sisipkan Formula Matematika</DialogTitle>
                 <DialogDescription>
-                    Tulis formula LaTeX di bawah ini. Anda dapat memilih tipe
+                    Ketik formula secara visual atau gunakan sintaks LaTeX. Anda dapat memilih tipe
                     tampilan inline atau terpisah.
                 </DialogDescription>
             </DialogHeader>
 
-            <div class="grid gap-4 py-4">
+            <div class="grid gap-6 py-4">
                 <div class="grid gap-2">
-                    <Label for="latex-code" required>Formula LaTeX</Label>
-                    <Textarea
-                        id="latex-code"
-                        placeholder="Contoh: \int_{a}^{b} x^2 \, dx = \frac{b^3 - a^3}{3}"
+                    <Label for="math-editor" required>Visual Editor / LaTeX</Label>
+                    <!-- MathLive provides WYSIWYG editing, so preview is built-in -->
+                    <MathField
+                        id="math-editor"
                         v-model="latex"
-                        rows="3"
-                        class="font-mono"
                     />
+                    <div class="text-[0.8rem] text-muted-foreground">
+                        Petunjuk: Ketik \ lalu nama simbol (contoh: \alpha) atau gunakan tombol di layar.
+                    </div>
                 </div>
 
                 <div class="grid gap-2">
@@ -140,33 +107,13 @@ function closeModal() {
                         </div>
                     </RadioGroup>
                 </div>
-
-                <div class="grid gap-2">
-                    <Label>Pratinjau</Label>
-                    <div
-                        class="flex min-h-[80px] w-full items-center justify-center overflow-x-auto rounded-md border border-input bg-muted/40 p-4"
-                    >
-                        <div v-if="previewHtml" v-html="previewHtml"></div>
-                        <span
-                            v-else
-                            class="text-xs text-muted-foreground italic"
-                            >Formula matematika akan dirender di sini...</span
-                        >
-                    </div>
-                    <div
-                        v-if="previewError"
-                        class="mt-1 font-mono text-xs break-all text-destructive"
-                    >
-                        {{ previewError }}
-                    </div>
-                </div>
             </div>
 
             <DialogFooter>
                 <Button variant="outline" @click="closeModal">Batal</Button>
                 <Button
                     @click="handleInsert"
-                    :disabled="!latex.trim() || !!previewError"
+                    :disabled="!latex.trim()"
                     >Sisipkan</Button
                 >
             </DialogFooter>

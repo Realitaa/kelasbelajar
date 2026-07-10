@@ -3,6 +3,7 @@ import { useHttp } from '@inertiajs/vue3';
 import UApp from '@nuxt/ui/components/App.vue';
 import UEditor from '@nuxt/ui/components/Editor.vue';
 import UEditorToolbar from '@nuxt/ui/components/EditorToolbar.vue';
+import { Color } from '@tiptap/extension-color';
 import Image from '@tiptap/extension-image';
 import { Mathematics } from '@tiptap/extension-mathematics';
 import { TableCell } from '@tiptap/extension-table/cell';
@@ -10,15 +11,25 @@ import { TableHeader } from '@tiptap/extension-table/header';
 import { TableRow } from '@tiptap/extension-table/row';
 import { Table } from '@tiptap/extension-table/table';
 import TextAlign from '@tiptap/extension-text-align';
+import { TextStyle } from '@tiptap/extension-text-style';
 import Youtube from '@tiptap/extension-youtube';
 import { computed, ref, provide, watch } from 'vue';
 import 'katex/dist/katex.min.css';
 import { toast } from 'vue-sonner';
 import { upload, show } from '@/actions/App/Http/Controllers/FileController';
+import { Button } from '@/components/ui/button';
+import ColorPicker from '@/components/ui/color-picker/ColorPicker.vue';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { SlideshowExtension } from './editor/extensions/SlideshowExtension';
 import ImageUploadModal from './editor/ImageUploadModal.vue';
-import MathInsertModal from './editor/MathInsertModal.vue';
+import MathEditorModal from './editor/MathEditorModal.vue';
 import TableInsertModal from './editor/TableInsertModal.vue';
 import YoutubeInsertModal from './editor/YoutubeInsertModal.vue';
 
@@ -42,7 +53,21 @@ const isImageModalOpen = ref(false);
 const isMathModalOpen = ref(false);
 const isYoutubeModalOpen = ref(false);
 const isTableModalOpen = ref(false);
+const isColorPickerOpen = ref(false);
+const selectedTextColor = ref('');
 const editorRef = ref<any>(null);
+
+function applyTextColor() {
+    if (editorRef.value?.editor) {
+        if (selectedTextColor.value) {
+            editorRef.value.editor.commands.setColor(selectedTextColor.value);
+        } else {
+            editorRef.value.editor.commands.unsetColor();
+        }
+    }
+
+    isColorPickerOpen.value = false;
+}
 
 const mathToEdit = ref<{
     latex: string;
@@ -89,6 +114,8 @@ const extensions = computed(() => {
         TextAlign.configure({
             types: ['heading', 'paragraph'],
         }),
+        TextStyle,
+        Color,
     ];
 
     if (props.isEducator) {
@@ -155,6 +182,14 @@ const toolbarItems = computed(() => {
                             kind: 'paragraph',
                             icon: 'i-lucide-pilcrow',
                             label: 'Paragraf',
+                        },
+                        {
+                            icon: 'i-lucide-palette',
+                            label: 'Warna Teks',
+                            onClick: () => {
+                                selectedTextColor.value = editorRef.value?.editor?.getAttributes('textStyle').color || '';
+                                isColorPickerOpen.value = true;
+                            },
                         },
                     ],
                     [
@@ -609,7 +644,7 @@ function handleDropEvent(view: any, event: DragEvent) {
             v-model:open="isTableModalOpen"
             @insert="handleTableInsert"
         />
-        <MathInsertModal
+        <MathEditorModal
             v-model:open="isMathModalOpen"
             :initial-latex="mathToEdit?.latex || ''"
             :initial-is-block="mathToEdit ? mathToEdit.isBlock : true"
@@ -619,6 +654,21 @@ function handleDropEvent(view: any, event: DragEvent) {
             v-model:open="isYoutubeModalOpen"
             @insert="handleYoutubeInsert"
         />
+
+        <Dialog :open="isColorPickerOpen" @update:open="isColorPickerOpen = $event">
+            <DialogContent class="sm:max-w-[400px]">
+                <DialogHeader>
+                    <DialogTitle>Warna Teks</DialogTitle>
+                </DialogHeader>
+                <div class="py-4">
+                    <ColorPicker v-model="selectedTextColor" />
+                </div>
+                <DialogFooter>
+                    <Button variant="outline" @click="isColorPickerOpen = false">Batal</Button>
+                    <Button @click="applyTextColor">Terapkan</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     </UApp>
 </template>
 
@@ -684,5 +734,14 @@ function handleDropEvent(view: any, event: DragEvent) {
     display: block;
     margin-left: auto;
     margin-right: auto;
+}
+
+/* Ensure horizontal scrolling for overflowing math elements */
+.ProseMirror .katex-display,
+.ProseMirror [data-type="block-math"],
+.ProseMirror [data-type="inline-math"] {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 </style>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Color } from '@tiptap/extension-color';
 import Image from '@tiptap/extension-image';
 import { Mathematics } from '@tiptap/extension-mathematics';
 import { TableCell } from '@tiptap/extension-table/cell';
@@ -6,6 +7,7 @@ import { TableHeader } from '@tiptap/extension-table/header';
 import { TableRow } from '@tiptap/extension-table/row';
 import { Table } from '@tiptap/extension-table/table';
 import TextAlign from '@tiptap/extension-text-align';
+import { TextStyle } from '@tiptap/extension-text-style';
 import Youtube from '@tiptap/extension-youtube';
 import { generateHTML } from '@tiptap/html';
 import StarterKit from '@tiptap/starter-kit';
@@ -46,6 +48,8 @@ const extensions = [
     TextAlign.configure({
         types: ['heading', 'paragraph'],
     }),
+    TextStyle,
+    Color,
 ];
 
 const containerRef = ref<HTMLElement | null>(null);
@@ -299,5 +303,14 @@ onMounted(() => {
     display: block;
     margin-left: auto;
     margin-right: auto;
+}
+
+/* Ensure horizontal scrolling for overflowing math elements */
+.tiptap-preview .katex-display,
+.tiptap-preview [data-type="block-math"],
+.tiptap-preview [data-type="inline-math"] {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 </style>
