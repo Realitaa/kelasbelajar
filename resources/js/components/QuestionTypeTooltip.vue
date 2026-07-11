@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { CircleQuestionMark } from '@lucide/vue';
+import type { TooltipContentProps } from "reka-ui"
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+
+const props = defineProps<{ side?: TooltipContentProps['side'] }>()
 </script>
 
 <template>
-    <TooltipProvider :delay-duration="250" :content="{ side: 'left' }">
+    <TooltipProvider :delay-duration="250" :content="{ side: props.side || 'left' }">
         <Tooltip>
             <TooltipTrigger as-child>
                 <button

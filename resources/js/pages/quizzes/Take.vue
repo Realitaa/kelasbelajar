@@ -5,6 +5,7 @@ import { useLocalStorage } from '@vueuse/core';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import PreviewRenderer from '@/components/PreviewRenderer.vue';
 import QuestionTypeTooltip from '@/components/QuestionTypeTooltip.vue';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import QuizLayout from '@/layouts/QuizLayout.vue';
@@ -379,12 +380,19 @@ onUnmounted(() => {
                                     >
                                         Soal No. {{ currentQuestionIndex + 1 }}
                                     </h2>
-                                    <span
-                                        class="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                                    <Badge
+                                        :variant="
+                                            currentQuestion.type === 'PG'
+                                                ? 'pg'
+                                                : currentQuestion.type ===
+                                                  'PG MCMA'
+                                                  ? 'mcma'
+                                                  : 'complex'
+                                        "
                                     >
                                         {{ currentQuestion.type }}
-                                    </span>
-                                    <QuestionTypeTooltip />
+                                    </Badge>
+                                    <QuestionTypeTooltip side="right" />
                                 </div>
                             </div>
 
