@@ -23,7 +23,9 @@ class UpdateLearningContentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => 'present',
+            'content' => ['required', 'array'],
+            'content.type' => ['required', 'in:doc'],
+            'content.content' => ['required', 'array'],
         ];
     }
 }

@@ -15,7 +15,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $tiptapContent = static fn (Request $request): bool =>
+            $request->hasAny([
+                'content',
+                'question',
+                'solution',
+                'option',
+            ]);
+
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+
+        $middleware->trimStrings(except: [$tiptapContent]);
+
+        $middleware->convertEmptyStringsToNull(except: [$tiptapContent]);
 
         $middleware->web(append: [
             HandleAppearance::class,
