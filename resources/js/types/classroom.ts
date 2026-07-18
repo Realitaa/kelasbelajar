@@ -48,6 +48,7 @@ interface ClassroomModule {
     id: number;
     classroom_id: number;
     title: string;
+    color?: string | null;
     position: number;
     objects?: ModuleObject[];
 }
@@ -74,6 +75,7 @@ interface Module {
     id: number;
     classroom_id: number;
     title: string;
+    color?: string | null;
     position: number;
     objects: LessonObject[];
 }

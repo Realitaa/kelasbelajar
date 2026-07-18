@@ -17,16 +17,8 @@ import { computed, ref, provide, watch } from 'vue';
 import 'katex/dist/katex.min.css';
 import { toast } from 'vue-sonner';
 import { upload, show } from '@/actions/App/Http/Controllers/FileController';
-import { Button } from '@/components/ui/button';
-import ColorPicker from '@/components/ui/color-picker/ColorPicker.vue';
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import ColorPickerDialog from './editor/ColorPickerDialog.vue';
 import { SlideshowExtension } from './editor/extensions/SlideshowExtension';
 import ImageUploadModal from './editor/ImageUploadModal.vue';
 import MathEditorModal from './editor/MathEditorModal.vue';
@@ -57,10 +49,12 @@ const isColorPickerOpen = ref(false);
 const selectedTextColor = ref('');
 const editorRef = ref<any>(null);
 
-function applyTextColor() {
+function applyTextColor(color?: string) {
+    const targetColor = color !== undefined ? color : selectedTextColor.value;
+
     if (editorRef.value?.editor) {
-        if (selectedTextColor.value) {
-            editorRef.value.editor.commands.setColor(selectedTextColor.value);
+        if (targetColor) {
+            editorRef.value.editor.commands.setColor(targetColor);
         } else {
             editorRef.value.editor.commands.unsetColor();
         }
@@ -655,20 +649,11 @@ function handleDropEvent(view: any, event: DragEvent) {
             @insert="handleYoutubeInsert"
         />
 
-        <Dialog :open="isColorPickerOpen" @update:open="isColorPickerOpen = $event">
-            <DialogContent class="sm:max-w-[400px]">
-                <DialogHeader>
-                    <DialogTitle>Warna Teks</DialogTitle>
-                </DialogHeader>
-                <div class="py-4">
-                    <ColorPicker v-model="selectedTextColor" />
-                </div>
-                <DialogFooter>
-                    <Button variant="outline" @click="isColorPickerOpen = false">Batal</Button>
-                    <Button @click="applyTextColor">Terapkan</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+        <ColorPickerDialog
+            v-model:open="isColorPickerOpen"
+            v-model="selectedTextColor"
+            @confirm="applyTextColor"
+        />
     </UApp>
 </template>
 

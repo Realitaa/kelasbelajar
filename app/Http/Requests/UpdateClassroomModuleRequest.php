@@ -26,6 +26,7 @@ class UpdateClassroomModuleRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
+            'color' => ['nullable', 'string', 'max:7'],
         ];
     }
 }

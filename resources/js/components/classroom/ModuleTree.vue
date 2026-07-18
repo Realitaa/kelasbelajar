@@ -18,6 +18,7 @@ import {
 } from '@/actions/App/Http/Controllers/ModuleObjectController';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import ColorPicker from '@/components/ui/color-picker/ColorPicker.vue';
 import {
     Dialog,
     DialogContent,
@@ -102,6 +103,7 @@ const deleteMessage = ref('');
 const moduleForm = useForm({
     id: null as number | null,
     title: '',
+    color: null as string | null,
 });
 
 const objectForm = useForm({
@@ -124,6 +126,7 @@ const deleteForm = useForm({});
 function openCreateModule() {
     moduleForm.reset();
     moduleForm.id = null;
+    moduleForm.color = null;
     isModuleModalOpen.value = true;
 }
 
@@ -131,6 +134,7 @@ function openEditModule(module: any) {
     moduleForm.reset();
     moduleForm.id = module.id;
     moduleForm.title = module.title;
+    moduleForm.color = module.color || null;
     isModuleModalOpen.value = true;
 }
 
@@ -530,6 +534,7 @@ function getContextMenuItems(item: any) {
                                 />
                                 <span
                                     class="text-sm font-bold text-highlighted"
+                                    :style="module.color ? { color: module.color } : {}"
                                     >{{ module.title }}</span
                                 >
                             </div>
@@ -625,6 +630,7 @@ function getContextMenuItems(item: any) {
                                     />
                                     <span
                                         class="truncate text-sm font-medium text-highlighted"
+                                        :style="item.original?.color ? { color: item.original.color } : {}"
                                         >{{ item.label }}</span
                                     >
                                 </div>
@@ -670,6 +676,32 @@ function getContextMenuItems(item: any) {
                             class="text-sm text-red-500"
                         >
                             {{ moduleForm.errors.title }}
+                        </p>
+                    </div>
+
+                    <!-- Color Picker Section -->
+                    <div class="grid gap-2 border-t border-border pt-4">
+                        <div class="flex items-center justify-between">
+                            <Label>Warna Modul (Opsional)</Label>
+                            <Button
+                                v-if="moduleForm.color"
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                class="h-6 px-2 text-xs text-red-500 hover:text-red-600 hover:bg-transparent"
+                                @click="moduleForm.color = null"
+                            >
+                                Hapus Warna
+                            </Button>
+                        </div>
+                        <div class="rounded-md border border-input p-1">
+                            <ColorPicker v-model="moduleForm.color" class="p-1" />
+                        </div>
+                        <p
+                            v-if="moduleForm.errors.color"
+                            class="text-sm text-red-500"
+                        >
+                            {{ moduleForm.errors.color }}
                         </p>
                     </div>
 

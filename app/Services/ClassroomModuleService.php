@@ -20,6 +20,7 @@ class ClassroomModuleService
 
         return $classroom->modules()->create([
             'title' => $data['title'],
+            'color' => $data['color'] ?? null,
             'position' => $maxPosition + 1,
         ]);
     }
@@ -27,12 +28,13 @@ class ClassroomModuleService
     /**
      * Update an existing classroom module.
      *
-     * @param  array{title: string}  $data
+     * @param  array{title: string, color?: string|null}  $data
      */
     public function updateModule(ClassroomModule $module, array $data): ClassroomModule
     {
         $module->update([
             'title' => $data['title'],
+            'color' => $data['color'] ?? null,
         ]);
 
         return $module;

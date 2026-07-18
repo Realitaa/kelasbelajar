@@ -8,6 +8,7 @@ import {
     BookOpen,
     MessageSquare,
 } from '@lucide/vue';
+import { computed } from 'vue';
 import PreviewRenderer from '@/components/PreviewRenderer.vue';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -22,6 +23,16 @@ const props = defineProps<{
     activeObject: LessonObject | null;
     activeQuizSubmissions: QuizSubmission[];
 }>();
+
+const activeModule = computed(() => {
+    const obj = props.activeObject;
+
+    if (!obj) {
+        return null;
+    }
+
+    return props.classroom.modules.find((m) => m.id === obj.module_id) || null;
+});
 
 defineOptions({
     layout: (props: any) => ({
@@ -173,6 +184,7 @@ function countTotalLessons() {
                                 >
                                 <h2
                                     class="text-xl font-bold tracking-tight text-slate-900 md:text-2xl dark:text-slate-100"
+                                    :style="activeModule?.color ? { color: activeModule.color } : {}"
                                 >
                                     {{ activeObject.object.title }}
                                 </h2>
@@ -208,6 +220,7 @@ function countTotalLessons() {
                                     >
                                     <h2
                                         class="text-xl font-bold tracking-tight text-slate-900 md:text-2xl dark:text-slate-100"
+                                        :style="activeModule?.color ? { color: activeModule.color } : {}"
                                     >
                                         {{ activeObject.object.title }}
                                     </h2>
@@ -431,6 +444,7 @@ function countTotalLessons() {
                             >
                                 <h4
                                     class="text-xs font-bold tracking-wider text-slate-400 uppercase dark:text-slate-500"
+                                    :style="mod.color ? { color: mod.color } : {}"
                                 >
                                     {{ mod.title }}
                                 </h4>

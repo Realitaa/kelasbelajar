@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable([
     'classroom_id',
     'title',
+    'color',
     'position',
 ])]
 class ClassroomModule extends Model
@@ -23,6 +24,7 @@ class ClassroomModule extends Model
     {
         return [
             'classroom_id' => 'integer',
+            'color' => 'string',
         ];
     }
 

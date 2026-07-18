@@ -4,7 +4,7 @@ import { computed } from 'vue';
 import { cn } from '@/lib/utils';
 
 const props = defineProps<{
-    modelValue: string;
+    modelValue: string | null;
     class?: string;
 }>();
 
@@ -27,7 +27,12 @@ const colors = [
 
 const selectedColor = computed({
     get: () => props.modelValue || '',
-    set: (val) => emit('update:modelValue', val),
+    set: (val) => emit('update:modelValue', val || null),
+});
+
+const customColorPickerValue = computed({
+    get: () => props.modelValue || '#3B82F6',
+    set: (val) => emit('update:modelValue', val || null),
 });
 
 function setColor(color: string) {
@@ -59,9 +64,9 @@ function setColor(color: string) {
         
         <div class="border-t border-border pt-3">
             <div class="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Custom (NuxtUI)
+                Custom
             </div>
-            <UColorPicker v-model="selectedColor" format="hex" />
+            <UColorPicker v-model="customColorPickerValue" format="hex" />
         </div>
         
         <div class="mt-1 flex items-center gap-2">
