@@ -33,7 +33,7 @@ function toggleTooltip() {
 <template>
     <TooltipProvider
         :delay-duration="250"
-        :content="{ side: props.side || 'left' }"
+        :content="{ side: isMobile ? 'bottom' : props.side || 'left' }"
     >
         <Tooltip :open="isOpen" @update:open="handleOpenChange">
             <TooltipTrigger as-child>
