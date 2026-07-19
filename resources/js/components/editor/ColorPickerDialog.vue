@@ -18,7 +18,7 @@ const props = withDefaults(
     }>(),
     {
         title: 'Warna Teks',
-    }
+    },
 );
 
 const emit = defineEmits<{
@@ -36,7 +36,7 @@ watch(
             localColor.value = props.modelValue || '';
         }
     },
-    { immediate: true }
+    { immediate: true },
 );
 
 function handleConfirm() {

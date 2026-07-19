@@ -33,7 +33,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { show } from '@/routes/classrooms';
+import { show, manage } from '@/routes/classrooms';
 import discussion from '@/routes/classrooms/discussion';
 import {
     store as storeComment,
@@ -101,11 +101,15 @@ function handleFilterChange(value: any) {
     if (value && value !== 'all') {
         query.module_id = value;
     }
-    
-    router.get(discussion.index.url(props.classroom.slug, { query }), {}, {
-        preserveState: true,
-        preserveScroll: true,
-    });
+
+    router.get(
+        discussion.index.url(props.classroom.slug, { query }),
+        {},
+        {
+            preserveState: true,
+            preserveScroll: true,
+        },
+    );
 }
 
 // Form for replies
@@ -249,7 +253,11 @@ function canEdit(comment: ClassroomComment) {
             <div class="flex items-center justify-between border-b pb-4">
                 <div class="flex items-center gap-3">
                     <Link
-                        :href="show(classroom.slug).url"
+                        :href="
+                            currentUser.role == 'educator'
+                                ? manage.url(classroom.slug)
+                                : show(classroom.slug).url
+                        "
                         class="inline-flex h-9 w-9 items-center justify-center rounded-lg border bg-card text-muted-foreground shadow-xs transition-colors hover:bg-muted"
                     >
                         <ArrowLeft class="size-5" />
@@ -292,7 +300,10 @@ function canEdit(comment: ClassroomComment) {
                     </div>
 
                     <div class="grid gap-2">
-                        <Label class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Modul Terkait</Label>
+                        <Label
+                            class="text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                            >Modul Terkait</Label
+                        >
                         <Combobox
                             v-model="newCommentForm.module_id"
                             :options="comboboxOptions"
@@ -335,7 +346,9 @@ function canEdit(comment: ClassroomComment) {
 
             <!-- Comments List -->
             <div class="space-y-6">
-                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div
+                    class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+                >
                     <h2
                         class="flex items-center gap-2 text-lg font-bold tracking-tight text-foreground"
                     >
@@ -345,13 +358,22 @@ function canEdit(comment: ClassroomComment) {
 
                     <!-- Filter Select -->
                     <div class="w-full sm:w-64">
-                        <Select v-model="filterModuleId" @update:modelValue="handleFilterChange">
-                            <SelectTrigger class="w-full bg-background border-input">
-                                <SelectValue placeholder="Filter berdasarkan modul" />
+                        <Select
+                            v-model="filterModuleId"
+                            @update:modelValue="handleFilterChange"
+                        >
+                            <SelectTrigger
+                                class="w-full border-input bg-background"
+                            >
+                                <SelectValue
+                                    placeholder="Filter berdasarkan modul"
+                                />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
-                                    <SelectItem value="all">Semua Diskusi</SelectItem>
+                                    <SelectItem value="all"
+                                        >Semua Diskusi</SelectItem
+                                    >
                                     <SelectItem value="umum">Umum</SelectItem>
                                     <SelectItem
                                         v-for="module in modules"
@@ -439,7 +461,7 @@ function canEdit(comment: ClassroomComment) {
                                         <Badge
                                             v-if="comment.module"
                                             variant="secondary"
-                                            class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-none px-1.5 py-0 text-[10px] font-medium"
+                                            class="border-none bg-slate-100 px-1.5 py-0 text-[10px] font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-300"
                                         >
                                             Modul: {{ comment.module.title }}
                                         </Badge>
@@ -607,9 +629,7 @@ function canEdit(comment: ClassroomComment) {
                                     class="rounded-xl border border-border bg-card/40 p-4 shadow-sm"
                                 >
                                     <form
-                                        @submit.prevent="
-                                            submitReply()
-                                        "
+                                        @submit.prevent="submitReply()"
                                         class="space-y-3"
                                     >
                                         <div

@@ -27,6 +27,7 @@ const props = defineProps<{
         passing_grade: number;
     };
     classroomSlug: string;
+    objectId: number;
 }>();
 
 defineOptions({
@@ -312,7 +313,13 @@ const getPgkCellIcon = (
                         </div>
 
                         <div class="mt-6">
-                            <Link :href="showClassroom.url(classroomSlug)">
+                            <Link
+                                :href="
+                                    showClassroom.url(classroomSlug, {
+                                        query: { object_id: objectId },
+                                    })
+                                "
+                            >
                                 <Button variant="outline" class="w-full gap-2">
                                     <ArrowLeft class="size-4" />
                                     Kembali ke Kelas

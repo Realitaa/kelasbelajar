@@ -68,25 +68,28 @@ function closeModal() {
 
 <template>
     <Dialog :open="open" @update:open="closeModal">
-        <DialogContent class="sm:max-w-[600px]" @interact-outside="(e) => e.preventDefault()">
+        <DialogContent
+            class="sm:max-w-[600px]"
+            @interact-outside="(e) => e.preventDefault()"
+        >
             <DialogHeader>
                 <DialogTitle>Sisipkan Formula Matematika</DialogTitle>
                 <DialogDescription>
-                    Ketik formula secara visual atau gunakan sintaks LaTeX. Anda dapat memilih tipe
-                    tampilan inline atau terpisah.
+                    Ketik formula secara visual atau gunakan sintaks LaTeX. Anda
+                    dapat memilih tipe tampilan inline atau terpisah.
                 </DialogDescription>
             </DialogHeader>
 
             <div class="grid gap-6 py-4">
                 <div class="grid gap-2">
-                    <Label for="math-editor" required>Visual Editor / LaTeX</Label>
+                    <Label for="math-editor" required
+                        >Visual Editor / LaTeX</Label
+                    >
                     <!-- MathLive provides WYSIWYG editing, so preview is built-in -->
-                    <MathField
-                        id="math-editor"
-                        v-model="latex"
-                    />
+                    <MathField id="math-editor" v-model="latex" />
                     <div class="text-[0.8rem] text-muted-foreground">
-                        Petunjuk: Ketik \ lalu nama simbol (contoh: \alpha) atau gunakan tombol di layar.
+                        Petunjuk: Ketik \ lalu nama simbol (contoh: \alpha) atau
+                        gunakan tombol di layar.
                     </div>
                 </div>
 
@@ -111,9 +114,7 @@ function closeModal() {
 
             <DialogFooter>
                 <Button variant="outline" @click="closeModal">Batal</Button>
-                <Button
-                    @click="handleInsert"
-                    :disabled="!latex.trim()"
+                <Button @click="handleInsert" :disabled="!latex.trim()"
                     >Sisipkan</Button
                 >
             </DialogFooter>

@@ -534,7 +534,11 @@ function getContextMenuItems(item: any) {
                                 />
                                 <span
                                     class="text-sm font-bold text-highlighted"
-                                    :style="module.color ? { color: module.color } : {}"
+                                    :style="
+                                        module.color
+                                            ? { color: module.color }
+                                            : {}
+                                    "
                                     >{{ module.title }}</span
                                 >
                             </div>
@@ -630,7 +634,11 @@ function getContextMenuItems(item: any) {
                                     />
                                     <span
                                         class="truncate text-sm font-medium text-highlighted"
-                                        :style="item.original?.color ? { color: item.original.color } : {}"
+                                        :style="
+                                            item.original?.color
+                                                ? { color: item.original.color }
+                                                : {}
+                                        "
                                         >{{ item.label }}</span
                                     >
                                 </div>
@@ -688,14 +696,17 @@ function getContextMenuItems(item: any) {
                                 type="button"
                                 variant="ghost"
                                 size="sm"
-                                class="h-6 px-2 text-xs text-red-500 hover:text-red-600 hover:bg-transparent"
+                                class="h-6 px-2 text-xs text-red-500 hover:bg-transparent hover:text-red-600"
                                 @click="moduleForm.color = null"
                             >
                                 Hapus Warna
                             </Button>
                         </div>
                         <div class="rounded-md border border-input p-1">
-                            <ColorPicker v-model="moduleForm.color" class="p-1" />
+                            <ColorPicker
+                                v-model="moduleForm.color"
+                                class="p-1"
+                            />
                         </div>
                         <p
                             v-if="moduleForm.errors.color"

@@ -15,13 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $tiptapContent = static fn (Request $request): bool =>
-            $request->hasAny([
-                'content',
-                'question',
-                'solution',
-                'option',
-            ]);
+        $tiptapContent = static fn (Request $request): bool => $request->hasAny([
+            'content',
+            'question',
+            'solution',
+            'option',
+        ]);
 
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 

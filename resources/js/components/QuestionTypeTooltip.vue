@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { CircleQuestionMark } from '@lucide/vue';
-import type { TooltipContentProps } from "reka-ui"
+import { useMediaQuery } from '@vueuse/core';
+import type { TooltipContentProps } from 'reka-ui';
+import { ref } from 'vue';
 import {
     Tooltip,
     TooltipContent,
@@ -8,16 +10,37 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-const props = defineProps<{ side?: TooltipContentProps['side'] }>()
+const props = defineProps<{ side?: TooltipContentProps['side'] }>();
+
+const isMobile = useMediaQuery('(max-width: 768px)');
+const isOpen = ref(false);
+
+function handleOpenChange(open: boolean) {
+    if (!isMobile.value) {
+        isOpen.value = open;
+    } else if (!open) {
+        isOpen.value = false;
+    }
+}
+
+function toggleTooltip() {
+    if (isMobile.value) {
+        isOpen.value = !isOpen.value;
+    }
+}
 </script>
 
 <template>
-    <TooltipProvider :delay-duration="250" :content="{ side: props.side || 'left' }">
-        <Tooltip>
+    <TooltipProvider
+        :delay-duration="250"
+        :content="{ side: props.side || 'left' }"
+    >
+        <Tooltip :open="isOpen" @update:open="handleOpenChange">
             <TooltipTrigger as-child>
                 <button
                     type="button"
                     class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    @click="toggleTooltip"
                 >
                     <CircleQuestionMark class="size-4" />
                 </button>

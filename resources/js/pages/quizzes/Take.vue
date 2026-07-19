@@ -385,7 +385,7 @@ onUnmounted(() => {
                                             currentQuestion.type === 'PG'
                                                 ? 'pg'
                                                 : currentQuestion.type ===
-                                                  'PG MCMA'
+                                                    'PG MCMA'
                                                   ? 'mcma'
                                                   : 'complex'
                                         "

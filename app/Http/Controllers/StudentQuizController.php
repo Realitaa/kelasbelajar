@@ -116,6 +116,7 @@ class StudentQuizController extends Controller
             'submission' => $submission,
             'quiz' => $submission->quiz,
             'classroomSlug' => $moduleObject->module->classroom->slug,
+            'objectId' => $moduleObject->id,
         ]);
     }
 }

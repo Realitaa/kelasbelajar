@@ -181,7 +181,10 @@ const toolbarItems = computed(() => {
                             icon: 'i-lucide-palette',
                             label: 'Warna Teks',
                             onClick: () => {
-                                selectedTextColor.value = editorRef.value?.editor?.getAttributes('textStyle').color || '';
+                                selectedTextColor.value =
+                                    editorRef.value?.editor?.getAttributes(
+                                        'textStyle',
+                                    ).color || '';
                                 isColorPickerOpen.value = true;
                             },
                         },
@@ -723,8 +726,8 @@ function handleDropEvent(view: any, event: DragEvent) {
 
 /* Ensure horizontal scrolling for overflowing math elements */
 .ProseMirror .katex-display,
-.ProseMirror [data-type="block-math"],
-.ProseMirror [data-type="inline-math"] {
+.ProseMirror [data-type='block-math'],
+.ProseMirror [data-type='inline-math'] {
     max-width: 100%;
     overflow-x: auto;
     overflow-y: hidden;

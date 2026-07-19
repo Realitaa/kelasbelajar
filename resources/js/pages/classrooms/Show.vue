@@ -184,7 +184,11 @@ function countTotalLessons() {
                                 >
                                 <h2
                                     class="text-xl font-bold tracking-tight text-slate-900 md:text-2xl dark:text-slate-100"
-                                    :style="activeModule?.color ? { color: activeModule.color } : {}"
+                                    :style="
+                                        activeModule?.color
+                                            ? { color: activeModule.color }
+                                            : {}
+                                    "
                                 >
                                     {{ activeObject.object.title }}
                                 </h2>
@@ -214,13 +218,13 @@ function countTotalLessons() {
                                 class="flex flex-wrap items-center justify-between gap-3"
                             >
                                 <div class="space-y-1">
-                                    <span
-                                        class="text-xs font-bold tracking-wider text-violet-600 uppercase dark:text-violet-400"
-                                        >Evaluasi Kuis</span
-                                    >
                                     <h2
                                         class="text-xl font-bold tracking-tight text-slate-900 md:text-2xl dark:text-slate-100"
-                                        :style="activeModule?.color ? { color: activeModule.color } : {}"
+                                        :style="
+                                            activeModule?.color
+                                                ? { color: activeModule.color }
+                                                : {}
+                                        "
                                     >
                                         {{ activeObject.object.title }}
                                     </h2>
@@ -229,7 +233,7 @@ function countTotalLessons() {
                                     <span
                                         class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-400"
                                     >
-                                        Kelulusan:
+                                        Nilai Minimal:
                                         {{
                                             activeObject.object.passing_grade ??
                                             70
@@ -245,11 +249,6 @@ function countTotalLessons() {
                                 class="flex flex-col items-center justify-between gap-6 rounded-xl border border-slate-100 bg-slate-50/20 p-6 md:flex-row dark:border-slate-900 dark:bg-slate-900/10"
                             >
                                 <div class="space-y-2 text-center md:text-left">
-                                    <h3
-                                        class="text-lg font-bold text-slate-900 dark:text-slate-100"
-                                    >
-                                        Kuis Kelulusan
-                                    </h3>
                                     <p class="max-w-md text-sm text-slate-500">
                                         {{
                                             activeObject.object.description ||
@@ -444,7 +443,9 @@ function countTotalLessons() {
                             >
                                 <h4
                                     class="text-xs font-bold tracking-wider text-slate-400 uppercase dark:text-slate-500"
-                                    :style="mod.color ? { color: mod.color } : {}"
+                                    :style="
+                                        mod.color ? { color: mod.color } : {}
+                                    "
                                 >
                                     {{ mod.title }}
                                 </h4>

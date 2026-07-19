@@ -263,6 +263,7 @@ onMounted(() => {
     color: var(--color-primary);
     text-decoration: underline;
     font-weight: 500;
+    word-break: break-all;
 }
 
 .tiptap-preview table {
@@ -299,16 +300,22 @@ onMounted(() => {
     margin-right: auto;
     max-width: 100%;
 }
+.tiptap-preview img {
+    height: auto;
+}
 .tiptap-preview [data-youtube-video] iframe {
     display: block;
     margin-left: auto;
     margin-right: auto;
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
 }
 
 /* Ensure horizontal scrolling for overflowing math elements */
 .tiptap-preview .katex-display,
-.tiptap-preview [data-type="block-math"],
-.tiptap-preview [data-type="inline-math"] {
+.tiptap-preview [data-type='block-math'],
+.tiptap-preview [data-type='inline-math'] {
     max-width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
