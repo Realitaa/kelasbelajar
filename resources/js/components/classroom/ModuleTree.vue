@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { useForm, router } from '@inertiajs/vue3';
-import { ArrowUpDown, Check, Plus, Infinity as InfinityIcon } from '@lucide/vue';
+import {
+    ArrowUpDown,
+    Check,
+    Plus,
+    Infinity as InfinityIcon,
+} from '@lucide/vue';
 import type { TreeItem } from '@nuxt/ui';
 import { ref, watch, computed } from 'vue';
 import { VueDraggable } from 'vue-draggable-plus';
@@ -202,7 +207,10 @@ function openEditObject(objectItem: any) {
         objectForm.passing_grade = objectItem.object.passing_grade;
         objectForm.time_limit = objectItem.object.time_limit || 30;
 
-        if (objectItem.object.max_attempts === null || objectItem.object.max_attempts === undefined) {
+        if (
+            objectItem.object.max_attempts === null ||
+            objectItem.object.max_attempts === undefined
+        ) {
             isUnlimited.value = true;
             objectForm.max_attempts = null;
         } else {
@@ -210,7 +218,8 @@ function openEditObject(objectItem: any) {
             objectForm.max_attempts = objectItem.object.max_attempts;
         }
 
-        objectForm.min_attempts_for_solution = objectItem.object.min_attempts_for_solution ?? 1;
+        objectForm.min_attempts_for_solution =
+            objectItem.object.min_attempts_for_solution ?? 1;
     }
 
     isObjectModalOpen.value = true;
@@ -842,14 +851,22 @@ function getContextMenuItems(item: any) {
                         </div>
 
                         <div class="grid gap-2">
-                            <Label :required="!isUnlimited">Batas Percobaan Kuis</Label>
+                            <Label :required="!isUnlimited"
+                                >Batas Percobaan Kuis</Label
+                            >
                             <div class="flex items-center">
-                                <div class="flex -space-x-px rounded-md shadow-xs">
+                                <div
+                                    class="flex -space-x-px rounded-md shadow-xs"
+                                >
                                     <Button
                                         type="button"
                                         variant="outline"
                                         class="rounded-r-none px-3"
-                                        :class="isUnlimited ? 'bg-accent text-accent-foreground font-bold' : ''"
+                                        :class="
+                                            isUnlimited
+                                                ? 'bg-accent font-bold text-accent-foreground'
+                                                : ''
+                                        "
                                         @click="setUnlimited(true)"
                                     >
                                         <InfinityIcon class="size-4" />
@@ -858,19 +875,25 @@ function getContextMenuItems(item: any) {
                                         type="button"
                                         variant="outline"
                                         class="rounded-l-none px-3"
-                                        :class="!isUnlimited ? 'bg-accent text-accent-foreground font-bold' : ''"
+                                        :class="
+                                            !isUnlimited
+                                                ? 'bg-accent font-bold text-accent-foreground'
+                                                : ''
+                                        "
                                         @click="setUnlimited(false)"
                                     >
-                                        <span class="text-xs font-semibold">123</span>
+                                        <span class="text-xs font-semibold"
+                                            >123</span
+                                        >
                                     </Button>
                                 </div>
-                                <div class="flex-1 ml-2">
+                                <div class="ml-2 flex-1">
                                     <Input
                                         v-if="isUnlimited"
                                         type="text"
                                         disabled
                                         model-value="Tak Terbatas"
-                                        class="bg-muted text-muted-foreground cursor-not-allowed"
+                                        class="cursor-not-allowed bg-muted text-muted-foreground"
                                     />
                                     <Input
                                         v-else
@@ -891,7 +914,10 @@ function getContextMenuItems(item: any) {
                         </div>
 
                         <div class="grid gap-2">
-                            <Label required>Minimal Percobaan untuk Melihat Pembahasan</Label>
+                            <Label required
+                                >Minimal Percobaan untuk Melihat
+                                Pembahasan</Label
+                            >
                             <Input
                                 v-model="objectForm.min_attempts_for_solution"
                                 type="number"
@@ -899,10 +925,14 @@ function getContextMenuItems(item: any) {
                                 required
                             />
                             <p
-                                v-if="objectForm.errors.min_attempts_for_solution"
+                                v-if="
+                                    objectForm.errors.min_attempts_for_solution
+                                "
                                 class="text-sm text-red-500"
                             >
-                                {{ objectForm.errors.min_attempts_for_solution }}
+                                {{
+                                    objectForm.errors.min_attempts_for_solution
+                                }}
                             </p>
                         </div>
                     </template>
