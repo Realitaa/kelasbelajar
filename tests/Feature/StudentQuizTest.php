@@ -10,6 +10,7 @@ use App\Models\QuizSession;
 use App\Models\QuizSubmission;
 use App\Models\User;
 use App\Services\StudentQuizService;
+use Inertia\Testing\AssertableInertia;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
@@ -267,4 +268,90 @@ it('grades PG K questions correctly with partial scoring', function () {
     $submission = QuizSubmission::orderBy('id', 'desc')->first();
     // PG K points = 1/2 = 0.5. Total points = 0.5. Total questions = 2. Score = 0.5 / 2 * 100 = 25
     expect($submission->score)->toBe(25);
+});
+
+it('denies starting quiz if student has reached max attempts limit', function () {
+    $this->quiz->update(['max_attempts' => 2]);
+
+    actingAs($this->student);
+
+    // Attempt 1
+    QuizSubmission::create([
+        'quiz_id' => $this->quiz->id,
+        'student_id' => $this->student->id,
+        'score' => 80,
+        'submitted_at' => now(),
+    ]);
+
+    // Attempt 2
+    QuizSubmission::create([
+        'quiz_id' => $this->quiz->id,
+        'student_id' => $this->student->id,
+        'score' => 90,
+        'submitted_at' => now(),
+    ]);
+
+    // Attempt 3 (Should be blocked)
+    $response = post(route('classrooms.quizzes.start', [$this->classroom->slug, $this->quiz->id]));
+    $response->assertRedirect();
+    $response->assertSessionHas('toast', [
+        'type' => 'error',
+        'message' => 'Batas maksimum percobaan kuis telah tercapai.',
+    ]);
+
+    expect(QuizSession::where('student_id', $this->student->id)->where('quiz_id', $this->quiz->id)->exists())->toBeFalse();
+});
+
+it('hides solution in submission details if min attempts is not met', function () {
+    $this->quiz->update(['min_attempts_for_solution' => 2]);
+    $this->question1->update(['solution' => ['ops' => [['insert' => 'This is the explanation']]]]);
+
+    actingAs($this->student);
+
+    // Attempt 1
+    $submission = QuizSubmission::create([
+        'quiz_id' => $this->quiz->id,
+        'student_id' => $this->student->id,
+        'score' => 80,
+        'submitted_at' => now(),
+    ]);
+
+    // View submission 1 (attemptsCount = 1 < 2) -> solution should be hidden/null
+    $response = get(route('quizzes.submissions.show', $submission->id));
+    $response->assertOk();
+    $response->assertInertia(fn (AssertableInertia $page) => $page
+        ->where('canShowSolution', false)
+        ->missing('quiz.questions.0.solution')
+    );
+});
+
+it('shows solution in submission details if min attempts is met', function () {
+    $this->quiz->update(['min_attempts_for_solution' => 2]);
+    $this->question1->update(['solution' => ['ops' => [['insert' => 'This is the explanation']]]]);
+
+    actingAs($this->student);
+
+    // Attempt 1
+    QuizSubmission::create([
+        'quiz_id' => $this->quiz->id,
+        'student_id' => $this->student->id,
+        'score' => 80,
+        'submitted_at' => now(),
+    ]);
+
+    // Attempt 2
+    $submission = QuizSubmission::create([
+        'quiz_id' => $this->quiz->id,
+        'student_id' => $this->student->id,
+        'score' => 90,
+        'submitted_at' => now(),
+    ]);
+
+    // View submission 2 (attemptsCount = 2 >= 2) -> solution should be shown
+    $response = get(route('quizzes.submissions.show', $submission->id));
+    $response->assertOk();
+    $response->assertInertia(fn (AssertableInertia $page) => $page
+        ->where('canShowSolution', true)
+        ->where('quiz.questions.0.solution', ['ops' => [['insert' => 'This is the explanation']]])
+    );
 });

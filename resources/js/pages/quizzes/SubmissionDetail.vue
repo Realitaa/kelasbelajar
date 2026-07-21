@@ -28,6 +28,7 @@ const props = defineProps<{
     };
     classroomSlug: string;
     objectId: number;
+    canShowSolution: boolean;
 }>();
 
 defineOptions({
@@ -585,7 +586,7 @@ const getPgkCellIcon = (
 
                                     <!-- Pembahasan / Solution -->
                                     <div
-                                        v-if="getQuestion(questionId).solution"
+                                        v-if="canShowSolution && getQuestion(questionId).solution"
                                         class="mt-6 rounded-xl border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-900/50 dark:bg-blue-950/20"
                                     >
                                         <div

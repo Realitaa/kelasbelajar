@@ -25,6 +25,8 @@ class ModuleObjectService
                 'description' => $validated['description'] ?? '',
                 'passing_grade' => $validated['passing_grade'] ?? 70,
                 'time_limit' => $validated['time_limit'] ?? 30,
+                'max_attempts' => $validated['max_attempts'] ?? null,
+                'min_attempts_for_solution' => $validated['min_attempts_for_solution'] ?? 1,
                 'created_by' => $userId,
             ]);
         }
@@ -50,6 +52,8 @@ class ModuleObjectService
                 'description' => $validated['description'] ?? '',
                 'passing_grade' => $validated['passing_grade'] ?? 70,
                 'time_limit' => $validated['time_limit'] ?? 30,
+                'max_attempts' => $validated['max_attempts'] ?? null,
+                'min_attempts_for_solution' => $validated['min_attempts_for_solution'] ?? 1,
             ]);
         }
     }

@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
     'created_by',
     'passing_grade',
     'time_limit',
+    'max_attempts',
+    'min_attempts_for_solution',
 ])]
 class Quiz extends Model
 {
@@ -28,7 +30,16 @@ class Quiz extends Model
             'created_by' => 'integer',
             'passing_grade' => 'integer',
             'time_limit' => 'integer',
+            'max_attempts' => 'integer',
+            'min_attempts_for_solution' => 'integer',
         ];
+    }
+
+    public function getAttemptsCount(int $studentId): int
+    {
+        return QuizSubmission::where('quiz_id', $this->id)
+            ->where('student_id', $studentId)
+            ->count();
     }
 
     /**

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm, router } from '@inertiajs/vue3';
-import { ArrowUpDown, Check, Plus } from '@lucide/vue';
+import { ArrowUpDown, Check, Plus, Infinity as InfinityIcon } from '@lucide/vue';
 import type { TreeItem } from '@nuxt/ui';
 import { ref, watch, computed } from 'vue';
 import { VueDraggable } from 'vue-draggable-plus';
@@ -114,7 +114,21 @@ const objectForm = useForm({
     description: '',
     passing_grade: 70,
     time_limit: 30,
+    max_attempts: null as number | null,
+    min_attempts_for_solution: 1,
 });
+
+const isUnlimited = ref(true);
+
+function setUnlimited(val: boolean) {
+    isUnlimited.value = val;
+
+    if (val) {
+        objectForm.max_attempts = null;
+    } else {
+        objectForm.max_attempts = 1;
+    }
+}
 
 const reorderForm = useForm({
     modules: [] as any[],
@@ -165,6 +179,13 @@ function openCreateObject(moduleId: number, type: 'learning_content' | 'quiz') {
     objectForm.id = null;
     objectForm.module_id = moduleId;
     objectForm.type = type;
+
+    if (type === 'quiz') {
+        isUnlimited.value = true;
+        objectForm.max_attempts = null;
+        objectForm.min_attempts_for_solution = 1;
+    }
+
     isObjectModalOpen.value = true;
 }
 
@@ -180,6 +201,16 @@ function openEditObject(objectItem: any) {
         objectForm.description = objectItem.object.description;
         objectForm.passing_grade = objectItem.object.passing_grade;
         objectForm.time_limit = objectItem.object.time_limit || 30;
+
+        if (objectItem.object.max_attempts === null || objectItem.object.max_attempts === undefined) {
+            isUnlimited.value = true;
+            objectForm.max_attempts = null;
+        } else {
+            isUnlimited.value = false;
+            objectForm.max_attempts = objectItem.object.max_attempts;
+        }
+
+        objectForm.min_attempts_for_solution = objectItem.object.min_attempts_for_solution ?? 1;
     }
 
     isObjectModalOpen.value = true;
@@ -734,7 +765,7 @@ function getContextMenuItems(item: any) {
 
         <!-- Modal Objek (Materi/Kuis) -->
         <Dialog v-model:open="isObjectModalOpen">
-            <DialogContent class="sm:max-w-[425px]">
+            <DialogContent class="sm:max-w-106.25">
                 <DialogHeader>
                     <DialogTitle>
                         {{
@@ -807,6 +838,71 @@ function getContextMenuItems(item: any) {
                                 class="text-sm text-red-500"
                             >
                                 {{ objectForm.errors.time_limit }}
+                            </p>
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label :required="!isUnlimited">Batas Percobaan Kuis</Label>
+                            <div class="flex items-center">
+                                <div class="flex -space-x-px rounded-md shadow-xs">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        class="rounded-r-none px-3"
+                                        :class="isUnlimited ? 'bg-accent text-accent-foreground font-bold' : ''"
+                                        @click="setUnlimited(true)"
+                                    >
+                                        <InfinityIcon class="size-4" />
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        class="rounded-l-none px-3"
+                                        :class="!isUnlimited ? 'bg-accent text-accent-foreground font-bold' : ''"
+                                        @click="setUnlimited(false)"
+                                    >
+                                        <span class="text-xs font-semibold">123</span>
+                                    </Button>
+                                </div>
+                                <div class="flex-1 ml-2">
+                                    <Input
+                                        v-if="isUnlimited"
+                                        type="text"
+                                        disabled
+                                        model-value="Tak Terbatas"
+                                        class="bg-muted text-muted-foreground cursor-not-allowed"
+                                    />
+                                    <Input
+                                        v-else
+                                        v-model="objectForm.max_attempts"
+                                        type="number"
+                                        min="1"
+                                        required
+                                        placeholder="Masukkan jumlah percobaan"
+                                    />
+                                </div>
+                            </div>
+                            <p
+                                v-if="objectForm.errors.max_attempts"
+                                class="text-sm text-red-500"
+                            >
+                                {{ objectForm.errors.max_attempts }}
+                            </p>
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label required>Minimal Percobaan untuk Melihat Pembahasan</Label>
+                            <Input
+                                v-model="objectForm.min_attempts_for_solution"
+                                type="number"
+                                min="1"
+                                required
+                            />
+                            <p
+                                v-if="objectForm.errors.min_attempts_for_solution"
+                                class="text-sm text-red-500"
+                            >
+                                {{ objectForm.errors.min_attempts_for_solution }}
                             </p>
                         </div>
                     </template>

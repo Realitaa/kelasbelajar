@@ -21,6 +21,21 @@ class StudentQuizController extends Controller
     {
         Gate::authorize('view', $classroom);
 
+        $hasActiveSession = QuizSession::where('student_id', $request->user()->id)
+            ->where('quiz_id', $quiz->id)
+            ->exists();
+
+        if (! $hasActiveSession && $quiz->max_attempts !== null) {
+            $attemptsCount = $quiz->getAttemptsCount($request->user()->id);
+
+            if ($attemptsCount >= $quiz->max_attempts) {
+                return redirect()->back()->with('toast', [
+                    'type' => 'error',
+                    'message' => 'Batas maksimum percobaan kuis telah tercapai.',
+                ]);
+            }
+        }
+
         $session = $studentQuizService->startSession($classroom, $quiz, $request->user()->id);
 
         if (! $session) {
@@ -110,6 +125,17 @@ class StudentQuizController extends Controller
             'quiz.questions.options' => fn ($q) => $q->withTrashed(),
         ]);
 
+        $attemptsCount = $submission->quiz->getAttemptsCount($request->user()->id);
+        $minAttempts = $submission->quiz->min_attempts_for_solution ?? 1;
+        $canShowSolution = $attemptsCount >= $minAttempts;
+
+        if (! $canShowSolution) {
+            $submission->quiz->questions->each(function ($question) {
+                $question->solution = null;
+                $question->makeHidden('solution');
+            });
+        }
+
         $moduleObject = $submission->quiz->moduleObjects()->first();
 
         return Inertia::render('quizzes/SubmissionDetail', [
@@ -117,6 +143,7 @@ class StudentQuizController extends Controller
             'quiz' => $submission->quiz,
             'classroomSlug' => $moduleObject->module->classroom->slug,
             'objectId' => $moduleObject->id,
+            'canShowSolution' => $canShowSolution,
         ]);
     }
 }

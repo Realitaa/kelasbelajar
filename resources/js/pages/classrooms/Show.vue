@@ -256,7 +256,12 @@ function countTotalLessons() {
                                         }}
                                     </p>
                                 </div>
-                                <div class="shrink-0">
+                                <div v-if="activeObject.object.max_attempts !== null && activeQuizSubmissions.length >= activeObject.object.max_attempts" class="rounded-xl border border-rose-100 bg-rose-50 p-3.5 dark:border-rose-900/50 dark:bg-rose-950/30 flex items-center gap-2">
+                                    <span class="text-xs font-semibold text-rose-800 dark:text-rose-300">
+                                        Batas maksimum percobaan tercapai (Maks: {{ activeObject.object.max_attempts }}).
+                                    </span>
+                                </div>
+                                <div v-else class="shrink-0">
                                     <form
                                         @submit.prevent="
                                             router.post(

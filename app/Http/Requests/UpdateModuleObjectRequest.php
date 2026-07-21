@@ -29,6 +29,8 @@ class UpdateModuleObjectRequest extends FormRequest
             'description' => 'nullable|string',
             'passing_grade' => 'nullable|integer|min:0|max:100',
             'time_limit' => 'nullable|integer|min:1',
+            'max_attempts' => 'nullable|integer|min:1',
+            'min_attempts_for_solution' => 'nullable|integer|min:1',
         ];
     }
 }
