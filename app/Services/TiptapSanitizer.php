@@ -25,24 +25,39 @@ class TiptapSanitizer
      */
     protected function sanitizeNode(array $node): ?array
     {
-        // A valid Tiptap node must have a type
+        // Node Tiptap yang valid wajib memiliki tipe bernilai string
         if (! isset($node['type']) || ! is_string($node['type'])) {
             return null;
         }
 
-        // Sanitize text nodes
+        // 1. Handling Text Node
         if ($node['type'] === 'text') {
+            // Text node wajib memiliki properti 'text' berupa string non-kosong
             if (! isset($node['text']) || ! is_string($node['text']) || $node['text'] === '') {
                 return null;
+            }
+
+            // Sanitisasi marks (seperti bold, italic, link) jika ada
+            if (isset($node['marks']) && is_array($node['marks'])) {
+                $sanitizedMarks = array_values(array_filter($node['marks'], function ($mark) {
+                    return is_array($mark) && isset($mark['type']) && is_string($mark['type']);
+                }));
+
+                if (! empty($sanitizedMarks)) {
+                    $node['marks'] = $sanitizedMarks;
+                } else {
+                    unset($node['marks']);
+                }
             }
 
             return $node;
         }
 
-        // Sanitize children if present
+        // 2. Handling Children (Content)
         if (isset($node['content'])) {
             if (is_array($node['content'])) {
                 $sanitizedContent = [];
+
                 foreach ($node['content'] as $child) {
                     if (is_array($child)) {
                         $sanitizedChild = $this->sanitizeNode($child);
@@ -51,7 +66,15 @@ class TiptapSanitizer
                         }
                     }
                 }
-                $node['content'] = $sanitizedContent;
+
+                // Jika setelah dibersihkan content-nya kosong, hapus key 'content'
+                // Tiptap menerima {"type": "paragraph"} sebagai paragraf kosong yang valid
+                if (empty($sanitizedContent)) {
+                    unset($node['content']);
+                } else {
+                    // Re-index array agar di-encode sebagai JSON Array [...] bukan JSON Object {}
+                    $node['content'] = array_values($sanitizedContent);
+                }
             } else {
                 unset($node['content']);
             }
